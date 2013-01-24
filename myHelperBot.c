@@ -20,10 +20,14 @@ int main(int argc, char *argv[])
   char serialport[256];
   int baudrate = B115200;
   char buf[256];
-  int rc,n = 1000;
+  int rc,n = 50;
 
   fd = serialport_init("/dev/ttyACM0", baudrate);
   if (fd == -1) return -1;
+
+  float sensorDataA, sensorDataB, sensorDataC;
+
+  usleep(n * 1000); // sleep milliseconds
 
   while(1)
   {
@@ -31,7 +35,10 @@ int main(int argc, char *argv[])
 
     serialport_read_until(fd, buf, '\n');
 
-    printf("read: %s\n", buf);
+    sscanf(buf, "%f %f %f", &sensorDataA, &sensorDataB, &sensorDataC);
+
+    printf("raw: %s\n", buf);
+    printf("a %f b %f c %f\n", sensorDataA, sensorDataB, sensorDataC);
   }
 }
 

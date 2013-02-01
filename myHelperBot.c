@@ -33,14 +33,16 @@ int main(int argc, char *argv[])
   {
     usleep(n * 1000); // sleep milliseconds
 
+    serialport_write(fd, "1.0 1.0");
+
     serialport_read_until(fd, buf, '\n');
 
-    sscanf(buf, "%f %f %f", &sensorDataA, &sensorDataB, &sensorDataC);
+    sscanf(buf, "%f", &sensorDataA);
 
     printf("raw: %s\n", buf);
-    printf("a %f b %f c %f\n", sensorDataA, sensorDataB, sensorDataC);
+    printf("a %f\n", sensorDataA);
   }
-}
+})
 
 int serialport_writebyte( int fd, uint8_t b)
 {

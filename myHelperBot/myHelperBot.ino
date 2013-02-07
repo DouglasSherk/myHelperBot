@@ -1,7 +1,7 @@
-#include <NewPing.h>
+#include "NewPing.h"
 #include "MC33926MotorShield.h"
 
-#define SONAR_NUM     6 // Number or sensors.
+#define SONAR_NUM     1 // Number or sensors.
 #define MAX_DISTANCE 200 // Maximum distance (in cm) to ping.
 #define PING_INTERVAL 33 // Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo).
 
@@ -16,7 +16,7 @@ NewPing sonar[SONAR_NUM] = {     // Sensor object array.
   NewPing(44, 45, MAX_DISTANCE),
   NewPing(46, 47, MAX_DISTANCE),
   NewPing(48, 49, MAX_DISTANCE),*/
-  NewPing(9,10, MAX_DISTANCE),
+  NewPing(9, 10, MAX_DISTANCE),
 };
 
 MC33926MotorShield m1(21, 23, 25, 3, 27, 29);
@@ -67,11 +67,11 @@ void oneSensorCycle() { // Sensor ping cycle complete, do something with the res
     }
 
     // parse data
-    sscanf(data[0], "%f %f", &motorA, &motorB);
+    sscanf(data, "%f %f", &motorA, &motorB);
 
     for (uint8_t i = 0; i < SONAR_NUM; i++) {
       Serial.print(cm[i]);
-      if (i != SOLAR_NUM - 1) {
+      if (i != SONAR_NUM - 1) {
         Serial.print(", ");
       }
     }

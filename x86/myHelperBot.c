@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     printf("raw: %s\n", buf);
     printf("a %f\n", sensorDataA);
   }
-})
+}
 
 int serialport_writebyte( int fd, uint8_t b)
 {

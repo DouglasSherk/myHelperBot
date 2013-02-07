@@ -1,5 +1,5 @@
-all: myHelperBot.c
-	gcc -o myHelperBot myHelperBot.c
+all: x86/myHelperBot.c
+	gcc -o myHelperBot.x86 x86/myHelperBot.c
 
 clean:
-	rm myHelperBot
+	rm myHelperBot.x86

@@ -1,80 +1,37 @@
-#include "NewPing.h"
-#include "MC33926MotorShield.h"
+/* 
+ * rosserial::std_msgs::Float64 Test
+ * Receives a Float64 input, subtracts 1.0, and publishes it
+ */
 
-#define SONAR_NUM     1 // Number or sensors.
-#define MAX_DISTANCE 200 // Maximum distance (in cm) to ping.
-#define PING_INTERVAL 33 // Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo).
+#include <ros.h>
+#include <std_msgs/String.h>
 
-unsigned long pingTimer[SONAR_NUM]; // Holds the times when the next ping should happen for each sensor.
-unsigned int cm[SONAR_NUM];         // Where the ping distances are stored.
-uint8_t currentSensor = 0;          // Keeps track of which sensor is active.
+ros::NodeHandle nh;
 
-NewPing sonar[SONAR_NUM] = {     // Sensor object array.
-  /*NewPing(38, 39, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping.
-  NewPing(40, 41, MAX_DISTANCE),
-  NewPing(42, 43, MAX_DISTANCE),
-  NewPing(44, 45, MAX_DISTANCE),
-  NewPing(46, 47, MAX_DISTANCE),
-  NewPing(48, 49, MAX_DISTANCE),*/
-  NewPing(9, 10, MAX_DISTANCE),
-};
+const int ledPin = 13;
+int ledState = LOW;
 
-MC33926MotorShield m1(21, 23, 25, 3, 27, 29);
-MC33926MotorShield m2(20, 22, 24, 2, 26, 28);
-
-void setup() {
-  //bs sart
-  pinMode(8, OUTPUT);
-  pinMode(11, OUTPUT);
-  digitalWrite(8, HIGH);
-  digitalWrite(11, LOW);
-  //bs end
-  
-  Serial.begin(115200);        // connect to the serial port
-  pingTimer[0] = millis() + 75;           // First ping starts at 75ms, gives time for the Arduino to chill before starting.
-  for (uint8_t i = 1; i < SONAR_NUM; i++) // Set the starting time for each sensor.
-    pingTimer[i] = pingTimer[i - 1] + PING_INTERVAL;
+void messageCb(const std_msgs::String& msg) {
+  ledState = (ledState == LOW ? HIGH : LOW);
+  digitalWrite(ledPin, ledState);
 }
 
-void loop () {
-  for (uint8_t i = 0; i < SONAR_NUM; i++) { // Loop through all the sensors.
-    if (millis() >= pingTimer[i]) {         // Is it this sensor's time to ping?
-      pingTimer[i] += PING_INTERVAL * SONAR_NUM;  // Set next time this sensor will be pinged.
-      if (i == 0 && currentSensor == SONAR_NUM - 1) oneSensorCycle(); // Sensor ping cycle complete, do something with the results.
-      sonar[currentSensor].timer_stop();          // Make sure previous timer is canceled before starting a new ping (insurance).
-      currentSensor = i;                          // Sensor being accessed.
-      cm[currentSensor] = 0;                      // Make distance zero in case there's no ping echo for this sensor.
-      sonar[currentSensor].ping_timer(echoCheck); // Do the ping (processing continues, interrupt will call echoCheck to look for echo).
-    }
-  }
-  // The rest of your code would go here.
+std_msgs::String test;
+ros::Subscriber<std_msgs::String> s("chatter", &messageCb);
+ros::Publisher p("my_topic", &test);
+
+void setup()
+{
+  pinMode(13, OUTPUT);
+  nh.initNode();
+  nh.advertise(p);
+  nh.subscribe(s);
 }
 
-void echoCheck() { // If ping received, set the sensor distance to array.
-  if (sonar[currentSensor].check_timer())
-    cm[currentSensor] = sonar[currentSensor].ping_result / US_ROUNDTRIP_CM;
-}
-
-char data[512];
-
-float motorA, motorB;
-
-void oneSensorCycle() { // Sensor ping cycle complete, do something with the results.
-  if (Serial.available() > 0) {
-    int pos = 0;
-    while (Serial.available() > 0) {
-      data[pos++] = Serial.read();
-    }
-
-    // parse data
-    sscanf(data, "%f %f", &motorA, &motorB);
-
-    for (uint8_t i = 0; i < SONAR_NUM; i++) {
-      Serial.print(cm[i]);
-      if (i != SONAR_NUM - 1) {
-        Serial.print(", ");
-      }
-    }
-    Serial.println();
-  }
+void loop()
+{
+  //test.data = 'ham';
+  //p.publish( &test );
+  nh.spinOnce();
+  delay(10);
 }

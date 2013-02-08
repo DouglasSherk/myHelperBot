@@ -51,3 +51,5 @@ if [ ! -z "${ROS_ROOT}" ]; then
     fi
   fi
 fi
+
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/home/bitch/myHelperBot/rosws

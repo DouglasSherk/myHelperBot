@@ -30,6 +30,7 @@
 // %EndTag(ROS_HEADER)%
 // %Tag(MSG_HEADER)%
 #include "std_msgs/String.h"
+#include "std_msgs/Int32.h"
 // %EndTag(MSG_HEADER)%
 
 #include <sstream>
@@ -80,7 +81,8 @@ int main(int argc, char **argv)
    * buffer up before throwing some away.
    */
 // %Tag(PUBLISHER)%
-  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+  ros::Publisher chatter_pub = n.advertise<std_msgs::Int32>("motorA", 1000);
+  ros::Publisher chatter_pub2 = n.advertise<std_msgs::String>("chatter", 1000);
 // %EndTag(PUBLISHER)%
 
 // %Tag(LOOP_RATE)%
@@ -105,10 +107,14 @@ int main(int argc, char **argv)
     std::stringstream ss;
     ss << "hello world " << count;
     msg.data = ss.str();
+
+    std_msgs::Int32 motorA;
+    motorA.data = 200;
 // %EndTag(FILL_MESSAGE)%
 
 // %Tag(ROSCONSOLE)%
-    ROS_INFO("%s", msg.data.c_str());
+    //ROS_INFO("%s", msg.data.c_str());
+    ROS_INFO("%s %d", msg.data.c_str(), motorA.data);
 // %EndTag(ROSCONSOLE)%
 
     /**
@@ -118,7 +124,8 @@ int main(int argc, char **argv)
      * in the constructor above.
      */
 // %Tag(PUBLISH)%
-    chatter_pub.publish(msg);
+    chatter_pub.publish(motorA);
+    chatter_pub2.publish(msg);
 // %EndTag(PUBLISH)%
 
 // %Tag(SPINONCE)%

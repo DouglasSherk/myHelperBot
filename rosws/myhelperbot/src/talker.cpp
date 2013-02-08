@@ -35,6 +35,24 @@
 
 #include <sstream>
 
+int gMotorSpeed = 200;
+
+void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
+{
+  int distances[6];
+  sscanf(msg->data.c_str(), "%d, %d, %d, %d, %d, %d", 
+         &distances[0], &distances[1], &distances[2],
+         &distances[3], &distances[4], &distances[5]);
+
+  gMotorSpeed = 200;
+  for (int i = 0; i < 6; i++) {
+    if (distances[i] > 0 && distances[i] < 10) {
+      gMotorSpeed = 0;
+      break;
+    }
+  }
+}
+
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
@@ -84,6 +102,8 @@ int main(int argc, char **argv)
   ros::Publisher chatter_pub = n.advertise<std_msgs::Int32>("motorA", 1000);
   ros::Publisher chatter_pub2 = n.advertise<std_msgs::String>("chatter", 1000);
 // %EndTag(PUBLISHER)%
+
+  ros::Subscriber sub = n.subscribe("ultrasonic", 1000, ultrasonicCallback);
 
 // %Tag(LOOP_RATE)%
   ros::Rate loop_rate(10);

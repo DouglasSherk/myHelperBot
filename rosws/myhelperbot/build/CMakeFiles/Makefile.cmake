@@ -62,6 +62,7 @@ SET(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/ROSBUILD_gensrv_cpp.dir/DependInfo.cmake"
   "CMakeFiles/ROSBUILD_gensrv_lisp.dir/DependInfo.cmake"
   "CMakeFiles/clean-test-results.dir/DependInfo.cmake"
+  "CMakeFiles/kinect.dir/DependInfo.cmake"
   "CMakeFiles/myhelperbot.dir/DependInfo.cmake"
   "CMakeFiles/rosbuild_precompile.dir/DependInfo.cmake"
   "CMakeFiles/rosbuild_premsgsrvgen.dir/DependInfo.cmake"

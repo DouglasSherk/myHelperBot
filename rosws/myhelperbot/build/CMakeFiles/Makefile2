@@ -205,6 +205,41 @@ clean: CMakeFiles/clean-test-results.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/kinect.dir
+
+# All Build rule for target.
+CMakeFiles/kinect.dir/all: CMakeFiles/rosbuild_precompile.dir/all
+	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/depend
+	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 
+	@echo "Built target kinect"
+.PHONY : CMakeFiles/kinect.dir/all
+
+# Include target in all.
+all: CMakeFiles/kinect.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/kinect.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/kinect.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 0
+.PHONY : CMakeFiles/kinect.dir/rule
+
+# Convenience name for target.
+kinect: CMakeFiles/kinect.dir/rule
+.PHONY : kinect
+
+# clean rule for target.
+CMakeFiles/kinect.dir/clean:
+	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/clean
+.PHONY : CMakeFiles/kinect.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/kinect.dir/clean
+.PHONY : clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/myhelperbot.dir
 
 # All Build rule for target.

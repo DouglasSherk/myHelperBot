@@ -3,6 +3,7 @@
 /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/ROSBUILD_gensrv_cpp.dir
 /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/ROSBUILD_gensrv_lisp.dir
 /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/clean-test-results.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/kinect.dir
 /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/myhelperbot.dir
 /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/rosbuild_precompile.dir
 /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/rosbuild_premsgsrvgen.dir

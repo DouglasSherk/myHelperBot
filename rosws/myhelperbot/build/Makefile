@@ -161,6 +161,19 @@ clean-test-results/fast:
 .PHONY : clean-test-results/fast
 
 #=============================================================================
+# Target rules for targets named kinect
+
+# Build rule for target.
+kinect: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 kinect
+.PHONY : kinect
+
+# fast build rule for target.
+kinect/fast:
+	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/build
+.PHONY : kinect/fast
+
+#=============================================================================
 # Target rules for targets named myhelperbot
 
 # Build rule for target.
@@ -330,6 +343,7 @@ help:
 	@echo "... ROSBUILD_gensrv_lisp"
 	@echo "... clean-test-results"
 	@echo "... edit_cache"
+	@echo "... kinect"
 	@echo "... myhelperbot"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_precompile"

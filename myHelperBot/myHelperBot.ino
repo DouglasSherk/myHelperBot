@@ -29,8 +29,8 @@ NewPing sonar[SONAR_NUM] = {     // Sensor object array.
 
 ros::NodeHandle nh;
 
-MC33926MotorShield m1(21, 23, 25, 3, 27, 29);
-MC33926MotorShield m2(20, 22, 24, 2, 26, 28);
+MC33926MotorShield m1(31, 23, 25, 3, 27, 29);
+MC33926MotorShield m2(30, 22, 24, 2, 26, 28);
 
 const int ledPin = 13;
 int ledState = LOW;
@@ -41,7 +41,7 @@ void messageCb(const std_msgs::String& msg) {
 }
 
 void motorACallback(const std_msgs::Int32& speed) {
-  m1.setSpeed(speed.data);
+  m1.setSpeed(-speed.data);
 }
 
 void motorBCallback(const std_msgs::Int32& speed) {
@@ -85,6 +85,7 @@ void loop() {
     }
   }
   // The rest of your code would go here.
+  nh.spinOnce();
 }
 
 void echoCheck() { // If ping received, set the sensor distance to array.
@@ -95,24 +96,23 @@ void echoCheck() { // If ping received, set the sensor distance to array.
 void oneSensorCycle() { // Sensor ping cycle complete, do something with the results.
   //sprintf(gUltrasonic.data, "");
   
-  //static char buf[512];
-  //buf[0] = 0;
+  static char buf[512];
+  buf[0] = 0;
 
-#if 0  
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     if (buf[0]) {
-      sprintf(buf, "%s, %d", buf, cm[i]);
+      sprintf(&buf[strlen(buf)], ", %d", cm[i]);
     } else {
       sprintf(buf, "%d", cm[i]);
     }
   }
-#endif
   
   //sprintf(gUltrasonic.data, buf);
   
-  //sprintf(gUltrasonic.data, "%d, %d, %d, %d, %d, %d",
+  //sprintf(buf, "%d, %d, %d, %d, %d, %d",
   //        cm[0], cm[1], cm[2], cm[3], cm[4], cm[5]);
-  gUltrasonic.data = "15 15 15 15 15 15";
+  //gUltrasonic.data = "15 15 15 15 15 15";
+  gUltrasonic.data = buf;
   
   ros_pUltrasonic.publish(&gUltrasonic);
   

@@ -23,11 +23,8 @@ void CseKinect::publishPoseData(ros::Publisher *pub_pose_data)
   cse_kinect::PoseData msg;
 
   // Send out the pose data.
-  msg.pose1  = pose1;
-  msg.pose2  = pose2;
-  msg.lVoila = lVoila;
-  msg.rVoila = rVoila;
-  msg.flat   = flat;
+  msg.mStop  = mStop;
+  msg.mGo    = mGo;
   pub_pose_data->publish(msg);
 
   // Reset whether we have found the poses.

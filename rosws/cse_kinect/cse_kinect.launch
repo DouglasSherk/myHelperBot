@@ -10,5 +10,5 @@
     <param name="pub_name_poses" value="cse_pose_data"/>
   </node>  
 
-  <node pkg="rviz" type="rviz" name="rviz" args="-f camera_depth_optical_frame"/>
+  <!-- <node pkg="rviz" type="rviz" name="rviz" args="-f camera_depth_optical_frame"/> -->
 </launch>

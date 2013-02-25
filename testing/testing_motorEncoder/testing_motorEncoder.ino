@@ -1,59 +1,55 @@
-#define ground 8
-#define power 9
-#define Index 10
-#define CHA 11
-#define CHB 12
+#define power1 8
+#define ground1 9
+#define index1 4
+#define power2 10
+#define ground2 11
+#define index2 5
 
 void setup() {
    Serial.begin(38400);
-   pinMode(Index, INPUT);
-   pinMode(CHA, INPUT);
-   pinMode(CHB, INPUT);
-   pinMode(ground, OUTPUT);
-   digitalWrite(ground, LOW);
-   pinMode(power, OUTPUT);
-   digitalWrite(power, HIGH);   
+   pinMode(index1, INPUT);
+   pinMode(ground1, OUTPUT);
+   digitalWrite(ground1, LOW);
+   pinMode(power1, OUTPUT);
+   digitalWrite(power1, HIGH);
+   
+   pinMode(index2, INPUT);
+   pinMode(ground2, OUTPUT);
+   digitalWrite(ground2, LOW);
+   pinMode(power2, OUTPUT);
+   digitalWrite(power2, HIGH);   
 }
 
-  int sumIndex = 0;
-  int sumCHA = 0;
-  int sumCHB = 0;
+  int sumIndex1 = 0;
+  int sumIndex2 = 0;
   
-  int lastIndex = 0;
-  int lastCHA = 0;
-  int lastCHB = 0;
+  int lastIndex1 = 0;
+  int lastIndex2 = 0;
+  
+  int currentIndex1;
+  int currentIndex2;
   
 void loop(){
 
-  int currentIndex = digitalRead(Index);
-  int currentCHA = digitalRead(CHA);
-  int currentCHB = digitalRead(CHB);
+  currentIndex1 = digitalRead(index1);
+  currentIndex2 = digitalRead(index2);
   
-  if (currentIndex != lastIndex) {
-     lastIndex = currentIndex;
-     sumIndex += 1; 
+  if (currentIndex1 != lastIndex1) {
+     lastIndex1 = currentIndex1;
+     sumIndex1 += 1; 
   }
   
-    if (currentCHA != lastCHA) {
-     lastCHA = currentCHA;
-     sumCHA += 1; 
+  if (currentIndex2 != lastIndex2) {
+     lastIndex2 = currentIndex2;
+     sumIndex2 += 1; 
   }
   
-  if (currentCHB != lastCHB) {
-     lastCHB = currentCHB;
-     sumCHB += 1; 
-  }
-  
-  Serial.print("Index: "); 
-  Serial.print(currentIndex);
+  Serial.print("Index1: "); 
+  Serial.print(currentIndex1);
   Serial.print("  ");
-  Serial.print(sumIndex);
-  Serial.print("  CHA: ");
-  Serial.print(currentCHA);
+  Serial.print(sumIndex1);
+  Serial.print("    Index2: "); 
+  Serial.print(currentIndex2);
   Serial.print("  ");
-  Serial.print(sumCHA);
-  Serial.print("  CHB: ");
-  Serial.print(sumCHB);
-  Serial.print("  ");
-  Serial.println(currentCHB);  
+  Serial.println(sumIndex2); 
 }

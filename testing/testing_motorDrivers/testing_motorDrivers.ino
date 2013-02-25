@@ -1,7 +1,7 @@
 #include "MC33926MotorShield.h"
 
-MC33926MotorShield m1(21, 23, 25, 3, 27, 29);
-MC33926MotorShield m2(20, 22, 24, 2, 26, 28);
+MC33926MotorShield m1(31, 23, 25, 3, 27, 29);
+MC33926MotorShield m2(30, 22, 24, 2, 26, 28);
 
 void setup() {
    m1.init();
@@ -27,6 +27,18 @@ void loop() {
       m1.setSpeed(value);
       m2.setSpeed(value);
       Serial.println(value);
-      delay(200);  
+      delay(200);
+   }   
+   for(int value=255; value>-255; value -= 10){
+      m1.setSpeed(value);
+      m2.setSpeed(value);
+      Serial.println(value);
+      delay(200);
    }
+   for(int value=-255; value<0; value += 10){
+      m1.setSpeed(value);
+      m2.setSpeed(value);
+      Serial.println(value);
+      delay(200);
+   }  
 }

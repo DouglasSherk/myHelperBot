@@ -1,61 +1,15 @@
-/*------------------------------------------------------------------------------
- *  Title:        cse_kinect.cpp
- *  Description:  ROS node for subscribing to Kinect skeleton transforms and
- *                finding gestures.
- *----------------------------------------------------------------------------*/
-
-/*
- *
- *    Copyright (c) 2010 <iBotics -- www.sdibotics.org>
- *    All rights reserved.
- *
- *    Redistribution and use in source and binary forms, with or without
- *    modification, are permitted provided that the following conditions are
- *    met:
- *
- *    * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above
- *    copyright notice, this list of conditions and the following disclaimer
- *    in the documentation and/or other materials provided with the
- *    distribution.
- *    * Neither the name of the Stingray, iBotics nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- *    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- *    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
-
 #include "cse_kinect.h"
 
-/*------------------------------------------------------------------------------
- * CseKinect()
- * Constructor.
- *----------------------------------------------------------------------------*/
 
 CseKinect::CseKinect()
 {
+
 } // end CseKinect()
 
 
-/*------------------------------------------------------------------------------
- * ~CseKinect()
- * Destructor.
- *----------------------------------------------------------------------------*/
-
 CseKinect::~CseKinect()
 {
+
 } // end ~CseKinect()
 
 
@@ -66,24 +20,84 @@ CseKinect::~CseKinect()
 
 void CseKinect::publishPoseData(ros::Publisher *pub_pose_data)
 {
-    cse_kinect::PoseData msg;
-  
-    // Send out the pose data.
-    msg.pose1  = pose1;
-    msg.pose2  = pose2;
-    msg.lVoila = lVoila;
-    msg.rVoila = rVoila;
-    msg.flat   = flat;
-    pub_pose_data->publish(msg);
-  
-    // Reset whether we have found the poses.
-    pose1  = false;
-    pose2  = false;
-    lVoila = false;
-    rVoila = false;
-    flat   = false;
+  cse_kinect::PoseData msg;
+
+  // Send out the pose data.
+  msg.pose1  = pose1;
+  msg.pose2  = pose2;
+  msg.lVoila = lVoila;
+  msg.rVoila = rVoila;
+  msg.flat   = flat;
+  pub_pose_data->publish(msg);
+
+  // Reset whether we have found the poses.
+  pose1  = false;
+  pose2  = false;
+  lVoila = false;
+  rVoila = false;
+  flat   = false;
 } // end publishPoseData()
 
+
+/*---------------------------------------------------------------------
+* lookForPoses()
+* Looks for poses in Kinect data.
+* -------------------------------------------------------------------*/
+
+void CseKinect::lookForPoses()
+{
+  try
+  {
+
+  }
+
+  catch (tf::TransformException ex)
+  {
+    if (strstr(ex.what(), "/openni_depth_frame does not exist!") == null)
+      ROS_ERROR("%s", ex.what());
+  }
+} // end lookForPoses()
+
+
+/*---------------------------------------------------------------------
+* main()
+* Main function for ROS node.
+* -------------------------------------------------------------------*/
+
+int main(int argc, char **argv)
+{
+  // Set up ROS.
+  ros::init(argc, argv, "cse_kinect");
+  ros::NodeHandle n;
+
+  // Set up a CseKinect object.
+  CseKinect *cse_kinect = new CseKinect();
+
+  // Set up parameter server variables.
+  ros::NodeHandle pnh("~");
+  int rate = 20;
+  std::string pub_name_poses;
+  pnh.param("pub_name_poses", pub_name_poses, std::string("cse_pose_data"));
+  pnh.param("rate",           rate,           int(20));
+  
+  // Set up a publisher.
+  ros::Publisher pub_pose_data = n.advertise<cse_kinect::PoseData>(pub_name_poses.c_str(), 1);
+
+  // Tell ROS to run this node at the desired rate.
+  ros::Rate r(rate);
+
+  // Main loop.
+  while (n.ok())
+  {
+    cse_kinect->lookForPoses();
+    ros::spinOnce();
+    r.sleep();
+  }
+
+  return 0;
+} // end main()
+
+#if 000
 
 /*---------------------------------------------------------------------
 * lookForPoses()
@@ -262,41 +276,4 @@ void CseKinect::lookForPoses()
     }
 } // end lookForPoses()
 
-
-/*---------------------------------------------------------------------
-* main()
-* Main function for ROS node.
-* -------------------------------------------------------------------*/
-
-int main(int argc, char **argv)
-{
-    // Set up ROS.
-    ros::init(argc, argv, "cse_kinect");
-    ros::NodeHandle n;
-  
-    // Set up a CseKinect object.
-    CseKinect *cse_kinect = new CseKinect();
-  
-    // Set up parameter server variables.
-    ros::NodeHandle pnh("~");
-    int rate = 20;
-    std::string pub_name_poses;
-    pnh.param("pub_name_poses", pub_name_poses, std::string("cse_pose_data"));
-    pnh.param("rate",           rate,           int(20));
-    
-    // Set up a publisher.
-    ros::Publisher pub_pose_data = n.advertise<cse_kinect::PoseData>(pub_name_poses.c_str(), 1);
-  
-    // Tell ROS to run this node at the desired rate.
-    ros::Rate r(rate);
-  
-    // Main loop.
-    while (n.ok())
-    {
-        cse_kinect->lookForPoses();
-        ros::spinOnce();
-        r.sleep();
-    }
-  
-    return 0;
-} // end main()
+#endif

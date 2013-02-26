@@ -43,8 +43,10 @@ void setup() {
     
     // Calibration values. Use the Calibrate example program to get the values for
     // your compass.
-    compass.m_min.x = -548; compass.m_min.y = -604; compass.m_min.z = -491;
-    compass.m_max.x = +344; compass.m_max.y = +294; compass.m_max.z = +483;
+    //compass.m_min.x = -548; compass.m_min.y = -604; compass.m_min.z = -491;
+    //compass.m_max.x = +344; compass.m_max.y = +294; compass.m_max.z = +483;
+    compass.m_min.x = 70; compass.m_min.y = -218; compass.m_min.z = -191;
+    compass.m_max.x = 183; compass.m_max.y = 31; compass.m_max.z = 66;
 }
 
 void loop() {
@@ -67,10 +69,11 @@ void loop() {
     // blink LED to indicate activity
     blinkState = !blinkState;
     digitalWrite(LED_PIN, blinkState);
-    
+
     compass.read();
     int heading = compass.heading((LSM303::vector){0,-1,0});
     Serial.print("\t");
     Serial.print("heading:");
     Serial.println(heading);
+    delay(100);
 }

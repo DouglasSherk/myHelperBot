@@ -4,18 +4,15 @@ import struct
 
 
 class PoseData(roslib.message.Message):
-  _md5sum = "1261c601270ddadfdc36b3c644334171"
+  _md5sum = "652a0a9116dab48c1aaaa7a7a1f63840"
   _type = "cse_kinect/PoseData"
   _has_header = False #flag to mark the presence of a Header object
-  _full_text = """bool pose1
-bool pose2
-bool lVoila
-bool rVoila
-bool flat
+  _full_text = """bool mStop
+bool mGo
 
 """
-  __slots__ = ['pose1','pose2','lVoila','rVoila','flat']
-  _slot_types = ['bool','bool','bool','bool','bool']
+  __slots__ = ['mStop','mGo']
+  _slot_types = ['bool','bool']
 
   def __init__(self, *args, **kwds):
     """
@@ -25,7 +22,7 @@ bool flat
     changes.  You cannot mix in-order arguments and keyword arguments.
     
     The available fields are:
-       pose1,pose2,lVoila,rVoila,flat
+       mStop,mGo
     
     @param args: complete set of field values, in .msg order
     @param kwds: use keyword arguments corresponding to message field names
@@ -34,22 +31,13 @@ bool flat
     if args or kwds:
       super(PoseData, self).__init__(*args, **kwds)
       #message fields cannot be None, assign default values for those that are
-      if self.pose1 is None:
-        self.pose1 = False
-      if self.pose2 is None:
-        self.pose2 = False
-      if self.lVoila is None:
-        self.lVoila = False
-      if self.rVoila is None:
-        self.rVoila = False
-      if self.flat is None:
-        self.flat = False
+      if self.mStop is None:
+        self.mStop = False
+      if self.mGo is None:
+        self.mGo = False
     else:
-      self.pose1 = False
-      self.pose2 = False
-      self.lVoila = False
-      self.rVoila = False
-      self.flat = False
+      self.mStop = False
+      self.mGo = False
 
   def _get_types(self):
     """
@@ -65,7 +53,7 @@ bool flat
     """
     try:
       _x = self
-      buff.write(_struct_5B.pack(_x.pose1, _x.pose2, _x.lVoila, _x.rVoila, _x.flat))
+      buff.write(_struct_2B.pack(_x.mStop, _x.mGo))
     except struct.error as se: self._check_types(se)
     except TypeError as te: self._check_types(te)
 
@@ -79,13 +67,10 @@ bool flat
       end = 0
       _x = self
       start = end
-      end += 5
-      (_x.pose1, _x.pose2, _x.lVoila, _x.rVoila, _x.flat,) = _struct_5B.unpack(str[start:end])
-      self.pose1 = bool(self.pose1)
-      self.pose2 = bool(self.pose2)
-      self.lVoila = bool(self.lVoila)
-      self.rVoila = bool(self.rVoila)
-      self.flat = bool(self.flat)
+      end += 2
+      (_x.mStop, _x.mGo,) = _struct_2B.unpack(str[start:end])
+      self.mStop = bool(self.mStop)
+      self.mGo = bool(self.mGo)
       return self
     except struct.error as e:
       raise roslib.message.DeserializationError(e) #most likely buffer underfill
@@ -101,7 +86,7 @@ bool flat
     """
     try:
       _x = self
-      buff.write(_struct_5B.pack(_x.pose1, _x.pose2, _x.lVoila, _x.rVoila, _x.flat))
+      buff.write(_struct_2B.pack(_x.mStop, _x.mGo))
     except struct.error as se: self._check_types(se)
     except TypeError as te: self._check_types(te)
 
@@ -117,16 +102,13 @@ bool flat
       end = 0
       _x = self
       start = end
-      end += 5
-      (_x.pose1, _x.pose2, _x.lVoila, _x.rVoila, _x.flat,) = _struct_5B.unpack(str[start:end])
-      self.pose1 = bool(self.pose1)
-      self.pose2 = bool(self.pose2)
-      self.lVoila = bool(self.lVoila)
-      self.rVoila = bool(self.rVoila)
-      self.flat = bool(self.flat)
+      end += 2
+      (_x.mStop, _x.mGo,) = _struct_2B.unpack(str[start:end])
+      self.mStop = bool(self.mStop)
+      self.mGo = bool(self.mGo)
       return self
     except struct.error as e:
       raise roslib.message.DeserializationError(e) #most likely buffer underfill
 
 _struct_I = roslib.message.struct_I
-_struct_5B = struct.Struct("<5B")
+_struct_2B = struct.Struct("<2B")

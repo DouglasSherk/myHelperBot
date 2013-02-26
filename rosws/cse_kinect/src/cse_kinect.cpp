@@ -2,6 +2,8 @@
 
 
 CseKinect::CseKinect()
+  : mStop(false),
+    mGo(false)
 {
 
 } // end CseKinect()
@@ -28,11 +30,8 @@ void CseKinect::publishPoseData(ros::Publisher *pub_pose_data)
   pub_pose_data->publish(msg);
 
   // Reset whether we have found the poses.
-  pose1  = false;
-  pose2  = false;
-  lVoila = false;
-  rVoila = false;
-  flat   = false;
+  mStop = false;
+  mGo = false;
 } // end publishPoseData()
 
 
@@ -45,13 +44,20 @@ void CseKinect::lookForPoses()
 {
   try
   {
+    listener.lookupTransform("/openni_depth_frame", "/torso_1", ros::Time(0), tf_torso);
+    x_torso = tf_torso.getOrigin().x();
+    y_torso = tf_torso.getOrigin().y();
 
+    static char buf[512];
+    sprintf(buf, "%f %f\n", x_torso, y_torso);
+    ROS_WARN(buf);
   }
 
   catch (tf::TransformException ex)
   {
-    if (strstr(ex.what(), "/openni_depth_frame does not exist!") == null)
+    if (strstr(ex.what(), "/openni_depth_frame does not exist!") == NULL) {
       ROS_ERROR("%s", ex.what());
+    }
   }
 } // end lookForPoses()
 

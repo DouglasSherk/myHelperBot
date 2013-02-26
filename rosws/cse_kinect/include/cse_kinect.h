@@ -46,6 +46,10 @@ private:
 
   bool mStop;
   bool mGo;
+  bool mTooFar;
+  bool mTooClose;
+  bool mTooClockwise;
+  bool mTooCClockwise;
 
   double x_right_shoulder;
   double y_right_shoulder;

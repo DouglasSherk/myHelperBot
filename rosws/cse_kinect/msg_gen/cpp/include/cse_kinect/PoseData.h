@@ -24,12 +24,20 @@ struct PoseData_ {
   PoseData_()
   : mStop(false)
   , mGo(false)
+  , mTooClose(false)
+  , mTooFar(false)
+  , mTooClockwise(false)
+  , mTooCClockwise(false)
   {
   }
 
   PoseData_(const ContainerAllocator& _alloc)
   : mStop(false)
   , mGo(false)
+  , mTooClose(false)
+  , mTooFar(false)
+  , mTooClockwise(false)
+  , mTooCClockwise(false)
   {
   }
 
@@ -38,6 +46,18 @@ struct PoseData_ {
 
   typedef uint8_t _mGo_type;
   uint8_t mGo;
+
+  typedef uint8_t _mTooClose_type;
+  uint8_t mTooClose;
+
+  typedef uint8_t _mTooFar_type;
+  uint8_t mTooFar;
+
+  typedef uint8_t _mTooClockwise_type;
+  uint8_t mTooClockwise;
+
+  typedef uint8_t _mTooCClockwise_type;
+  uint8_t mTooCClockwise;
 
 
 private:
@@ -48,7 +68,7 @@ public:
   ROS_DEPRECATED const std::string __getDataType() const { return __s_getDataType_(); }
 
 private:
-  static const char* __s_getMD5Sum_() { return "652a0a9116dab48c1aaaa7a7a1f63840"; }
+  static const char* __s_getMD5Sum_() { return "b0bc174e6016dc1293495107c6428485"; }
 public:
   ROS_DEPRECATED static const std::string __s_getMD5Sum() { return __s_getMD5Sum_(); }
 
@@ -57,6 +77,10 @@ public:
 private:
   static const char* __s_getMessageDefinition_() { return "bool mStop\n\
 bool mGo\n\
+bool mTooClose\n\
+bool mTooFar\n\
+bool mTooClockwise\n\
+bool mTooCClockwise\n\
 \n\
 "; }
 public:
@@ -69,6 +93,10 @@ public:
     ros::serialization::OStream stream(write_ptr, 1000000000);
     ros::serialization::serialize(stream, mStop);
     ros::serialization::serialize(stream, mGo);
+    ros::serialization::serialize(stream, mTooClose);
+    ros::serialization::serialize(stream, mTooFar);
+    ros::serialization::serialize(stream, mTooClockwise);
+    ros::serialization::serialize(stream, mTooCClockwise);
     return stream.getData();
   }
 
@@ -77,6 +105,10 @@ public:
     ros::serialization::IStream stream(read_ptr, 1000000000);
     ros::serialization::deserialize(stream, mStop);
     ros::serialization::deserialize(stream, mGo);
+    ros::serialization::deserialize(stream, mTooClose);
+    ros::serialization::deserialize(stream, mTooFar);
+    ros::serialization::deserialize(stream, mTooClockwise);
+    ros::serialization::deserialize(stream, mTooCClockwise);
     return stream.getData();
   }
 
@@ -85,6 +117,10 @@ public:
     uint32_t size = 0;
     size += ros::serialization::serializationLength(mStop);
     size += ros::serialization::serializationLength(mGo);
+    size += ros::serialization::serializationLength(mTooClose);
+    size += ros::serialization::serializationLength(mTooFar);
+    size += ros::serialization::serializationLength(mTooClockwise);
+    size += ros::serialization::serializationLength(mTooCClockwise);
     return size;
   }
 
@@ -116,12 +152,12 @@ template<class ContainerAllocator>
 struct MD5Sum< ::cse_kinect::PoseData_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "652a0a9116dab48c1aaaa7a7a1f63840";
+    return "b0bc174e6016dc1293495107c6428485";
   }
 
   static const char* value(const  ::cse_kinect::PoseData_<ContainerAllocator> &) { return value(); } 
-  static const uint64_t static_value1 = 0x652a0a9116dab48cULL;
-  static const uint64_t static_value2 = 0x1aaaa7a7a1f63840ULL;
+  static const uint64_t static_value1 = 0xb0bc174e6016dc12ULL;
+  static const uint64_t static_value2 = 0x93495107c6428485ULL;
 };
 
 template<class ContainerAllocator>
@@ -140,6 +176,10 @@ struct Definition< ::cse_kinect::PoseData_<ContainerAllocator> > {
   {
     return "bool mStop\n\
 bool mGo\n\
+bool mTooClose\n\
+bool mTooFar\n\
+bool mTooClockwise\n\
+bool mTooCClockwise\n\
 \n\
 ";
   }
@@ -162,6 +202,10 @@ template<class ContainerAllocator> struct Serializer< ::cse_kinect::PoseData_<Co
   {
     stream.next(m.mStop);
     stream.next(m.mGo);
+    stream.next(m.mTooClose);
+    stream.next(m.mTooFar);
+    stream.next(m.mTooClockwise);
+    stream.next(m.mTooCClockwise);
   }
 
   ROS_DECLARE_ALLINONE_SERIALIZER;
@@ -183,6 +227,14 @@ struct Printer< ::cse_kinect::PoseData_<ContainerAllocator> >
     Printer<uint8_t>::stream(s, indent + "  ", v.mStop);
     s << indent << "mGo: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.mGo);
+    s << indent << "mTooClose: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooClose);
+    s << indent << "mTooFar: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooFar);
+    s << indent << "mTooClockwise: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooClockwise);
+    s << indent << "mTooCClockwise: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooCClockwise);
   }
 };
 

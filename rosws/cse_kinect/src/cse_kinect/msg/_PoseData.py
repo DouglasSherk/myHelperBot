@@ -4,15 +4,19 @@ import struct
 
 
 class PoseData(roslib.message.Message):
-  _md5sum = "652a0a9116dab48c1aaaa7a7a1f63840"
+  _md5sum = "b0bc174e6016dc1293495107c6428485"
   _type = "cse_kinect/PoseData"
   _has_header = False #flag to mark the presence of a Header object
   _full_text = """bool mStop
 bool mGo
+bool mTooClose
+bool mTooFar
+bool mTooClockwise
+bool mTooCClockwise
 
 """
-  __slots__ = ['mStop','mGo']
-  _slot_types = ['bool','bool']
+  __slots__ = ['mStop','mGo','mTooClose','mTooFar','mTooClockwise','mTooCClockwise']
+  _slot_types = ['bool','bool','bool','bool','bool','bool']
 
   def __init__(self, *args, **kwds):
     """
@@ -22,7 +26,7 @@ bool mGo
     changes.  You cannot mix in-order arguments and keyword arguments.
     
     The available fields are:
-       mStop,mGo
+       mStop,mGo,mTooClose,mTooFar,mTooClockwise,mTooCClockwise
     
     @param args: complete set of field values, in .msg order
     @param kwds: use keyword arguments corresponding to message field names
@@ -35,9 +39,21 @@ bool mGo
         self.mStop = False
       if self.mGo is None:
         self.mGo = False
+      if self.mTooClose is None:
+        self.mTooClose = False
+      if self.mTooFar is None:
+        self.mTooFar = False
+      if self.mTooClockwise is None:
+        self.mTooClockwise = False
+      if self.mTooCClockwise is None:
+        self.mTooCClockwise = False
     else:
       self.mStop = False
       self.mGo = False
+      self.mTooClose = False
+      self.mTooFar = False
+      self.mTooClockwise = False
+      self.mTooCClockwise = False
 
   def _get_types(self):
     """
@@ -53,7 +69,7 @@ bool mGo
     """
     try:
       _x = self
-      buff.write(_struct_2B.pack(_x.mStop, _x.mGo))
+      buff.write(_struct_6B.pack(_x.mStop, _x.mGo, _x.mTooClose, _x.mTooFar, _x.mTooClockwise, _x.mTooCClockwise))
     except struct.error as se: self._check_types(se)
     except TypeError as te: self._check_types(te)
 
@@ -67,10 +83,14 @@ bool mGo
       end = 0
       _x = self
       start = end
-      end += 2
-      (_x.mStop, _x.mGo,) = _struct_2B.unpack(str[start:end])
+      end += 6
+      (_x.mStop, _x.mGo, _x.mTooClose, _x.mTooFar, _x.mTooClockwise, _x.mTooCClockwise,) = _struct_6B.unpack(str[start:end])
       self.mStop = bool(self.mStop)
       self.mGo = bool(self.mGo)
+      self.mTooClose = bool(self.mTooClose)
+      self.mTooFar = bool(self.mTooFar)
+      self.mTooClockwise = bool(self.mTooClockwise)
+      self.mTooCClockwise = bool(self.mTooCClockwise)
       return self
     except struct.error as e:
       raise roslib.message.DeserializationError(e) #most likely buffer underfill
@@ -86,7 +106,7 @@ bool mGo
     """
     try:
       _x = self
-      buff.write(_struct_2B.pack(_x.mStop, _x.mGo))
+      buff.write(_struct_6B.pack(_x.mStop, _x.mGo, _x.mTooClose, _x.mTooFar, _x.mTooClockwise, _x.mTooCClockwise))
     except struct.error as se: self._check_types(se)
     except TypeError as te: self._check_types(te)
 
@@ -102,13 +122,17 @@ bool mGo
       end = 0
       _x = self
       start = end
-      end += 2
-      (_x.mStop, _x.mGo,) = _struct_2B.unpack(str[start:end])
+      end += 6
+      (_x.mStop, _x.mGo, _x.mTooClose, _x.mTooFar, _x.mTooClockwise, _x.mTooCClockwise,) = _struct_6B.unpack(str[start:end])
       self.mStop = bool(self.mStop)
       self.mGo = bool(self.mGo)
+      self.mTooClose = bool(self.mTooClose)
+      self.mTooFar = bool(self.mTooFar)
+      self.mTooClockwise = bool(self.mTooClockwise)
+      self.mTooCClockwise = bool(self.mTooCClockwise)
       return self
     except struct.error as e:
       raise roslib.message.DeserializationError(e) #most likely buffer underfill
 
 _struct_I = roslib.message.struct_I
-_struct_2B = struct.Struct("<2B")
+_struct_6B = struct.Struct("<6B")

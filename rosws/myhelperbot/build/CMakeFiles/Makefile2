@@ -205,73 +205,73 @@ clean: CMakeFiles/clean-test-results.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/kinect.dir
+# Target rules for target CMakeFiles/myhelperbot_core.dir
 
 # All Build rule for target.
-CMakeFiles/kinect.dir/all: CMakeFiles/rosbuild_precompile.dir/all
-	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/depend
-	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 
-	@echo "Built target kinect"
-.PHONY : CMakeFiles/kinect.dir/all
+CMakeFiles/myhelperbot_core.dir/all: CMakeFiles/rosbuild_precompile.dir/all
+	$(MAKE) -f CMakeFiles/myhelperbot_core.dir/build.make CMakeFiles/myhelperbot_core.dir/depend
+	$(MAKE) -f CMakeFiles/myhelperbot_core.dir/build.make CMakeFiles/myhelperbot_core.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles  1
+	@echo "Built target myhelperbot_core"
+.PHONY : CMakeFiles/myhelperbot_core.dir/all
 
 # Include target in all.
-all: CMakeFiles/kinect.dir/all
+all: CMakeFiles/myhelperbot_core.dir/all
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/kinect.dir/rule: cmake_check_build_system
+CMakeFiles/myhelperbot_core.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/myhelperbot_core.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 0
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/kinect.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 0
-.PHONY : CMakeFiles/kinect.dir/rule
+.PHONY : CMakeFiles/myhelperbot_core.dir/rule
 
 # Convenience name for target.
-kinect: CMakeFiles/kinect.dir/rule
-.PHONY : kinect
+myhelperbot_core: CMakeFiles/myhelperbot_core.dir/rule
+.PHONY : myhelperbot_core
 
 # clean rule for target.
-CMakeFiles/kinect.dir/clean:
-	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/clean
-.PHONY : CMakeFiles/kinect.dir/clean
+CMakeFiles/myhelperbot_core.dir/clean:
+	$(MAKE) -f CMakeFiles/myhelperbot_core.dir/build.make CMakeFiles/myhelperbot_core.dir/clean
+.PHONY : CMakeFiles/myhelperbot_core.dir/clean
 
 # clean rule for target.
-clean: CMakeFiles/kinect.dir/clean
+clean: CMakeFiles/myhelperbot_core.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/myhelperbot.dir
+# Target rules for target CMakeFiles/myhelperbot_file.dir
 
 # All Build rule for target.
-CMakeFiles/myhelperbot.dir/all: CMakeFiles/rosbuild_precompile.dir/all
-	$(MAKE) -f CMakeFiles/myhelperbot.dir/build.make CMakeFiles/myhelperbot.dir/depend
-	$(MAKE) -f CMakeFiles/myhelperbot.dir/build.make CMakeFiles/myhelperbot.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles  1
-	@echo "Built target myhelperbot"
-.PHONY : CMakeFiles/myhelperbot.dir/all
+CMakeFiles/myhelperbot_file.dir/all: CMakeFiles/rosbuild_precompile.dir/all
+	$(MAKE) -f CMakeFiles/myhelperbot_file.dir/build.make CMakeFiles/myhelperbot_file.dir/depend
+	$(MAKE) -f CMakeFiles/myhelperbot_file.dir/build.make CMakeFiles/myhelperbot_file.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles  2
+	@echo "Built target myhelperbot_file"
+.PHONY : CMakeFiles/myhelperbot_file.dir/all
 
 # Include target in all.
-all: CMakeFiles/myhelperbot.dir/all
+all: CMakeFiles/myhelperbot_file.dir/all
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/myhelperbot.dir/rule: cmake_check_build_system
+CMakeFiles/myhelperbot_file.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 1
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/myhelperbot.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/myhelperbot_file.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles 0
-.PHONY : CMakeFiles/myhelperbot.dir/rule
+.PHONY : CMakeFiles/myhelperbot_file.dir/rule
 
 # Convenience name for target.
-myhelperbot: CMakeFiles/myhelperbot.dir/rule
-.PHONY : myhelperbot
+myhelperbot_file: CMakeFiles/myhelperbot_file.dir/rule
+.PHONY : myhelperbot_file
 
 # clean rule for target.
-CMakeFiles/myhelperbot.dir/clean:
-	$(MAKE) -f CMakeFiles/myhelperbot.dir/build.make CMakeFiles/myhelperbot.dir/clean
-.PHONY : CMakeFiles/myhelperbot.dir/clean
+CMakeFiles/myhelperbot_file.dir/clean:
+	$(MAKE) -f CMakeFiles/myhelperbot_file.dir/build.make CMakeFiles/myhelperbot_file.dir/clean
+.PHONY : CMakeFiles/myhelperbot_file.dir/clean
 
 # clean rule for target.
-clean: CMakeFiles/myhelperbot.dir/clean
+clean: CMakeFiles/myhelperbot_file.dir/clean
 .PHONY : clean
 
 #=============================================================================

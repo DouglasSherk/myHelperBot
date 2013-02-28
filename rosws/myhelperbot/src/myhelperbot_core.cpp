@@ -7,6 +7,11 @@
 
 int gMotorSpeed = 200;
 
+void kinectCallback(const std_msgs::String::ConstPtr& msg)
+{
+  ROS_WARN(msg->data.c_str());
+}
+
 void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
 {
   int distances[6];
@@ -29,29 +34,17 @@ int main(int argc, char **argv)
 
   ros::NodeHandle n;
 
-  ros::Publisher pubMotorA = n.advertise<std_msgs::Int32>("motorA", 1000);
-  ros::Publisher pubMotorB = n.advertise<std_msgs::Int32>("motorB", 1000);
+  ros::Publisher pubMotorA = n.advertise<std_msgs::Int32>("motorA", 10);
+  ros::Publisher pubMotorB = n.advertise<std_msgs::Int32>("motorB", 10);
 
-  ros::Subscriber subUltrasonic = n.subscribe("ultrasonic", 1000, ultrasonicCallback);
+  ros::Subscriber subUltrasonic = n.subscribe("ultrasonic", 10, ultrasonicCallback);
+  ros::Subscriber subKinect = n.subscribe("kinect", 10, kinectCallback);
 
   ros::Rate loop_rate(10);
-
-  int count = 0;
-  while (ros::ok())
-  {
-/**
-    std_msgs::String msg;
-
-    std::stringstream ss;
-    ss << "hello world " << count;
-    msg.data = ss.str();
-*/
-
+  while (ros::ok()) {
     std_msgs::Int32 motorA, motorB;
     motorA.data = gMotorSpeed;
     motorB.data = gMotorSpeed;
-    
-    ROS_INFO("motors: %d %d", motorA.data, motorB.data);
 
     pubMotorA.publish(motorA);
     pubMotorB.publish(motorB);
@@ -59,7 +52,6 @@ int main(int argc, char **argv)
     ros::spinOnce();
 
     loop_rate.sleep();
-    ++count;
   }
 
   return 0;

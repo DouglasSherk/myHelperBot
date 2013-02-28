@@ -1,2 +1,2 @@
 #!/bin/sh
-rosrun myhelperbot myhelperbot
+roslaunch myhelperbot myhelperbot.launch

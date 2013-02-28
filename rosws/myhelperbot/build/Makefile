@@ -161,30 +161,30 @@ clean-test-results/fast:
 .PHONY : clean-test-results/fast
 
 #=============================================================================
-# Target rules for targets named kinect
+# Target rules for targets named myhelperbot_core
 
 # Build rule for target.
-kinect: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 kinect
-.PHONY : kinect
+myhelperbot_core: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 myhelperbot_core
+.PHONY : myhelperbot_core
 
 # fast build rule for target.
-kinect/fast:
-	$(MAKE) -f CMakeFiles/kinect.dir/build.make CMakeFiles/kinect.dir/build
-.PHONY : kinect/fast
+myhelperbot_core/fast:
+	$(MAKE) -f CMakeFiles/myhelperbot_core.dir/build.make CMakeFiles/myhelperbot_core.dir/build
+.PHONY : myhelperbot_core/fast
 
 #=============================================================================
-# Target rules for targets named myhelperbot
+# Target rules for targets named myhelperbot_file
 
 # Build rule for target.
-myhelperbot: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 myhelperbot
-.PHONY : myhelperbot
+myhelperbot_file: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 myhelperbot_file
+.PHONY : myhelperbot_file
 
 # fast build rule for target.
-myhelperbot/fast:
-	$(MAKE) -f CMakeFiles/myhelperbot.dir/build.make CMakeFiles/myhelperbot.dir/build
-.PHONY : myhelperbot/fast
+myhelperbot_file/fast:
+	$(MAKE) -f CMakeFiles/myhelperbot_file.dir/build.make CMakeFiles/myhelperbot_file.dir/build
+.PHONY : myhelperbot_file/fast
 
 #=============================================================================
 # Target rules for targets named rosbuild_precompile
@@ -317,19 +317,34 @@ tests/fast:
 .PHONY : tests/fast
 
 # target to build an object file
-src/myhelperbot.o:
-	$(MAKE) -f CMakeFiles/myhelperbot.dir/build.make CMakeFiles/myhelperbot.dir/src/myhelperbot.o
-.PHONY : src/myhelperbot.o
+src/myhelperbot_core.o:
+	$(MAKE) -f CMakeFiles/myhelperbot_core.dir/build.make CMakeFiles/myhelperbot_core.dir/src/myhelperbot_core.o
+.PHONY : src/myhelperbot_core.o
 
 # target to preprocess a source file
-src/myhelperbot.i:
-	$(MAKE) -f CMakeFiles/myhelperbot.dir/build.make CMakeFiles/myhelperbot.dir/src/myhelperbot.i
-.PHONY : src/myhelperbot.i
+src/myhelperbot_core.i:
+	$(MAKE) -f CMakeFiles/myhelperbot_core.dir/build.make CMakeFiles/myhelperbot_core.dir/src/myhelperbot_core.i
+.PHONY : src/myhelperbot_core.i
 
 # target to generate assembly for a file
-src/myhelperbot.s:
-	$(MAKE) -f CMakeFiles/myhelperbot.dir/build.make CMakeFiles/myhelperbot.dir/src/myhelperbot.s
-.PHONY : src/myhelperbot.s
+src/myhelperbot_core.s:
+	$(MAKE) -f CMakeFiles/myhelperbot_core.dir/build.make CMakeFiles/myhelperbot_core.dir/src/myhelperbot_core.s
+.PHONY : src/myhelperbot_core.s
+
+# target to build an object file
+src/myhelperbot_file.o:
+	$(MAKE) -f CMakeFiles/myhelperbot_file.dir/build.make CMakeFiles/myhelperbot_file.dir/src/myhelperbot_file.o
+.PHONY : src/myhelperbot_file.o
+
+# target to preprocess a source file
+src/myhelperbot_file.i:
+	$(MAKE) -f CMakeFiles/myhelperbot_file.dir/build.make CMakeFiles/myhelperbot_file.dir/src/myhelperbot_file.i
+.PHONY : src/myhelperbot_file.i
+
+# target to generate assembly for a file
+src/myhelperbot_file.s:
+	$(MAKE) -f CMakeFiles/myhelperbot_file.dir/build.make CMakeFiles/myhelperbot_file.dir/src/myhelperbot_file.s
+.PHONY : src/myhelperbot_file.s
 
 # Help Target
 help:
@@ -343,8 +358,8 @@ help:
 	@echo "... ROSBUILD_gensrv_lisp"
 	@echo "... clean-test-results"
 	@echo "... edit_cache"
-	@echo "... kinect"
-	@echo "... myhelperbot"
+	@echo "... myhelperbot_core"
+	@echo "... myhelperbot_file"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
@@ -356,9 +371,12 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
-	@echo "... src/myhelperbot.o"
-	@echo "... src/myhelperbot.i"
-	@echo "... src/myhelperbot.s"
+	@echo "... src/myhelperbot_core.o"
+	@echo "... src/myhelperbot_core.i"
+	@echo "... src/myhelperbot_core.s"
+	@echo "... src/myhelperbot_file.o"
+	@echo "... src/myhelperbot_file.i"
+	@echo "... src/myhelperbot_file.s"
 .PHONY : help
 
 

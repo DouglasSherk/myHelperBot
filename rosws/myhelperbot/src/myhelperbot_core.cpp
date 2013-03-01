@@ -5,53 +5,51 @@
 
 #include <sstream>
 
-enum {
-  Speed_None = 0,
-  Speed_Low = 140,
-  Speed_High = 200,
-  Speed_Max = 255,
-};
+const float SPEED_NONE = 0.0;
+const float SPEED_MAX = 100.0;
 
-bool gTooClose = false;
-bool gTooFar = false;
-bool gTooClw = false;
-bool gTooCClw = false;
+const float DISTANCE_MIN = 1.4;
+const float DISTANCE_MAX = 1.6;
 
-int gMotorSpeed = 200;
+const float ROTATION_MIN = -0.2;
+const float ROTATION_MAX = 0.2;
+
+/** Map a rotation of 0.2 to max speed. */
+const float ROTATION_FACTOR = SPEED_MAX / 5.0;
+/** Map a distance of 0.8 to max speed. */
+const float DISTANCE_FACTOR = SPEED_MAX / 5.0;
+
+float gLastDistance = 0.0;
+float gLastRotation = 0.0;
+
+float gDistance = 0.0;
+float gRotation = 0.0;
+
+int gConsecutiveSame = 0;
 
 void kinectCallback(const std_msgs::String::ConstPtr& msg)
 {
   // x: rotation
   // y: elevation
   // z: depth
-  static float lastDistances[3];
   float distances[3];
   sscanf(msg->data.c_str(), "%f, %f, %f",
          &distances[0], &distances[1], &distances[2]);
 
-  if (fabsf(distances[0] - lastDistances[0]) < 0.01 &&
-      fabsf(distances[1] - lastDistances[1]) < 0.01 &&
-      fabsf(distances[2] - lastDistances[2]) < 0.01) {
-    //return;
-  }
-
   ROS_WARN(msg->data.c_str());
 
-  if (distances[0] < -0.20) {
-    gTooClw = true;
-  } else if (distances[0] > 0.20) {
-    gTooCClw = true;
-  }
+  gLastRotation = gRotation;
+  gLastDistance = gDistance;
 
-  if (distances[2] < 1.3) {
-    gTooClose = true;
-  } else if (distances[2] > 1.55) {
-    gTooFar = true;
-  }
+  gRotation = distances[0];
+  gDistance = distances[2];
 
-  lastDistances[0] = distances[0];
-  lastDistances[1] = distances[1];
-  lastDistances[2] = distances[2];
+  if (fabsf(gRotation - gLastRotation) < 0.00001 &&
+      fabsf(gDistance - gLastDistance) < 0.00001) {
+    gConsecutiveSame++;
+  } else {
+    gConsecutiveSame = 0;
+  }
 }
 
 void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
@@ -61,10 +59,9 @@ void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
          &distances[0], &distances[1], &distances[2],
          &distances[3], &distances[4], &distances[5]);
 
-  gMotorSpeed = 200;
   for (int i = 0; i < 6; i++) {
     if (distances[i] > 0 && distances[i] < 30) {
-      gMotorSpeed = 0;
+      // XXX: set speed?
       break;
     }
   }
@@ -72,37 +69,44 @@ void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
 
 void calculateMotorSpeeds(int& motorA, int& motorB)
 {
-  motorA = Speed_None;
-  motorB = Speed_None;
+  motorA = SPEED_NONE;
+  motorB = SPEED_NONE;
 
-  ROS_WARN("%d %d %d %d", gTooFar, gTooClose, gTooClw, gTooCClw);
+  if ((gConsecutiveSame >= 3) ||
+      (gRotation < 0.01 && gDistance < 0.01)) {
+    return;
+  }
 
-  if (gTooClw) {
-    motorA = -Speed_High;
-    motorB = Speed_High;
-  } else if (gTooCClw) {
-    motorA = Speed_High;
-    motorB = -Speed_High;
-  } else if (gTooFar) {
-    motorA = Speed_High;
-    motorB = Speed_High;
-  } else if (gTooClose) {
-    motorA = -Speed_High;
-    motorB = -Speed_High;
+  float rotationGettingCloser = (float) (fabsf(gRotation) < fabsf(gLastRotation));
+  float distanceGettingCloser = (float) (fabsf(gDistance) < fabsf(gLastDistance));
+
+  if (gRotation > ROTATION_MAX) {
+    float propSpeed = 70.0 + (gRotation - ROTATION_MAX) * ROTATION_FACTOR - rotationGettingCloser * 30.0;
+    motorA = (int) propSpeed;
+    motorB = (int) -propSpeed;
+  } else if (gRotation < ROTATION_MIN) {
+    float propSpeed = 70.0 + (ROTATION_MIN - gRotation) * ROTATION_FACTOR - rotationGettingCloser * 30.0;
+    motorA = (int) -propSpeed;
+    motorB = (int) propSpeed;
+  } else if (gDistance > DISTANCE_MAX) {
+    float propSpeed = 70.0 + (gDistance - DISTANCE_MAX) * DISTANCE_FACTOR - distanceGettingCloser * 30.0;
+    motorA = (int) propSpeed * 0.9;
+    motorB = (int) propSpeed;
+  } else if (gDistance < DISTANCE_MIN) {
+    float propSpeed = 70.0 + (DISTANCE_MIN - gDistance) * DISTANCE_FACTOR - distanceGettingCloser * 30.0;
+    motorA = (int) -propSpeed * 0.9;
+    motorB = (int) -propSpeed;
   } 
-}
 
-void resetFlags()
-{
-  gTooFar = false;
-  gTooClose = false;
-  gTooClw = false;
-  gTooCClw = false;
+  if (motorA < -SPEED_MAX) motorA = -SPEED_MAX;
+  else if (motorA > SPEED_MAX) motorA = SPEED_MAX;
+  if (motorB < -SPEED_MAX) motorB = -SPEED_MAX;
+  else if (motorB > SPEED_MAX) motorB = SPEED_MAX;
 }
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "talker");
+  ros::init(argc, argv, "myhelperbot_core");
 
   ros::NodeHandle n;
 
@@ -117,7 +121,8 @@ int main(int argc, char **argv)
     std_msgs::Int32 motorA, motorB;
 
     calculateMotorSpeeds(motorA.data, motorB.data);
-    resetFlags();
+    motorA.data *= 2.55;
+    motorB.data *= 2.55;
 
     pubMotorA.publish(motorA);
     pubMotorB.publish(motorB);

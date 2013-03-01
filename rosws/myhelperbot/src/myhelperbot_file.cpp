@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
   ros::Publisher pubKinect = n.advertise<std_msgs::String>("kinect", 10);
 
-  ros::Rate loop_rate(5);
+  ros::Rate loop_rate(20);
   while (ros::ok()) {
     std_msgs::String kinect;
 

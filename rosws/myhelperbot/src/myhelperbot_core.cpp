@@ -37,10 +37,10 @@ void kinectCallback(const std_msgs::String::ConstPtr& msg)
   // x: rotation
   // y: elevation
   // z: depth
-  int stop, go;
+  int stop, go, save;
   float distances[3];
-  sscanf(msg->data.c_str(), "%i, %i, %f, %f, %f",
-         &stop, &go, &distances[0], &distances[1], &distances[2]);
+  sscanf(msg->data.c_str(), "%i, %i, %i, %f, %f, %f",
+         &stop, &go, &save, &distances[0], &distances[1], &distances[2]);
 
   if (!gStopped && !!stop && ++gConsecutiveStop >= 5) { gStopped = true; gConsecutiveStop = 0; }
   if (gStopped && !!go && ++gConsecutiveGo >= 5) { gStopped = false; gConsecutiveGo = 0; }

@@ -25,6 +25,11 @@ float gLastRotation = 0.0;
 float gDistance = 0.0;
 float gRotation = 0.0;
 
+bool gStopped = false;
+
+int gConsecutiveStop = 0;
+int gConsecutiveGo = 0;
+
 int gConsecutiveSame = 0;
 
 void kinectCallback(const std_msgs::String::ConstPtr& msg)
@@ -32,11 +37,18 @@ void kinectCallback(const std_msgs::String::ConstPtr& msg)
   // x: rotation
   // y: elevation
   // z: depth
+  int stop, go;
   float distances[3];
-  sscanf(msg->data.c_str(), "%f, %f, %f",
-         &distances[0], &distances[1], &distances[2]);
+  sscanf(msg->data.c_str(), "%i, %i, %f, %f, %f",
+         &stop, &go, &distances[0], &distances[1], &distances[2]);
+
+  if (!gStopped && !!stop && ++gConsecutiveStop >= 5) { gStopped = true; gConsecutiveStop = 0; }
+  if (gStopped && !!go && ++gConsecutiveGo >= 5) { gStopped = false; gConsecutiveGo = 0; }
 
   ROS_WARN(msg->data.c_str());
+  char buf[256];
+  sprintf(buf, "%d", gStopped);
+  ROS_WARN(buf);
 
   gLastRotation = gRotation;
   gLastDistance = gDistance;
@@ -73,7 +85,8 @@ void calculateMotorSpeeds(int& motorA, int& motorB)
   motorB = SPEED_NONE;
 
   if ((gConsecutiveSame >= 3) ||
-      (gRotation < 0.01 && gDistance < 0.01)) {
+      (gRotation < 0.01 && gDistance < 0.01) ||
+      gStopped) {
     return;
   }
 

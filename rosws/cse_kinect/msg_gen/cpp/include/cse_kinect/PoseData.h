@@ -22,37 +22,42 @@ struct PoseData_ {
   typedef PoseData_<ContainerAllocator> Type;
 
   PoseData_()
-  : pose1(false)
-  , pose2(false)
-  , lVoila(false)
-  , rVoila(false)
-  , flat(false)
+  : mStop(false)
+  , mGo(false)
+  , mTooClose(false)
+  , mTooFar(false)
+  , mTooClockwise(false)
+  , mTooCClockwise(false)
   {
   }
 
   PoseData_(const ContainerAllocator& _alloc)
-  : pose1(false)
-  , pose2(false)
-  , lVoila(false)
-  , rVoila(false)
-  , flat(false)
+  : mStop(false)
+  , mGo(false)
+  , mTooClose(false)
+  , mTooFar(false)
+  , mTooClockwise(false)
+  , mTooCClockwise(false)
   {
   }
 
-  typedef uint8_t _pose1_type;
-  uint8_t pose1;
+  typedef uint8_t _mStop_type;
+  uint8_t mStop;
 
-  typedef uint8_t _pose2_type;
-  uint8_t pose2;
+  typedef uint8_t _mGo_type;
+  uint8_t mGo;
 
-  typedef uint8_t _lVoila_type;
-  uint8_t lVoila;
+  typedef uint8_t _mTooClose_type;
+  uint8_t mTooClose;
 
-  typedef uint8_t _rVoila_type;
-  uint8_t rVoila;
+  typedef uint8_t _mTooFar_type;
+  uint8_t mTooFar;
 
-  typedef uint8_t _flat_type;
-  uint8_t flat;
+  typedef uint8_t _mTooClockwise_type;
+  uint8_t mTooClockwise;
+
+  typedef uint8_t _mTooCClockwise_type;
+  uint8_t mTooCClockwise;
 
 
 private:
@@ -63,18 +68,19 @@ public:
   ROS_DEPRECATED const std::string __getDataType() const { return __s_getDataType_(); }
 
 private:
-  static const char* __s_getMD5Sum_() { return "1261c601270ddadfdc36b3c644334171"; }
+  static const char* __s_getMD5Sum_() { return "b0bc174e6016dc1293495107c6428485"; }
 public:
   ROS_DEPRECATED static const std::string __s_getMD5Sum() { return __s_getMD5Sum_(); }
 
   ROS_DEPRECATED const std::string __getMD5Sum() const { return __s_getMD5Sum_(); }
 
 private:
-  static const char* __s_getMessageDefinition_() { return "bool pose1\n\
-bool pose2\n\
-bool lVoila\n\
-bool rVoila\n\
-bool flat\n\
+  static const char* __s_getMessageDefinition_() { return "bool mStop\n\
+bool mGo\n\
+bool mTooClose\n\
+bool mTooFar\n\
+bool mTooClockwise\n\
+bool mTooCClockwise\n\
 \n\
 "; }
 public:
@@ -85,33 +91,36 @@ public:
   ROS_DEPRECATED virtual uint8_t *serialize(uint8_t *write_ptr, uint32_t seq) const
   {
     ros::serialization::OStream stream(write_ptr, 1000000000);
-    ros::serialization::serialize(stream, pose1);
-    ros::serialization::serialize(stream, pose2);
-    ros::serialization::serialize(stream, lVoila);
-    ros::serialization::serialize(stream, rVoila);
-    ros::serialization::serialize(stream, flat);
+    ros::serialization::serialize(stream, mStop);
+    ros::serialization::serialize(stream, mGo);
+    ros::serialization::serialize(stream, mTooClose);
+    ros::serialization::serialize(stream, mTooFar);
+    ros::serialization::serialize(stream, mTooClockwise);
+    ros::serialization::serialize(stream, mTooCClockwise);
     return stream.getData();
   }
 
   ROS_DEPRECATED virtual uint8_t *deserialize(uint8_t *read_ptr)
   {
     ros::serialization::IStream stream(read_ptr, 1000000000);
-    ros::serialization::deserialize(stream, pose1);
-    ros::serialization::deserialize(stream, pose2);
-    ros::serialization::deserialize(stream, lVoila);
-    ros::serialization::deserialize(stream, rVoila);
-    ros::serialization::deserialize(stream, flat);
+    ros::serialization::deserialize(stream, mStop);
+    ros::serialization::deserialize(stream, mGo);
+    ros::serialization::deserialize(stream, mTooClose);
+    ros::serialization::deserialize(stream, mTooFar);
+    ros::serialization::deserialize(stream, mTooClockwise);
+    ros::serialization::deserialize(stream, mTooCClockwise);
     return stream.getData();
   }
 
   ROS_DEPRECATED virtual uint32_t serializationLength() const
   {
     uint32_t size = 0;
-    size += ros::serialization::serializationLength(pose1);
-    size += ros::serialization::serializationLength(pose2);
-    size += ros::serialization::serializationLength(lVoila);
-    size += ros::serialization::serializationLength(rVoila);
-    size += ros::serialization::serializationLength(flat);
+    size += ros::serialization::serializationLength(mStop);
+    size += ros::serialization::serializationLength(mGo);
+    size += ros::serialization::serializationLength(mTooClose);
+    size += ros::serialization::serializationLength(mTooFar);
+    size += ros::serialization::serializationLength(mTooClockwise);
+    size += ros::serialization::serializationLength(mTooCClockwise);
     return size;
   }
 
@@ -143,12 +152,12 @@ template<class ContainerAllocator>
 struct MD5Sum< ::cse_kinect::PoseData_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "1261c601270ddadfdc36b3c644334171";
+    return "b0bc174e6016dc1293495107c6428485";
   }
 
   static const char* value(const  ::cse_kinect::PoseData_<ContainerAllocator> &) { return value(); } 
-  static const uint64_t static_value1 = 0x1261c601270ddadfULL;
-  static const uint64_t static_value2 = 0xdc36b3c644334171ULL;
+  static const uint64_t static_value1 = 0xb0bc174e6016dc12ULL;
+  static const uint64_t static_value2 = 0x93495107c6428485ULL;
 };
 
 template<class ContainerAllocator>
@@ -165,11 +174,12 @@ template<class ContainerAllocator>
 struct Definition< ::cse_kinect::PoseData_<ContainerAllocator> > {
   static const char* value() 
   {
-    return "bool pose1\n\
-bool pose2\n\
-bool lVoila\n\
-bool rVoila\n\
-bool flat\n\
+    return "bool mStop\n\
+bool mGo\n\
+bool mTooClose\n\
+bool mTooFar\n\
+bool mTooClockwise\n\
+bool mTooCClockwise\n\
 \n\
 ";
   }
@@ -190,11 +200,12 @@ template<class ContainerAllocator> struct Serializer< ::cse_kinect::PoseData_<Co
 {
   template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
   {
-    stream.next(m.pose1);
-    stream.next(m.pose2);
-    stream.next(m.lVoila);
-    stream.next(m.rVoila);
-    stream.next(m.flat);
+    stream.next(m.mStop);
+    stream.next(m.mGo);
+    stream.next(m.mTooClose);
+    stream.next(m.mTooFar);
+    stream.next(m.mTooClockwise);
+    stream.next(m.mTooCClockwise);
   }
 
   ROS_DECLARE_ALLINONE_SERIALIZER;
@@ -212,16 +223,18 @@ struct Printer< ::cse_kinect::PoseData_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const  ::cse_kinect::PoseData_<ContainerAllocator> & v) 
   {
-    s << indent << "pose1: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.pose1);
-    s << indent << "pose2: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.pose2);
-    s << indent << "lVoila: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.lVoila);
-    s << indent << "rVoila: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.rVoila);
-    s << indent << "flat: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.flat);
+    s << indent << "mStop: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mStop);
+    s << indent << "mGo: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mGo);
+    s << indent << "mTooClose: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooClose);
+    s << indent << "mTooFar: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooFar);
+    s << indent << "mTooClockwise: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooClockwise);
+    s << indent << "mTooCClockwise: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.mTooCClockwise);
   }
 };
 

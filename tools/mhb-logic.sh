@@ -1,2 +1,2 @@
 #!/bin/sh
-rosrun myhelperbot myhelperbot
+roslaunch cse_kinect cse_kinect.launch

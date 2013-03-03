@@ -7,29 +7,34 @@
 ;//! \htmlinclude PoseData.msg.html
 
 (cl:defclass <PoseData> (roslisp-msg-protocol:ros-message)
-  ((pose1
-    :reader pose1
-    :initarg :pose1
+  ((mStop
+    :reader mStop
+    :initarg :mStop
     :type cl:boolean
     :initform cl:nil)
-   (pose2
-    :reader pose2
-    :initarg :pose2
+   (mGo
+    :reader mGo
+    :initarg :mGo
     :type cl:boolean
     :initform cl:nil)
-   (lVoila
-    :reader lVoila
-    :initarg :lVoila
+   (mTooClose
+    :reader mTooClose
+    :initarg :mTooClose
     :type cl:boolean
     :initform cl:nil)
-   (rVoila
-    :reader rVoila
-    :initarg :rVoila
+   (mTooFar
+    :reader mTooFar
+    :initarg :mTooFar
     :type cl:boolean
     :initform cl:nil)
-   (flat
-    :reader flat
-    :initarg :flat
+   (mTooClockwise
+    :reader mTooClockwise
+    :initarg :mTooClockwise
+    :type cl:boolean
+    :initform cl:nil)
+   (mTooCClockwise
+    :reader mTooCClockwise
+    :initarg :mTooCClockwise
     :type cl:boolean
     :initform cl:nil))
 )
@@ -42,45 +47,52 @@
   (cl:unless (cl:typep m 'PoseData)
     (roslisp-msg-protocol:msg-deprecation-warning "using old message class name cse_kinect-msg:<PoseData> is deprecated: use cse_kinect-msg:PoseData instead.")))
 
-(cl:ensure-generic-function 'pose1-val :lambda-list '(m))
-(cl:defmethod pose1-val ((m <PoseData>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:pose1-val is deprecated.  Use cse_kinect-msg:pose1 instead.")
-  (pose1 m))
+(cl:ensure-generic-function 'mStop-val :lambda-list '(m))
+(cl:defmethod mStop-val ((m <PoseData>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:mStop-val is deprecated.  Use cse_kinect-msg:mStop instead.")
+  (mStop m))
 
-(cl:ensure-generic-function 'pose2-val :lambda-list '(m))
-(cl:defmethod pose2-val ((m <PoseData>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:pose2-val is deprecated.  Use cse_kinect-msg:pose2 instead.")
-  (pose2 m))
+(cl:ensure-generic-function 'mGo-val :lambda-list '(m))
+(cl:defmethod mGo-val ((m <PoseData>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:mGo-val is deprecated.  Use cse_kinect-msg:mGo instead.")
+  (mGo m))
 
-(cl:ensure-generic-function 'lVoila-val :lambda-list '(m))
-(cl:defmethod lVoila-val ((m <PoseData>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:lVoila-val is deprecated.  Use cse_kinect-msg:lVoila instead.")
-  (lVoila m))
+(cl:ensure-generic-function 'mTooClose-val :lambda-list '(m))
+(cl:defmethod mTooClose-val ((m <PoseData>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:mTooClose-val is deprecated.  Use cse_kinect-msg:mTooClose instead.")
+  (mTooClose m))
 
-(cl:ensure-generic-function 'rVoila-val :lambda-list '(m))
-(cl:defmethod rVoila-val ((m <PoseData>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:rVoila-val is deprecated.  Use cse_kinect-msg:rVoila instead.")
-  (rVoila m))
+(cl:ensure-generic-function 'mTooFar-val :lambda-list '(m))
+(cl:defmethod mTooFar-val ((m <PoseData>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:mTooFar-val is deprecated.  Use cse_kinect-msg:mTooFar instead.")
+  (mTooFar m))
 
-(cl:ensure-generic-function 'flat-val :lambda-list '(m))
-(cl:defmethod flat-val ((m <PoseData>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:flat-val is deprecated.  Use cse_kinect-msg:flat instead.")
-  (flat m))
+(cl:ensure-generic-function 'mTooClockwise-val :lambda-list '(m))
+(cl:defmethod mTooClockwise-val ((m <PoseData>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:mTooClockwise-val is deprecated.  Use cse_kinect-msg:mTooClockwise instead.")
+  (mTooClockwise m))
+
+(cl:ensure-generic-function 'mTooCClockwise-val :lambda-list '(m))
+(cl:defmethod mTooCClockwise-val ((m <PoseData>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader cse_kinect-msg:mTooCClockwise-val is deprecated.  Use cse_kinect-msg:mTooCClockwise instead.")
+  (mTooCClockwise m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <PoseData>) ostream)
   "Serializes a message object of type '<PoseData>"
-  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'pose1) 1 0)) ostream)
-  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'pose2) 1 0)) ostream)
-  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'lVoila) 1 0)) ostream)
-  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'rVoila) 1 0)) ostream)
-  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'flat) 1 0)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'mStop) 1 0)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'mGo) 1 0)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'mTooClose) 1 0)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'mTooFar) 1 0)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'mTooClockwise) 1 0)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:if (cl:slot-value msg 'mTooCClockwise) 1 0)) ostream)
 )
 (cl:defmethod roslisp-msg-protocol:deserialize ((msg <PoseData>) istream)
   "Deserializes a message object of type '<PoseData>"
-    (cl:setf (cl:slot-value msg 'pose1) (cl:not (cl:zerop (cl:read-byte istream))))
-    (cl:setf (cl:slot-value msg 'pose2) (cl:not (cl:zerop (cl:read-byte istream))))
-    (cl:setf (cl:slot-value msg 'lVoila) (cl:not (cl:zerop (cl:read-byte istream))))
-    (cl:setf (cl:slot-value msg 'rVoila) (cl:not (cl:zerop (cl:read-byte istream))))
-    (cl:setf (cl:slot-value msg 'flat) (cl:not (cl:zerop (cl:read-byte istream))))
+    (cl:setf (cl:slot-value msg 'mStop) (cl:not (cl:zerop (cl:read-byte istream))))
+    (cl:setf (cl:slot-value msg 'mGo) (cl:not (cl:zerop (cl:read-byte istream))))
+    (cl:setf (cl:slot-value msg 'mTooClose) (cl:not (cl:zerop (cl:read-byte istream))))
+    (cl:setf (cl:slot-value msg 'mTooFar) (cl:not (cl:zerop (cl:read-byte istream))))
+    (cl:setf (cl:slot-value msg 'mTooClockwise) (cl:not (cl:zerop (cl:read-byte istream))))
+    (cl:setf (cl:slot-value msg 'mTooCClockwise) (cl:not (cl:zerop (cl:read-byte istream))))
   msg
 )
 (cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<PoseData>)))
@@ -91,18 +103,19 @@
   "cse_kinect/PoseData")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<PoseData>)))
   "Returns md5sum for a message object of type '<PoseData>"
-  "1261c601270ddadfdc36b3c644334171")
+  "b0bc174e6016dc1293495107c6428485")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'PoseData)))
   "Returns md5sum for a message object of type 'PoseData"
-  "1261c601270ddadfdc36b3c644334171")
+  "b0bc174e6016dc1293495107c6428485")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<PoseData>)))
   "Returns full string definition for message of type '<PoseData>"
-  (cl:format cl:nil "bool pose1~%bool pose2~%bool lVoila~%bool rVoila~%bool flat~%~%~%"))
+  (cl:format cl:nil "bool mStop~%bool mGo~%bool mTooClose~%bool mTooFar~%bool mTooClockwise~%bool mTooCClockwise~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'PoseData)))
   "Returns full string definition for message of type 'PoseData"
-  (cl:format cl:nil "bool pose1~%bool pose2~%bool lVoila~%bool rVoila~%bool flat~%~%~%"))
+  (cl:format cl:nil "bool mStop~%bool mGo~%bool mTooClose~%bool mTooFar~%bool mTooClockwise~%bool mTooCClockwise~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <PoseData>))
   (cl:+ 0
+     1
      1
      1
      1
@@ -112,9 +125,10 @@
 (cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <PoseData>))
   "Converts a ROS message object to a list"
   (cl:list 'PoseData
-    (cl:cons ':pose1 (pose1 msg))
-    (cl:cons ':pose2 (pose2 msg))
-    (cl:cons ':lVoila (lVoila msg))
-    (cl:cons ':rVoila (rVoila msg))
-    (cl:cons ':flat (flat msg))
+    (cl:cons ':mStop (mStop msg))
+    (cl:cons ':mGo (mGo msg))
+    (cl:cons ':mTooClose (mTooClose msg))
+    (cl:cons ':mTooFar (mTooFar msg))
+    (cl:cons ':mTooClockwise (mTooClockwise msg))
+    (cl:cons ':mTooCClockwise (mTooCClockwise msg))
 ))

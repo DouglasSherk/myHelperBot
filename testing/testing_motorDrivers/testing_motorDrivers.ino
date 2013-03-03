@@ -23,22 +23,7 @@ void loop() {
    Serial.print(digitalRead(motorR._INV));
    Serial.print("\n");*/
    
-   for(int value=0; value<255; value += 10){
-      motorR.setSpeed(value);
-      motorL.setSpeed(value);
-      Serial.println(value);
-      delay(200);
-   }   
-   for(int value=255; value>-255; value -= 10){
-      motorR.setSpeed(value);
-      motorL.setSpeed(value);
-      Serial.println(value);
-      delay(200);
-   }
-   for(int value=-255; value<0; value += 10){
-      motorR.setSpeed(value);
-      motorL.setSpeed(value);
-      Serial.println(value);
-      delay(200);
-   }  
+      motorR.setPWM(180);
+      motorL.setPWM(-180);
+
 }

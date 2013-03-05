@@ -47,8 +47,8 @@ void MC33926MotorShield::init() {
     digitalWrite(_EN, HIGH);
 }
 
-// Set speed for motor, speed is a number betwenn -400 and 400
-void MC33926MotorShield::setSpeed(int speed) {
+// Set speed for motor, speed is a number betwenn -255 and 255
+void MC33926MotorShield::setPWM(int speed) {
     unsigned char reverse = 0;
     if(speed < 0){
         speed = -speed;

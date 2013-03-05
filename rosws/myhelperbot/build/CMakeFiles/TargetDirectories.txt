@@ -1,0 +1,17 @@
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/ROSBUILD_genmsg_cpp.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/ROSBUILD_genmsg_lisp.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/ROSBUILD_gensrv_cpp.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/ROSBUILD_gensrv_lisp.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/clean-test-results.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/myhelperbot_core.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/myhelperbot_file.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/rosbuild_precompile.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/rosbuild_premsgsrvgen.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/rospack_genmsg.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/rospack_genmsg_libexe.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/rospack_gensrv.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/test.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/test-future.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/test-results.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/test-results-run.dir
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/build/CMakeFiles/tests.dir

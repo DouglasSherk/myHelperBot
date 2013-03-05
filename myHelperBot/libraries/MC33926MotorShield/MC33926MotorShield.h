@@ -24,7 +24,7 @@ class MC33926MotorShield
     
         //PUBLIC METHODS
         void init();
-        void setSpeed(int speed);
+        void setPWM(int speed);
 
         //private:
         unsigned char _D1;

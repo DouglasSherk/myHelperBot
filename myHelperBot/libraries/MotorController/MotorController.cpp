@@ -1,4 +1,4 @@
-f//
+//
 //  MotorController.cpp
 //  
 //
@@ -14,7 +14,7 @@ MotorController::MotorController(int D1, int D2, int IN1, int IN2, int INV, int 
 
 void MotorController::init() {
     _ms.init();
-    _en.init();f
+    _en.init();
 }
 
 // Update the requested MotorController speed in ticks/second
@@ -48,7 +48,7 @@ void MotorController::adjustPWM(int timeElapsed) {
     /*Serial.print("\tcurSpeed: ");
     Serial.println(_currentSpeed);*/
     
-    int correction = abs((_currentSpeed-_speed)/100);
+    int correction = abs((_currentSpeed-_speed)/100); ///100
     
     if(_currentSpeed > _speed) {
         _pwmValue -= correction;

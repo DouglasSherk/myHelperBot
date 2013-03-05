@@ -13,6 +13,7 @@ Encoder::Encoder() {
     _GR = 9;
     _IN = 4;
     _sumIndex=0;
+    _lastSumIndex=0;
     _lastIndex=0;
 }
 
@@ -22,6 +23,7 @@ Encoder::Encoder(unsigned char VIN, unsigned char GR, unsigned char IN) {
     _GR = GR;
     _IN = IN;
     _sumIndex=0;
+    _lastSumIndex=0;
     _lastIndex=0;
 }
 
@@ -32,10 +34,11 @@ void Encoder::init() {
     pinMode(_VIN, OUTPUT);
     digitalWrite(_VIN, HIGH);
     _sumIndex = 0L;
+    _lastSumIndex = 0L;
     _lastIndex = 0L;
 }
 
-// Update the encoder value
+// Update the encoder valuege
 void Encoder::updateIndex(bool forward = true) {
     int currentIndex = digitalRead(_IN);
     
@@ -50,6 +53,14 @@ void Encoder::updateIndex(bool forward = true) {
     }
 }
 
+// Get the total number of counts
 long Encoder::getIndex() {
     return _sumIndex;
+}
+
+// Get the number of counts since the last time this function was called.
+long Encoder::getDeltaIndex() {
+    long d = _sumIndex - _lastSumIndex;
+    _lastSumIndex = _sumIndex;
+    return d;
 }

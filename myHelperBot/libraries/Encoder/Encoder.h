@@ -22,14 +22,15 @@ class Encoder
         void init();
         void updateIndex(bool forward);
         long getIndex();
+        long getDeltaIndex();
 
         //private:
         unsigned char _VIN;
         unsigned char _GR;
         unsigned char _IN;
         long _sumIndex;
+        long _lastSumIndex;
         long _lastIndex;
-    
 };
 
 #endif

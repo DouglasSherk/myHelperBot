@@ -9,7 +9,7 @@
 #ifndef _MotorController_h
 #define _MotorController_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <Encoder.h>
 #include <MC33926MotorShield.h>
 #include <Timer.h>

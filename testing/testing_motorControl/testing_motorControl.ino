@@ -1,8 +1,8 @@
+#include "MotorController.h"
 
 #include "Timer.h"
 Timer t;
 
-#include "MotorController.h"
 //have to include MotorController includes here as well
 #include "Encoder.h"
 #include "MC33926MotorShield.h"
@@ -17,8 +17,8 @@ void setup() {
    pinMode(13, OUTPUT);
    t.every(100,test);
    //t.every(1000,printSpeedData);
-   mcL.setSpeed(2500);
-   mcR.setSpeed(-2500);
+   mcL.setSpeed(1000);
+   mcR.setSpeed(-1000);
 }
 
 int count = 0;

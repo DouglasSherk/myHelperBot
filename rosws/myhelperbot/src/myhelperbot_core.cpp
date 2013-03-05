@@ -81,11 +81,16 @@ void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
 
 void calculateMotorSpeeds(int& motorA, int& motorB)
 {
+  // XXX: Remove these when we have motor speed control working.
+  const float MIN_SPEED = 80.0, CLOSE_SPEED = 30.0;
+
+  static int prevSpeed[2];
+
   motorA = SPEED_NONE;
   motorB = SPEED_NONE;
 
-  if ((gConsecutiveSame >= 3) ||
-      (gRotation < 0.01 && gDistance < 0.01) ||
+  if ((gConsecutiveSame >= 4) ||
+      (fabsf(gRotation) < 0.01 && fabsf(gDistance) < 0.01) ||
       gStopped) {
     return;
   }
@@ -94,27 +99,34 @@ void calculateMotorSpeeds(int& motorA, int& motorB)
   float distanceGettingCloser = (float) (fabsf(gDistance) < fabsf(gLastDistance));
 
   if (gRotation > ROTATION_MAX) {
-    float propSpeed = 70.0 + (gRotation - ROTATION_MAX) * ROTATION_FACTOR - rotationGettingCloser * 30.0;
+    float propSpeed = MIN_SPEED + (gRotation - ROTATION_MAX) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
     motorA = (int) propSpeed;
     motorB = (int) -propSpeed;
   } else if (gRotation < ROTATION_MIN) {
-    float propSpeed = 70.0 + (ROTATION_MIN - gRotation) * ROTATION_FACTOR - rotationGettingCloser * 30.0;
+    float propSpeed = MIN_SPEED + (ROTATION_MIN - gRotation) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
     motorA = (int) -propSpeed;
     motorB = (int) propSpeed;
   } else if (gDistance > DISTANCE_MAX) {
-    float propSpeed = 70.0 + (gDistance - DISTANCE_MAX) * DISTANCE_FACTOR - distanceGettingCloser * 30.0;
+    float propSpeed = MIN_SPEED + (gDistance - DISTANCE_MAX) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
     motorA = (int) propSpeed * 0.9;
     motorB = (int) propSpeed;
   } else if (gDistance < DISTANCE_MIN) {
-    float propSpeed = 70.0 + (DISTANCE_MIN - gDistance) * DISTANCE_FACTOR - distanceGettingCloser * 30.0;
+    float propSpeed = MIN_SPEED + (DISTANCE_MIN - gDistance) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
     motorA = (int) -propSpeed * 0.9;
     motorB = (int) -propSpeed;
   } 
+
+  // Max out throttle on start from stop.
+  // XXX: Remove these when we have motor speed control working.
+  if (prevSpeed[0] == 0 && prevSpeed[1] == 0 && motorA != 0 && motorB != 0) { motorA *= 999; motorB *= 999; }
 
   if (motorA < -SPEED_MAX) motorA = -SPEED_MAX;
   else if (motorA > SPEED_MAX) motorA = SPEED_MAX;
   if (motorB < -SPEED_MAX) motorB = -SPEED_MAX;
   else if (motorB > SPEED_MAX) motorB = SPEED_MAX;
+
+  prevSpeed[0] = motorA;
+  prevSpeed[1] = motorB;
 }
 
 int main(int argc, char **argv)
@@ -136,6 +148,10 @@ int main(int argc, char **argv)
     calculateMotorSpeeds(motorA.data, motorB.data);
     motorA.data *= 2.55;
     motorB.data *= 2.55;
+
+    char buf[256];
+    sprintf(buf, "Speeds: %d %d", motorA.data, motorB.data);
+    ROS_WARN(buf);
 
     pubMotorA.publish(motorA);
     pubMotorB.publish(motorB);

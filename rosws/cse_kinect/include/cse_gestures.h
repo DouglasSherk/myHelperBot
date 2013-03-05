@@ -17,9 +17,14 @@ public:
 
   //! Callback function to send out pose information.
   void poseDataCallback(const cse_kinect::PoseData::ConstPtr &msg);
+  void ultrasonicCallback(const std_msgs::String::ConstPtr &msg);
 
   bool mStop;
   bool mGo;
+  bool mTooFar;
+  bool mTooClose;
+  bool mTooClockwise;
+  bool mTooCClockwise;
 };
 
 #endif // CSEGESTURES_H

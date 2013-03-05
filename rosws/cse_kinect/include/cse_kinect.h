@@ -42,9 +42,14 @@ private:
   tf::StampedTransform tf_right_knee;
   tf::StampedTransform tf_left_knee;
   tf::StampedTransform tf_head;
+  tf::StampedTransform tf_torso;
 
   bool mStop;
   bool mGo;
+  bool mTooFar;
+  bool mTooClose;
+  bool mTooClockwise;
+  bool mTooCClockwise;
 
   double x_right_shoulder;
   double y_right_shoulder;
@@ -74,6 +79,8 @@ private:
   double y_left_knee;
   double x_head;
   double y_head;
+  double x_torso;
+  double y_torso;
 };
 
 #endif // CSEKINECT_H

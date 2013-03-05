@@ -2,6 +2,12 @@
 
 
 CseKinect::CseKinect()
+  : mStop(false),
+    mGo(false),
+    mTooFar(false),
+    mTooClose(false),
+    mTooClockwise(false),
+    mTooCClockwise(false)
 {
 
 } // end CseKinect()
@@ -23,16 +29,21 @@ void CseKinect::publishPoseData(ros::Publisher *pub_pose_data)
   cse_kinect::PoseData msg;
 
   // Send out the pose data.
-  msg.mStop  = mStop;
-  msg.mGo    = mGo;
+  msg.mStop = mStop;
+  msg.mGo = mGo;
+  msg.mTooFar = mTooFar;
+  msg.mTooClose = mTooClose;
+  msg.mTooClockwise = mTooClockwise;
+  msg.mTooCClockwise = mTooCClockwise;
   pub_pose_data->publish(msg);
 
   // Reset whether we have found the poses.
-  pose1  = false;
-  pose2  = false;
-  lVoila = false;
-  rVoila = false;
-  flat   = false;
+  mStop = false;
+  mGo = false;
+  mTooFar = false;
+  mTooClose = false;
+  mTooClockwise = false;
+  mTooCClockwise = false;
 } // end publishPoseData()
 
 
@@ -45,13 +56,36 @@ void CseKinect::lookForPoses()
 {
   try
   {
+    listener.lookupTransform("/openni_depth_frame", "/torso_1", ros::Time(0), tf_torso);
+    x_torso = tf_torso.getOrigin().x();
+    y_torso = tf_torso.getOrigin().y();
 
+    //static char buf[512];
+    //sprintf(buf, "%f %f\n", x_torso, y_torso);
+    //ROS_WARN(buf);
+
+    if (x_torso < 1.00) {
+      ROS_WARN("too close");
+      mTooClose = true;
+    } else if (x_torso > 1.75) {
+      ROS_WARN("too far");
+      mTooFar = true;
+    }
+
+    if (y_torso < -0.5) {
+      ROS_WARN("too clockwise");
+      mTooClockwise = true;
+    } else if (y_torso > 0.5) {
+      ROS_WARN("too cclockwise");
+      mTooCClockwise = true;
+    }
   }
 
   catch (tf::TransformException ex)
   {
-    if (strstr(ex.what(), "/openni_depth_frame does not exist!") == null)
+    if (strstr(ex.what(), "/openni_depth_frame does not exist!") == NULL) {
       ROS_ERROR("%s", ex.what());
+    }
   }
 } // end lookForPoses()
 
@@ -74,11 +108,11 @@ int main(int argc, char **argv)
   ros::NodeHandle pnh("~");
   int rate = 20;
   std::string pub_name_poses;
-  pnh.param("pub_name_poses", pub_name_poses, std::string("cse_pose_data"));
+  pnh.param("pub_name_poses", pub_name_poses, std::string("poseData"));
   pnh.param("rate",           rate,           int(20));
   
   // Set up a publisher.
-  ros::Publisher pub_pose_data = n.advertise<cse_kinect::PoseData>(pub_name_poses.c_str(), 1);
+  ros::Publisher pub_pose_data = n.advertise<cse_kinect::PoseData>("poseData", 1);
 
   // Tell ROS to run this node at the desired rate.
   ros::Rate r(rate);
@@ -87,6 +121,7 @@ int main(int argc, char **argv)
   while (n.ok())
   {
     cse_kinect->lookForPoses();
+    cse_kinect->publishPoseData(&pub_pose_data);
     ros::spinOnce();
     r.sleep();
   }

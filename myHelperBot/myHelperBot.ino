@@ -1,13 +1,8 @@
-/* 
- * rosserial::std_msgs::Float64 Test
- * Receives a Float64 input, subtracts 1.0, and publishes it
- */
-
 #include <ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Int32.h>
 
-#include "MC33926MotorShield.h"
+#include "MotorController.h"
 #include "NewPing.h"
 
 #define SONAR_NUM     6 // Number or sensors.
@@ -29,45 +24,31 @@ NewPing sonar[SONAR_NUM] = {     // Sensor object array.
 
 ros::NodeHandle nh;
 
-MC33926MotorShield m1(31, 23, 25, 3, 27, 29);
-MC33926MotorShield m2(30, 22, 24, 2, 26, 28);
+MotorController mcL(30, 22, 24, 2, 26, 28, 10, 11, 5);
+MotorController mcR(31, 23, 25, 3, 27, 29, 8, 9, 4);
 
-const int ledPin = 13;
-int ledState = LOW;
-
-void messageCb(const std_msgs::String& msg) {
-  ledState = (ledState == LOW ? HIGH : LOW);
-  digitalWrite(ledPin, ledState);
+void motorRCallback(const std_msgs::Int32& speed) {
+  mcR.setSpeed(-speed.data);
 }
 
-void motorACallback(const std_msgs::Int32& speed) {
-  m1.setSpeed(-speed.data);
+void motorLCallback(const std_msgs::Int32& speed) {
+  mcL.setSpeed(speed.data);
 }
 
-void motorBCallback(const std_msgs::Int32& speed) {
-  m2.setSpeed(speed.data);
-}
-
-std_msgs::String test;
 std_msgs::String gUltrasonic;
-ros::Subscriber<std_msgs::String> s("chatter", &messageCb);
-ros::Subscriber<std_msgs::Int32> ros_sMotorA("motorA", &motorACallback);
-ros::Subscriber<std_msgs::Int32> ros_sMotorB("motorB", &motorBCallback);
-ros::Publisher p("my_topic", &test);
+ros::Subscriber<std_msgs::Int32> ros_sMotorR("motorR", &motorRCallback);
+ros::Subscriber<std_msgs::Int32> ros_sMotorL("motorL", &motorLCallback);
 ros::Publisher ros_pUltrasonic("ultrasonic", &gUltrasonic);
 
 void setup()
 {
-  m1.init();
-  m2.init();
-  pinMode(13, OUTPUT);
+  mcR.init();
+  mcL.init();
   nh.initNode();
-  nh.advertise(p);
   nh.advertise(ros_pUltrasonic);
-  nh.subscribe(s);
-  nh.subscribe(ros_sMotorA);
-  nh.subscribe(ros_sMotorB);
-  
+  nh.subscribe(ros_sMotorR);
+  nh.subscribe(ros_sMotorL);
+
   pingTimer[0] = millis() + 75;           // First ping starts at 75ms, gives time for the Arduino to chill before starting.
   for (uint8_t i = 1; i < SONAR_NUM; i++) // Set the starting time for each sensor.
     pingTimer[i] = pingTimer[i - 1] + PING_INTERVAL;
@@ -94,8 +75,6 @@ void echoCheck() { // If ping received, set the sensor distance to array.
 }
 
 void oneSensorCycle() { // Sensor ping cycle complete, do something with the results.
-  //sprintf(gUltrasonic.data, "");
-  
   static char buf[512];
   buf[0] = 0;
 
@@ -106,16 +85,8 @@ void oneSensorCycle() { // Sensor ping cycle complete, do something with the res
       sprintf(buf, "%d", cm[i]);
     }
   }
-  
-  //sprintf(gUltrasonic.data, buf);
-  
-  //sprintf(buf, "%d, %d, %d, %d, %d, %d",
-  //        cm[0], cm[1], cm[2], cm[3], cm[4], cm[5]);
-  //gUltrasonic.data = "15 15 15 15 15 15";
+
   gUltrasonic.data = buf;
-  
+
   ros_pUltrasonic.publish(&gUltrasonic);
-  
-  ledState = (ledState == LOW ? HIGH : LOW);
-  digitalWrite(ledPin, ledState);
 }

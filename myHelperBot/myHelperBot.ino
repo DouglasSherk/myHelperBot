@@ -2,6 +2,9 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Int32.h>
 
+#include "MC33926MotorShield.h"
+#include "Encoder.h"
+
 #include "MotorController.h"
 #include "NewPing.h"
 
@@ -79,8 +82,8 @@ void loop() {
 
   // Motor timed code.
   if (time - gMotorTimer > MOTOR_INTERVAL) {
-    mcR.periodicUpdate(MOTOR_INTERVAL);
-    mcL.periodicUpdate(MOTOR_INTERVAL);
+    mcR.periodicUpdate(time - gMotorTime);
+    mcL.periodicUpdate(time - gMotorTime);
     gMotorTimer = time;
   }
 

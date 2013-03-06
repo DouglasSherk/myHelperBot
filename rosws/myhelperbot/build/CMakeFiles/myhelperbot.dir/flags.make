@@ -6,5 +6,5 @@ CXX_FLAGS = -O2 -g -I/home/myhelperbot/myHelperBot/rosws/myhelperbot/include -I/
 
 CXX_DEFINES = 
 
-# TARGET_FLAGS = -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread
+# TARGET_FLAGS = -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread
 

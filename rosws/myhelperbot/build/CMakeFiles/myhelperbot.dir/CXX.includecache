@@ -16,6 +16,20 @@ std_msgs/Int32.h
 sstream
 -
 
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/src/myhelperbot_file.cpp
+ros/ros.h
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/src/ros/ros.h
+std_msgs/String.h
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/src/std_msgs/String.h
+std_msgs/Int32.h
+/home/myhelperbot/myHelperBot/rosws/myhelperbot/src/std_msgs/Int32.h
+stdio.h
+-
+stdlib.h
+-
+sstream
+-
+
 /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/include/ros/advertise_options.h
 ros/forwards.h
 /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/include/ros/ros/forwards.h

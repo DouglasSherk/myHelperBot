@@ -6,7 +6,7 @@
 #include <sstream>
 
 const float SPEED_NONE = 0.0;
-const float SPEED_MAX = 100.0;
+const float SPEED_MAX = 2500.0;
 
 const float DISTANCE_MIN = 1.4;
 const float DISTANCE_MAX = 1.6;
@@ -14,9 +14,9 @@ const float DISTANCE_MAX = 1.6;
 const float ROTATION_MIN = -0.2;
 const float ROTATION_MAX = 0.2;
 
-/** Map a rotation of 0.2 to max speed. */
+/** Map a rotation of 5.0 to max speed. */
 const float ROTATION_FACTOR = SPEED_MAX / 5.0;
-/** Map a distance of 0.8 to max speed. */
+/** Map a distance of 5.0 to max speed. */
 const float DISTANCE_FACTOR = SPEED_MAX / 5.0;
 
 float gLastDistance = 0.0;
@@ -82,7 +82,7 @@ void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
 void calculateMotorSpeeds(int& motorR, int& motorL)
 {
   // XXX: Remove these when we have motor speed control working.
-  const float MIN_SPEED = 80.0, CLOSE_SPEED = 30.0;
+  const float MIN_SPEED = 1000.0, CLOSE_SPEED = 500.0;
 
   static int prevSpeed[2];
 
@@ -146,8 +146,6 @@ int main(int argc, char **argv)
     std_msgs::Int32 motorR, motorL;
 
     calculateMotorSpeeds(motorR.data, motorL.data);
-    motorR.data *= 2.55;
-    motorL.data *= 2.55;
 
     char buf[256];
     sprintf(buf, "Speeds: %d %d", motorR.data, motorL.data);

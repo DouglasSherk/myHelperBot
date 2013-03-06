@@ -1,0 +1,10 @@
+<package>
+  <description brief="myHelperBot">
+    myHelperBot
+  </description>
+  <author>myhelperbot</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/myHelperBot</url>
+
+</package>

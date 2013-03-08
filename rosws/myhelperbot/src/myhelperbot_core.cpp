@@ -6,7 +6,7 @@
 #include <sstream>
 
 const float SPEED_NONE = 0.0;
-const float SPEED_MAX = 100.0;
+const float SPEED_MAX = 2500.0;
 
 const float DISTANCE_MIN = 1.4;
 const float DISTANCE_MAX = 1.6;
@@ -14,9 +14,9 @@ const float DISTANCE_MAX = 1.6;
 const float ROTATION_MIN = -0.2;
 const float ROTATION_MAX = 0.2;
 
-/** Map a rotation of 0.2 to max speed. */
+/** Map a rotation of 5.0 to max speed. */
 const float ROTATION_FACTOR = SPEED_MAX / 5.0;
-/** Map a distance of 0.8 to max speed. */
+/** Map a distance of 5.0 to max speed. */
 const float DISTANCE_FACTOR = SPEED_MAX / 5.0;
 
 float gLastDistance = 0.0;
@@ -79,15 +79,15 @@ void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
   }
 }
 
-void calculateMotorSpeeds(int& motorA, int& motorB)
+void calculateMotorSpeeds(int& motorR, int& motorL)
 {
   // XXX: Remove these when we have motor speed control working.
-  const float MIN_SPEED = 80.0, CLOSE_SPEED = 30.0;
+  const float MIN_SPEED = 1000.0, CLOSE_SPEED = 500.0;
 
   static int prevSpeed[2];
 
-  motorA = SPEED_NONE;
-  motorB = SPEED_NONE;
+  motorR = SPEED_NONE;
+  motorL = SPEED_NONE;
 
   if ((gConsecutiveSame >= 4) ||
       (fabsf(gRotation) < 0.01 && fabsf(gDistance) < 0.01) ||
@@ -100,33 +100,33 @@ void calculateMotorSpeeds(int& motorA, int& motorB)
 
   if (gRotation > ROTATION_MAX) {
     float propSpeed = MIN_SPEED + (gRotation - ROTATION_MAX) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
-    motorA = (int) propSpeed;
-    motorB = (int) -propSpeed;
+    motorR = (int) propSpeed;
+    motorL = (int) -propSpeed;
   } else if (gRotation < ROTATION_MIN) {
     float propSpeed = MIN_SPEED + (ROTATION_MIN - gRotation) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
-    motorA = (int) -propSpeed;
-    motorB = (int) propSpeed;
+    motorR = (int) -propSpeed;
+    motorL = (int) propSpeed;
   } else if (gDistance > DISTANCE_MAX) {
     float propSpeed = MIN_SPEED + (gDistance - DISTANCE_MAX) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
-    motorA = (int) propSpeed * 0.9;
-    motorB = (int) propSpeed;
+    motorR = (int) propSpeed * 0.9;
+    motorL = (int) propSpeed;
   } else if (gDistance < DISTANCE_MIN) {
     float propSpeed = MIN_SPEED + (DISTANCE_MIN - gDistance) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
-    motorA = (int) -propSpeed * 0.9;
-    motorB = (int) -propSpeed;
+    motorR = (int) -propSpeed * 0.9;
+    motorL = (int) -propSpeed;
   } 
 
   // Max out throttle on start from stop.
   // XXX: Remove these when we have motor speed control working.
-  if (prevSpeed[0] == 0 && prevSpeed[1] == 0 && motorA != 0 && motorB != 0) { motorA *= 999; motorB *= 999; }
+  if (prevSpeed[0] == 0 && prevSpeed[1] == 0 && motorR != 0 && motorL != 0) { motorR *= 999; motorL *= 999; }
 
-  if (motorA < -SPEED_MAX) motorA = -SPEED_MAX;
-  else if (motorA > SPEED_MAX) motorA = SPEED_MAX;
-  if (motorB < -SPEED_MAX) motorB = -SPEED_MAX;
-  else if (motorB > SPEED_MAX) motorB = SPEED_MAX;
+  if (motorR < -SPEED_MAX) motorR = -SPEED_MAX;
+  else if (motorR > SPEED_MAX) motorR = SPEED_MAX;
+  if (motorL < -SPEED_MAX) motorL = -SPEED_MAX;
+  else if (motorL > SPEED_MAX) motorL = SPEED_MAX;
 
-  prevSpeed[0] = motorA;
-  prevSpeed[1] = motorB;
+  prevSpeed[0] = motorR;
+  prevSpeed[1] = motorL;
 }
 
 int main(int argc, char **argv)
@@ -135,26 +135,24 @@ int main(int argc, char **argv)
 
   ros::NodeHandle n;
 
-  ros::Publisher pubMotorA = n.advertise<std_msgs::Int32>("motorA", 10);
-  ros::Publisher pubMotorB = n.advertise<std_msgs::Int32>("motorB", 10);
+  ros::Publisher pubMotorR = n.advertise<std_msgs::Int32>("motorR", 10);
+  ros::Publisher pubMotorL = n.advertise<std_msgs::Int32>("motorL", 10);
 
   ros::Subscriber subUltrasonic = n.subscribe("ultrasonic", 10, ultrasonicCallback);
   ros::Subscriber subKinect = n.subscribe("kinect", 10, kinectCallback);
 
   ros::Rate loop_rate(20);
   while (ros::ok()) {
-    std_msgs::Int32 motorA, motorB;
+    std_msgs::Int32 motorR, motorL;
 
-    calculateMotorSpeeds(motorA.data, motorB.data);
-    motorA.data *= 2.55;
-    motorB.data *= 2.55;
+    calculateMotorSpeeds(motorR.data, motorL.data);
 
     char buf[256];
-    sprintf(buf, "Speeds: %d %d", motorA.data, motorB.data);
+    sprintf(buf, "Speeds: %d %d", motorR.data, motorL.data);
     ROS_WARN(buf);
 
-    pubMotorA.publish(motorA);
-    pubMotorB.publish(motorB);
+    pubMotorR.publish(motorR);
+    pubMotorL.publish(motorL);
 
     ros::spinOnce();
 

@@ -75,14 +75,14 @@ namespace myHelperBot
       return new Joint();
     }
 
-    private double AngleJoints(Joint a1, Joint a2, Joint b1, Joint b2)
+    private double AngleJoints(Joint a1, Joint a2, Joint b1, Joint b2, Axis ignoreAxes = Axis.None)
     {
-      Vector3D aVector = new Vector3D(a1.Position.X - a2.Position.X,
-                                      a1.Position.Y - a2.Position.Y,
-                                      a1.Position.Z - a2.Position.Z);
-      Vector3D bVector = new Vector3D(b1.Position.X - b2.Position.X,
-                                      b1.Position.Y - b2.Position.Y,
-                                      b1.Position.Z - b2.Position.Z);
+      Vector3D aVector = new Vector3D((ignoreAxes & Axis.X) == Axis.X ? 0.0 : (a1.Position.X - a2.Position.X),
+                                      (ignoreAxes & Axis.Y) == Axis.Y ? 0.0 : (a1.Position.Y - a2.Position.Y),
+                                      (ignoreAxes & Axis.Z) == Axis.Z ? 0.0 : (a1.Position.Z - a2.Position.Z));
+      Vector3D bVector = new Vector3D((ignoreAxes & Axis.X) == Axis.X ? 0.0 : (b1.Position.X - b2.Position.X),
+                                      (ignoreAxes & Axis.Y) == Axis.Y ? 0.0 : (b1.Position.Y - b2.Position.Y),
+                                      (ignoreAxes & Axis.Z) == Axis.Z ? 0.0 : (b1.Position.Z - b2.Position.Z));
       return Vector3D.AngleBetween(aVector, bVector);
     }
 
@@ -133,7 +133,7 @@ namespace myHelperBot
       double leftHandAngle = AngleJoints(leftHand, leftWrist, leftWrist, leftShoulder);
       double rightHandAngle = AngleJoints(rightHand, rightWrist, rightWrist, rightShoulder);
 
-      return
+      bool isPossiblyStopGesture =
         (leftArmAngle > STOP_ARM_ANGLE - STOP_ARM_ANGLE_TOL &&
          leftArmAngle < STOP_ARM_ANGLE + STOP_ARM_ANGLE_TOL &&
          leftHandAngle > STOP_HAND_ANGLE - STOP_HAND_ANGLE_TOL &&
@@ -146,6 +146,106 @@ namespace myHelperBot
          rightHandAngle < STOP_HAND_ANGLE + STOP_HAND_ANGLE_TOL &&
          rightHand.Position.Y > rightWrist.Position.Y &&
          rightShoulder.Position.Z > rightWrist.Position.Z);
+
+      if (isPossiblyStopGesture) {
+        numSuccessiveStopGestures++;
+      } else {
+        numSuccessiveStopGestures = 0;
+      }
+
+      return numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
+    }
+
+    private bool IsInGoGesture(JointsCollection joints)
+    {
+      Joint leftShoulder = new Joint(),
+            rightShoulder = new Joint(),
+            centerShoulder = new Joint(),
+            leftWrist = new Joint(),
+            rightWrist = new Joint(),
+            leftElbow = new Joint(),
+            rightElbow = new Joint();
+
+      foreach (Joint joint in joints) {
+        switch (joint.ID) {
+          case JointID.ElbowLeft:
+            leftElbow = joint;
+            break;
+          case JointID.ElbowRight:
+            rightElbow = joint;
+            break;
+          case JointID.WristLeft:
+            leftWrist = joint;
+            break;
+          case JointID.WristRight:
+            rightWrist = joint;
+            break;
+          case JointID.ShoulderLeft:
+            leftShoulder = joint;
+            break;
+          case JointID.ShoulderRight:
+            rightShoulder = joint;
+            break;
+          case JointID.ShoulderCenter:
+            centerShoulder = joint;
+            break;
+          default:
+            break;
+        }
+      }
+
+      double leftElbowAngle = AngleJoints(leftWrist, leftElbow, leftShoulder, leftElbow);
+      double rightElbowAngle = AngleJoints(rightWrist, rightElbow, rightShoulder, rightElbow);
+      double leftArmAngle = AngleJoints(leftWrist, leftShoulder, rightShoulder, leftShoulder, Axis.Y);
+      double rightArmAngle = AngleJoints(rightWrist, rightShoulder, leftShoulder, rightShoulder, Axis.Y);
+      double leftForearmAngle = AngleJoints(leftWrist, leftElbow, rightShoulder, leftShoulder, Axis.Y);
+      double rightForearmAngle = AngleJoints(rightWrist, rightElbow, leftShoulder, rightShoulder, Axis.Y);
+
+      if (!possibleGoGestureLeft &&
+          leftElbowAngle < GO_ELBOW_ANGLE_START_MAX &&
+          leftElbowAngle > GO_ELBOW_ANGLE_START_MIN) {
+        lastGoGestureAngleLeft = leftElbowAngle + 0.001;
+        possibleGoGestureLeft = true;
+      }
+
+      if (!possibleGoGestureRight &&
+          rightElbowAngle < GO_ELBOW_ANGLE_START_MAX &&
+          rightElbowAngle > GO_ELBOW_ANGLE_START_MIN) {
+        lastGoGestureAngleRight = rightElbowAngle + 0.001;
+        possibleGoGestureRight = true;
+      }
+
+      if (possibleGoGestureLeft &&
+          leftElbowAngle < lastGoGestureAngleLeft &&
+          leftArmAngle > GO_ARM_ANGLE - GO_ARM_ANGLE_TOL &&
+          leftArmAngle < GO_ARM_ANGLE + GO_ARM_ANGLE_TOL /* &&
+          leftForearmAngle > GO_ARM_ANGLE - GO_ARM_ANGLE_TOL &&
+          leftForearmAngle < GO_ARM_ANGLE + GO_ARM_ANGLE_TOL*/) {
+        lastGoGestureAngleLeft = leftElbowAngle;
+      } else {
+        possibleGoGestureLeft = false;
+      }
+
+      if (possibleGoGestureRight &&
+          rightElbowAngle < lastGoGestureAngleRight &&
+          rightArmAngle > GO_ARM_ANGLE - GO_ARM_ANGLE_TOL &&
+          rightArmAngle < GO_ARM_ANGLE + GO_ARM_ANGLE_TOL/* &&
+          rightForearmAngle > GO_ARM_ANGLE - GO_ARM_ANGLE_TOL &&
+          rightForearmAngle < GO_ARM_ANGLE + GO_ARM_ANGLE_TOL*/) {
+        lastGoGestureAngleRight = rightElbowAngle;
+      } else {
+        possibleGoGestureRight = false;
+      }
+
+      if ((lastGoGestureAngleLeft <= GO_ELBOW_ANGLE_END && possibleGoGestureLeft) ||
+          (lastGoGestureAngleRight <= GO_ELBOW_ANGLE_END && possibleGoGestureRight)) {
+        System.Diagnostics.Debugger.Break();
+        possibleGoGestureLeft = false;
+        possibleGoGestureRight = false;
+      }
+
+      return (lastGoGestureAngleLeft <= GO_ELBOW_ANGLE_END && possibleGoGestureLeft) ||
+             (lastGoGestureAngleRight <= GO_ELBOW_ANGLE_END && possibleGoGestureRight);
     }
 
     private void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e) {
@@ -160,7 +260,7 @@ namespace myHelperBot
         if (SkeletonTrackingState.Tracked == data.TrackingState) {
           WriteHttpRequest(FindJoint(data.Joints, JointID.Spine),
                            IsInStopGesture(data.Joints),
-                           false,
+                           IsInGoGesture(data.Joints),
                            false);
           break;
         }
@@ -187,18 +287,39 @@ namespace myHelperBot
     }
     #endregion http
 
-    #region Private state
-    private KinectNui.Runtime _Kinect;
-    private DateTime lastRequest;
+    #region constants
+    private enum Axis {
+      None = 0,
+      X = 1,
+      Y = 2,
+      Z = 4,
+    };
+
+    private const int STOP_SUCCESSIVE_GESTURES = 3;
 
     private const double STOP_ARM_ANGLE = 90.0;
     private const double STOP_ARM_ANGLE_TOL = 20.0;
     private const double STOP_HAND_ANGLE = 35.0;
     private const double STOP_HAND_ANGLE_TOL = 15.0;
 
-    private const double MIN_STOP_DIST = 0.15;
-    private const double MIN_GO_DIST = 0.10;
-    private const double MIN_SAVE_DIST = 0.30;
+    private const double GO_ELBOW_ANGLE_STEP = 0.0;
+    private const double GO_ELBOW_ANGLE_START_MIN = 110.0;
+    private const double GO_ELBOW_ANGLE_START_MAX = 180.0;
+    private const double GO_ELBOW_ANGLE_END = 80.0;
+    private const double GO_ARM_ANGLE = 90.0;
+    private const double GO_ARM_ANGLE_TOL = 45.0;
+    #endregion constants
+
+    #region Private state
+    private KinectNui.Runtime _Kinect;
+    private DateTime lastRequest;
+
+    private int numSuccessiveStopGestures = 0;
+
+    private bool possibleGoGestureLeft = false;
+    private bool possibleGoGestureRight = false;
+    private double lastGoGestureAngleLeft = GO_ELBOW_ANGLE_START_MAX;
+    private double lastGoGestureAngleRight = GO_ELBOW_ANGLE_START_MAX;
     #endregion Private state
   }
 }

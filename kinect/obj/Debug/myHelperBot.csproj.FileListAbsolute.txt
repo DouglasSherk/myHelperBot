@@ -12,3 +12,15 @@ C:\Common\Kinect\myHelperBot\obj\Debug\myHelperBot_MarkupCompile.cache
 C:\Common\Kinect\myHelperBot\obj\Debug\myHelperBot.g.resources
 C:\Common\Kinect\myHelperBot\obj\Debug\myHelperBot.exe
 C:\Common\Kinect\myHelperBot\obj\Debug\myHelperBot.pdb
+C:\Common\myHelperBot\kinect\bin\Debug\myHelperBot.exe.config
+C:\Common\myHelperBot\kinect\obj\Debug\myHelperBot.exe
+C:\Common\myHelperBot\kinect\obj\Debug\myHelperBot.pdb
+C:\Common\myHelperBot\kinect\bin\Debug\myHelperBot.exe
+C:\Common\myHelperBot\kinect\bin\Debug\myHelperBot.pdb
+C:\Common\myHelperBot\kinect\bin\Debug\INuiInstanceHelper.dll
+C:\Common\myHelperBot\kinect\obj\Debug\ResolveAssemblyReference.cache
+C:\Common\myHelperBot\kinect\obj\Debug\MainWindow.baml
+C:\Common\myHelperBot\kinect\obj\Debug\MainWindow.g.cs
+C:\Common\myHelperBot\kinect\obj\Debug\App.g.cs
+C:\Common\myHelperBot\kinect\obj\Debug\myHelperBot_MarkupCompile.cache
+C:\Common\myHelperBot\kinect\obj\Debug\myHelperBot.g.resources

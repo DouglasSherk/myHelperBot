@@ -7,18 +7,20 @@
 
 #include "MotorController.h"
 
-MotorController::MotorController(int D1, int D2, int IN1, int IN2, int INV, int EN, int VIN, int GR, int IN) {
-    _ms = MC33926MotorShield(D1,D2,IN1,IN2,INV,EN);
-    _en = Encoder(VIN, GR, IN);
+MotorController::MotorController(MC33926MotorShield &ms, Encoder &en)
+  : _isForward(true),
+    _en(en),
+    _ms(ms) {
 }
 
 void MotorController::init() {
-    _ms.init();
-    _en.init();
+    //nothing here yet
 }
 
 // Update the requested MotorController speed in ticks/second
 void MotorController::setSpeed(int s) {
+    _useSpeedControl = true;
+    
     if(s>_maxSpeed) {
         _speed = _maxSpeed;
     }
@@ -28,46 +30,53 @@ void MotorController::setSpeed(int s) {
     else {
         _speed = s;
     }
-    _pwmValue = 255*_speed/_maxSpeed;
-    _ms.setPWM(_pwmValue);
+    //Serial.print("set speed: ");
+    //Serial.println(_speed);
 }
 
 // adjust the pwm to get closer to the desired speed. timeElapsed is in milliseconds.
 void MotorController::adjustPWM(int timeElapsed) {
     long currentIndex = _en.getIndex();
     
-    /*Serial.print("curIndex: ");
-    Serial.print(currentIndex);
-    Serial.print("\tlastIndex: ");
-    Serial.print(_lastIndex);
-    Serial.print("\ttimeElapsed: ");
-    Serial.print(timeElapsed);*/
-    
-    _currentSpeed = (currentIndex - _lastIndex)/(double(timeElapsed)/1000.00);
-    
-    /*Serial.print("\tcurSpeed: ");
-    Serial.println(_currentSpeed);*/
-    
-    int correction = abs((_currentSpeed-_speed)/100); ///100
-    
-    if(_currentSpeed > _speed) {
-        _pwmValue -= correction;
-        if(_pwmValue < -255) {
-            _pwmValue = -255;
+    _measuredSpeed = (currentIndex - _lastIndex)/(double(timeElapsed)/1000.00);
+        
+    if(_isForward ^ (_speed > 0)) {
+        if(abs(_measuredSpeed) < 500) {
+            _isForward = !_isForward; //robot is now going in same direction as motor power is asking.
+        }
+        else {
+            _measuredSpeed *= -1;
+            //Serial.print("inverted");
         }
     }
-    else {
-        _pwmValue += correction;
-        if(_pwmValue > 255) {
-            _pwmValue = 255;
-        }
+    
+    //Serial.print("\tmeasured speed: ");
+    //Serial.print(_measuredSpeed);
+    
+    int correction = (_speed-_measuredSpeed)/100; ///100
+    
+    //Serial.print("\tcorrection: ");
+    //Serial.print(correction);
+    
+    _pwmValue += correction;
+    if(_pwmValue < -255) {
+        _pwmValue = -255;
     }
+    else if(_pwmValue > 255) {
+        _pwmValue = 255;
+    }
+    
+    //Serial.print("\tpwm: ");
+    //Serial.println(_pwmValue);
+    
     _ms.setPWM(_pwmValue);
     _lastIndex = currentIndex;
 }
 
 void MotorController::periodicUpdate(int timeElapsed) {
-    adjustPWM(timeElapsed);
+    if(_useSpeedControl) {
+        adjustPWM(timeElapsed);
+    }
 }
 
 // Update the encoder value
@@ -78,4 +87,15 @@ void MotorController::updateEncoder() {
     else {
         _en.updateIndex(false);
     }
+}
+
+// speed is in ticks/second
+void MotorController::setPWM(int speed) {
+
+    _useSpeedControl = false;
+    _ms.setPWM(speed/double(_maxSpeed)*255);
+    
+    //Serial.print("set pwm: ");
+    //Serial.println(speed/double(_maxSpeed)*255);
+    
 }

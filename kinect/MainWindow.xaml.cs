@@ -99,11 +99,6 @@ namespace myHelperBot
     #endregion KinectViewer Utilities
 
     #region Private state
-    private int minKinectCount = 1;       //0 - app is "Kinect Enabled". 1 - app "Requires Kinect".
-    const int maxKinectCount = 2; //Change to 1 if you only want to view one at a time. Switching will be enabled.
-                                  //Each Kinect needs to be in its own USB hub, otherwise it won't have enough USB bandwidth.
-                                  //Currently only 1 Kinect per process can have SkeletalTracking working, but color and depth work for all.
-                                  //KinectSDK TODO: enable a larger maxKinectCount (assuming your PC can dedicate a USB hub for each Kinect)
     mhbLogic mLogic;
     #endregion Private state
   }

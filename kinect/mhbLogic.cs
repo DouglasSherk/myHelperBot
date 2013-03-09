@@ -263,7 +263,7 @@ namespace myHelperBot
       bool definitelyInGoGesture =
         (possibleGoGestureLeft &&
          lastGoGestureAngleLeftWrist <= GO_WRIST_ANGLE_END &&
-         leftHandDist < GO_HAND_MAX_DIST) ||
+         leftHandDist < GO_HAND_MAX_DIST) &&
         (possibleGoGestureRight &&
          lastGoGestureAngleRightWrist <= GO_WRIST_ANGLE_END &&
          rightHandDist < GO_HAND_MAX_DIST);
@@ -331,12 +331,12 @@ namespace myHelperBot
     private const double STOP_HAND_ANGLE = 35.0;
     private const double STOP_HAND_ANGLE_TOL = 15.0;
 
-    private const double GO_WRIST_ANGLE_START_MIN = 140.0;
+    private const double GO_WRIST_ANGLE_START_MIN = 130.0;
     private const double GO_WRIST_ANGLE_START_MAX = 180.0;
-    private const double GO_WRIST_ANGLE_END = 110.0;
+    private const double GO_WRIST_ANGLE_END = 130.0;
     private const double GO_ARM_ANGLE = 90.0;
-    private const double GO_ARM_ANGLE_TOL = 25.0;
-    private const double GO_HAND_MAX_DIST = 0.2;
+    private const double GO_ARM_ANGLE_TOL = 45.0;
+    private const double GO_HAND_MAX_DIST = 0.25;
     #endregion constants
 
     #region Private state

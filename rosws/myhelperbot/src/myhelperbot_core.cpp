@@ -5,7 +5,7 @@
 
 #include <sstream>
 
-const float SPEED_NONE = 0.0;
+const float SPEED_NONE = 100.0;
 const float SPEED_MAX = 2500.0;
 
 const float DISTANCE_MIN = 1.4;
@@ -15,9 +15,9 @@ const float ROTATION_MIN = -0.2;
 const float ROTATION_MAX = 0.2;
 
 /** Map a rotation of 5.0 to max speed. */
-const float ROTATION_FACTOR = SPEED_MAX / 5.0;
+const float ROTATION_FACTOR = SPEED_MAX / 1.0;
 /** Map a distance of 5.0 to max speed. */
-const float DISTANCE_FACTOR = SPEED_MAX / 5.0;
+const float DISTANCE_FACTOR = SPEED_MAX / 1.0;
 
 float gLastDistance = 0.0;
 float gLastRotation = 0.0;
@@ -28,7 +28,6 @@ float gRotation = 0.0;
 bool gStopped = false;
 
 int gConsecutiveStop = 0;
-int gConsecutiveGo = 0;
 
 int gConsecutiveSame = 0;
 
@@ -43,7 +42,7 @@ void kinectCallback(const std_msgs::String::ConstPtr& msg)
          &stop, &go, &save, &distances[0], &distances[1], &distances[2]);
 
   if (!gStopped && !!stop && ++gConsecutiveStop >= 5) { gStopped = true; gConsecutiveStop = 0; }
-  if (gStopped && !!go && ++gConsecutiveGo >= 5) { gStopped = false; gConsecutiveGo = 0; }
+  if (gStopped && !!go) { gStopped = false; }
 
   ROS_WARN(msg->data.c_str());
   char buf[256];

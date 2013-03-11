@@ -146,7 +146,7 @@ namespace myHelperBot
          leftHandAngle > STOP_HAND_ANGLE - STOP_HAND_ANGLE_TOL &&
          leftHandAngle < STOP_HAND_ANGLE + STOP_HAND_ANGLE_TOL &&
          leftHand.Position.Y > leftWrist.Position.Y &&
-         leftShoulder.Position.Z > leftWrist.Position.Z) ||
+         leftShoulder.Position.Z > leftWrist.Position.Z) &&
         (rightArmAngle > STOP_ARM_ANGLE - STOP_ARM_ANGLE_TOL &&
          rightArmAngle < STOP_ARM_ANGLE + STOP_ARM_ANGLE_TOL &&
          rightHandAngle > STOP_HAND_ANGLE - STOP_HAND_ANGLE_TOL &&
@@ -157,6 +157,11 @@ namespace myHelperBot
       if (isPossiblyStopGesture) {
         numSuccessiveStopGestures++;
       } else {
+        numSuccessiveStopGestures = 0;
+      }
+
+      if (numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES) {
+        System.Diagnostics.Debugger.Break();
         numSuccessiveStopGestures = 0;
       }
 
@@ -327,9 +332,9 @@ namespace myHelperBot
     private const int STOP_SUCCESSIVE_GESTURES = 3;
 
     private const double STOP_ARM_ANGLE = 90.0;
-    private const double STOP_ARM_ANGLE_TOL = 20.0;
+    private const double STOP_ARM_ANGLE_TOL = 30.0;
     private const double STOP_HAND_ANGLE = 35.0;
-    private const double STOP_HAND_ANGLE_TOL = 15.0;
+    private const double STOP_HAND_ANGLE_TOL = 20.0;
 
     private const double GO_WRIST_ANGLE_START_MIN = 130.0;
     private const double GO_WRIST_ANGLE_START_MAX = 180.0;

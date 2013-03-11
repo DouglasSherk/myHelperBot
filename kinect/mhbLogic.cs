@@ -247,14 +247,66 @@ namespace myHelperBot
             (leftHand.Position.Y > startGoLeftHandY && rightHand.Position.Y > startGoRightHandY ||
              leftHand.Position.Z > startGoLeftHandZ && rightHand.Position.Z > startGoRightHandZ)) {
           definitelyInGoGesture = true;
-          possibleGoGesture = false;
-          //System.Diagnostics.Debugger.Break();
-        } else {
-          possibleGoGesture = false;
+          // System.Diagnostics.Debugger.Break();
         }
+
+        possibleGoGesture = false;
       }
       
       return definitelyInGoGesture;
+    }
+
+    private bool IsInSaveGesture(JointsCollection joints)
+    {
+      Joint leftHand = new Joint(),
+      rightHand = new Joint(),
+      spine = new Joint(),
+      centerShoulder = new Joint();
+
+      foreach (Joint joint in joints) {
+        switch (joint.ID) {
+          case JointID.HandLeft:
+            leftHand = joint;
+            break;
+          case JointID.HandRight:
+            rightHand = joint;
+            break;
+          case JointID.Spine:
+            spine = joint;
+            break;
+          case JointID.ShoulderCenter:
+            centerShoulder = joint;
+            break;
+          default:
+            break;
+        }
+      }
+
+      double handDist = DistanceJoints(leftHand, rightHand);
+
+      if (!possibleSaveGesture) {
+        if (leftHand.Position.Y < centerShoulder.Position.Y &&
+            rightHand.Position.Y < centerShoulder.Position.Y &&
+            handDist >= SAVE_HAND_START_DIST) {
+          possibleSaveGesture = true;
+          startSaveTime = DateTime.Now;
+        }
+      }
+
+      bool definitelyInSaveGesture = false;
+
+      if (possibleSaveGesture && (DateTime.Now - startSaveTime).TotalMilliseconds >= SAVE_INTERVAL) {
+        if (leftHand.Position.Y < spine.Position.Y &&
+            rightHand.Position.Y < spine.Position.Y &&
+            handDist <= SAVE_HAND_END_DIST) {
+          definitelyInSaveGesture = true;
+          System.Diagnostics.Debugger.Break();
+        }
+
+        possibleSaveGesture = false;
+      }
+
+      return definitelyInSaveGesture;
     }
 
     private void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e) {
@@ -270,7 +322,7 @@ namespace myHelperBot
           WriteHttpRequest(FindJoint(data.Joints, JointID.Spine),
                            IsInStopGesture(data.Joints),
                            IsInGoGesture(data.Joints),
-                           false);
+                           IsInSaveGesture(data.Joints));
           break;
         }
       }
@@ -313,6 +365,10 @@ namespace myHelperBot
     private const double GO_WRIST_START_ANGLE = 165.0;
     private const double GO_WRIST_END_ANGLE = 145.0;
     private const int GO_INTERVAL = 250;
+
+    private const double SAVE_HAND_START_DIST = 0.5;
+    private const double SAVE_HAND_END_DIST = 0.2;
+    private const int SAVE_INTERVAL = 750;
     #endregion constants
 
     #region Private state
@@ -329,6 +385,9 @@ namespace myHelperBot
     private double startGoLeftHandZ;
     private double startGoRightHandZ;
     private DateTime startGoTime;
+
+    private bool possibleSaveGesture = false;
+    private DateTime startSaveTime;
     #endregion Private state
   }
 }

@@ -20,7 +20,8 @@ DualMotorController mc(mcL, mcR);
 #include <MappingEncoder.h>
 MappingEncoder me(178/2, 340, 2500);
 
-int testSpeed = 2500;
+int testSpeed[] = {0, 2500, 0, -2500};
+int testSpeedIndex = 0;
 
 void setup() {   
    Serial.begin(38400);
@@ -31,12 +32,11 @@ void setup() {
    mcL.init();
    mcR.init();   
    t.every(100,test);
+   t.every(2000,changeSpeed);
 }
 
 void loop() {         
     mc.updateEncoders();
-    //enL.updateIndex(true);
-    //enR.updateIndex(true);
     t.update();
 }
 
@@ -44,6 +44,13 @@ void test() {
   updatePosition(); 
   mcL.periodicUpdate(100);
   mcR.periodicUpdate(100);
+}
+
+void changeSpeed() { //want to see if roobt position is about equal when it returns
+   testSpeedIndex = (testSpeedIndex + 1)% ;
+   Serial.print("ardNewSpeed: ");
+   Serial.println(testSpeed);
+   mc.setSpeed(testSpeed, testSpeed);  
 }
 
 void updatePosition() {

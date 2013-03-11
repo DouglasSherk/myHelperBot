@@ -29,10 +29,10 @@ void setup() {
    pinMode(13, OUTPUT);
    t.every(100,test);
    //t.every(1000,printSpeedData);
-   t.every(5000,changeSpeed);
+   t.every(2000,changeSpeed);
    //mcL.setSpeed(testSpeed);
    //mcR.setSpeed(testSpeed);
-   mc.setSpeed(testSpeed, testSpeed);
+   //mc.setSpeed(testSpeed, testSpeed);
 }
 
 int count = 0;

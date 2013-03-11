@@ -168,7 +168,7 @@ namespace myHelperBot
       bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
 
       if (definitelyInStopGesture) {
-        System.Diagnostics.Debugger.Break();
+        //System.Diagnostics.Debugger.Break();
         possibleGoGesture = false;
         numSuccessiveStopGestures = 0;
       }
@@ -248,7 +248,7 @@ namespace myHelperBot
              leftHand.Position.Z > startGoLeftHandZ && rightHand.Position.Z > startGoRightHandZ)) {
           definitelyInGoGesture = true;
           possibleGoGesture = false;
-          System.Diagnostics.Debugger.Break();
+          //System.Diagnostics.Debugger.Break();
         } else {
           possibleGoGesture = false;
         }

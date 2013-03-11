@@ -3,9 +3,23 @@
 #include <std_msgs/Int32.h>
 
 #include "MC33926MotorShield.h"
+MC33926MotorShield motorL(30, 22, 24, 2, 26, 28); //left
+MC33926MotorShield motorR(31, 23, 25, 3, 27, 29); //right
+
+#include "Timer.h"
+Timer t;
+
 #include "Encoder.h"
+Encoder enL(10,11,5);
+Encoder enR(8,9,4);
 
 #include "MotorController.h"
+MotorController mcL(motorL, enL);
+MotorController mcR(motorR, enR);
+
+#include "DualMotorController.h"
+DualMotorController dmc(mcL, mcR);
+
 #include "NewPing.h"
 
 #define SONAR_NUM     6 // Number or sensors.
@@ -29,15 +43,16 @@ NewPing sonar[SONAR_NUM] = {     // Sensor object array.
 
 ros::NodeHandle nh;
 
-MotorController mcL(30, 22, 24, 2, 26, 28, 10, 11, 5);
-MotorController mcR(31, 23, 25, 3, 27, 29, 8, 9, 4);
+int leftSpeed, rightSpeed;
 
 void motorRCallback(const std_msgs::Int32& speed) {
-  mcR.setSpeed(-speed.data);
+  leftSpeed = speed.data;
+  dmc.setSpeed(leftSpeed, rightSpeed);
 }
 
 void motorLCallback(const std_msgs::Int32& speed) {
-  mcL.setSpeed(speed.data);
+  rightSpeed = speed.data
+  dmc.setSpeed(leftSpeed, rightSpeed);
 }
 
 std_msgs::String gUltrasonic;
@@ -47,6 +62,10 @@ ros::Publisher ros_pUltrasonic("ultrasonic", &gUltrasonic);
 
 void setup()
 {
+  motorL.init();
+  motorR.init();
+  enL.init();
+  enR.init();
   mcR.init();
   mcL.init();
   nh.initNode();
@@ -77,13 +96,12 @@ void loop() {
     }
   }
 
-  mcR.updateEncoder();
-  mcL.updateEncoder();
+  dmc.updateEncoders();
 
   // Motor timed code.
   if (time - gMotorTimer > MOTOR_INTERVAL) {
-    mcR.periodicUpdate(time - gMotorTime);
-    mcL.periodicUpdate(time - gMotorTime);
+    mcR.periodicUpdate(time - gMotorTimer);
+    mcL.periodicUpdate(time - gMotorTimer);
     gMotorTimer = time;
   }
 

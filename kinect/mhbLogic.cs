@@ -99,19 +99,16 @@ namespace myHelperBot
             spine = new Joint(),
             leftShoulder = new Joint(),
             rightShoulder = new Joint(),
+            centerShoulder = new Joint(),
             leftWrist = new Joint(),
             rightWrist = new Joint(),
             leftHand = new Joint(),
-            rightHand = new Joint();
+            rightHand = new Joint(),
+            leftElbow = new Joint(),
+            rightElbow = new Joint();
 
       foreach (Joint joint in joints) {
         switch (joint.ID) {
-          case JointID.Head:
-            head = joint;
-            break;
-          case JointID.Spine:
-            spine = joint;
-            break;
           case JointID.HandLeft:
             leftHand = joint;
             break;
@@ -124,35 +121,35 @@ namespace myHelperBot
           case JointID.WristRight:
             rightWrist = joint;
             break;
+          case JointID.ElbowLeft:
+            leftElbow = joint;
+            break;
+          case JointID.ElbowRight:
+            rightElbow = joint;
+            break;
           case JointID.ShoulderLeft:
             leftShoulder = joint;
             break;
           case JointID.ShoulderRight:
             rightShoulder = joint;
             break;
+          case JointID.ShoulderCenter:
+            centerShoulder = joint;
+            break;
           default:
             break;
         }
       }
 
-      double leftArmAngle = AngleJoints(leftShoulder, leftWrist, head, spine);
-      double rightArmAngle = AngleJoints(rightShoulder, rightWrist, head, spine);
-      double leftHandAngle = AngleJoints(leftHand, leftWrist, leftWrist, leftShoulder);
-      double rightHandAngle = AngleJoints(rightHand, rightWrist, rightWrist, rightShoulder);
+      double leftElbowAngle = AngleJoints(leftWrist, leftElbow, leftShoulder, leftElbow);
+      double rightElbowAngle = AngleJoints(rightWrist, rightElbow, rightShoulder, rightElbow);
+      double handDist = DistanceJoints(leftHand, rightHand);
 
       bool isPossiblyStopGesture =
-        (leftArmAngle > STOP_ARM_ANGLE - STOP_ARM_ANGLE_TOL &&
-         leftArmAngle < STOP_ARM_ANGLE + STOP_ARM_ANGLE_TOL &&
-         leftHandAngle > STOP_HAND_ANGLE - STOP_HAND_ANGLE_TOL &&
-         leftHandAngle < STOP_HAND_ANGLE + STOP_HAND_ANGLE_TOL &&
-         leftHand.Position.Y > leftWrist.Position.Y &&
-         leftShoulder.Position.Z > leftWrist.Position.Z) &&
-        (rightArmAngle > STOP_ARM_ANGLE - STOP_ARM_ANGLE_TOL &&
-         rightArmAngle < STOP_ARM_ANGLE + STOP_ARM_ANGLE_TOL &&
-         rightHandAngle > STOP_HAND_ANGLE - STOP_HAND_ANGLE_TOL &&
-         rightHandAngle < STOP_HAND_ANGLE + STOP_HAND_ANGLE_TOL &&
-         rightHand.Position.Y > rightWrist.Position.Y &&
-         rightShoulder.Position.Z > rightWrist.Position.Z);
+        Math.Abs(leftElbowAngle - rightElbowAngle) < STOP_ELBOW_ANGLE_TOL &&
+        handDist >= STOP_HAND_MIN_DIST &&
+        leftHand.Position.Y > centerShoulder.Position.Y &&
+        rightHand.Position.Y > centerShoulder.Position.Y;
 
       if (isPossiblyStopGesture) {
         numSuccessiveStopGestures++;
@@ -160,16 +157,23 @@ namespace myHelperBot
         numSuccessiveStopGestures = 0;
       }
 
-      if (numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES) {
+      bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
+
+      if (definitelyInStopGesture) {
         System.Diagnostics.Debugger.Break();
+        possibleGoGestureRight = possibleGoGestureLeft = false;
         numSuccessiveStopGestures = 0;
       }
 
-      return numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
+      return definitelyInStopGesture;
     }
 
     private bool IsInGoGesture(JointsCollection joints)
     {
+      if (numSuccessiveStopGestures > 0) {
+        return false;
+      }
+
       Joint leftShoulder = new Joint(),
             rightShoulder = new Joint(),
             centerShoulder = new Joint(),
@@ -224,7 +228,7 @@ namespace myHelperBot
       if (!possibleGoGestureLeft &&
           leftWristAngle < GO_WRIST_ANGLE_START_MAX &&
           leftWristAngle > GO_WRIST_ANGLE_START_MIN) {
-        lastGoGestureAngleLeftWrist = leftWristAngle + 0.001;
+        lastGoGestureAngleLeftWrist = leftWristAngle + GO_WRIST_ANGLE_STEP + 0.001;
         lastGoGestureAngleLeftElbow = leftElbowAngle + 0.001;
         possibleGoGestureLeft = true;
       }
@@ -232,14 +236,14 @@ namespace myHelperBot
       if (!possibleGoGestureRight &&
           rightWristAngle < GO_WRIST_ANGLE_START_MAX &&
           rightWristAngle > GO_WRIST_ANGLE_START_MIN) {
-        lastGoGestureAngleRightWrist = rightWristAngle + 0.001;
+        lastGoGestureAngleRightWrist = rightWristAngle + GO_WRIST_ANGLE_STEP + 0.001;
         lastGoGestureAngleRightElbow = rightElbowAngle + 0.001;
         possibleGoGestureRight = true;
       }
 
       if (possibleGoGestureLeft &&
           leftElbowAngle < lastGoGestureAngleLeftElbow &&
-          leftWristAngle < lastGoGestureAngleLeftWrist &&
+          leftWristAngle < lastGoGestureAngleLeftWrist - GO_WRIST_ANGLE_STEP &&
           leftArmAngle > GO_ARM_ANGLE - GO_ARM_ANGLE_TOL &&
           leftArmAngle < GO_ARM_ANGLE + GO_ARM_ANGLE_TOL &&
           (leftWrist.Position.Y > lastGoLeftWristPositionY || leftHandDist < GO_HAND_MAX_DIST)) {
@@ -251,7 +255,7 @@ namespace myHelperBot
 
       if (possibleGoGestureRight &&
           ((rightElbowAngle < lastGoGestureAngleRightElbow &&
-            rightWristAngle < lastGoGestureAngleRightWrist &&
+            rightWristAngle < lastGoGestureAngleRightWrist - GO_WRIST_ANGLE_STEP &&
             rightArmAngle > GO_ARM_ANGLE - GO_ARM_ANGLE_TOL &&
             rightArmAngle < GO_ARM_ANGLE + GO_ARM_ANGLE_TOL &&
             rightWrist.Position.Y > lastGoRightWristPositionY) ||
@@ -331,11 +335,10 @@ namespace myHelperBot
 
     private const int STOP_SUCCESSIVE_GESTURES = 3;
 
-    private const double STOP_ARM_ANGLE = 90.0;
-    private const double STOP_ARM_ANGLE_TOL = 30.0;
-    private const double STOP_HAND_ANGLE = 35.0;
-    private const double STOP_HAND_ANGLE_TOL = 20.0;
+    private const double STOP_ELBOW_ANGLE_TOL = 10.0;
+    private const double STOP_HAND_MIN_DIST = 0.5;
 
+    private const double GO_WRIST_ANGLE_STEP = 6.0;
     private const double GO_WRIST_ANGLE_START_MIN = 130.0;
     private const double GO_WRIST_ANGLE_START_MAX = 180.0;
     private const double GO_WRIST_ANGLE_END = 130.0;

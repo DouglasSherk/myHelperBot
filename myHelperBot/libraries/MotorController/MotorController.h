@@ -26,6 +26,11 @@ class MotorController
         void setPWM(int pwmValue);
 
         //private:
+        const static int MAX_SPEED = 5000;
+
+        const static int MIN_POWER = 170;
+        const static int MAX_POWER = 255;
+
         Encoder &_en;
         MC33926MotorShield &_ms;
         void periodicUpdate(int timeElapsed);
@@ -34,7 +39,6 @@ class MotorController
         int _pwmValue;
         long _lastIndex;
         int _measuredSpeed;
-        const static int _maxSpeed = 5000;
         bool _useSpeedControl;
         bool _isForward; //true is forwards, false is backwards
 };

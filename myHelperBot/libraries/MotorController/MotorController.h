@@ -26,8 +26,8 @@ class MotorController
         void setPWM(int pwmValue);
 
         //private:
-        Encoder _en;
-        MC33926MotorShield _ms;
+        Encoder &_en;
+        MC33926MotorShield &_ms;
         void periodicUpdate(int timeElapsed);
         void adjustPWM(int timeElapsed);
         int _speed;

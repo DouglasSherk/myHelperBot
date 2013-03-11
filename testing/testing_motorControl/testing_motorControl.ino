@@ -29,7 +29,7 @@ void setup() {
    pinMode(13, OUTPUT);
    t.every(100,test);
    //t.every(1000,printSpeedData);
-   t.every(100,changeSpeed);
+   t.every(5000,changeSpeed);
    //mcL.setSpeed(testSpeed);
    //mcR.setSpeed(testSpeed);
    mc.setSpeed(testSpeed, testSpeed);
@@ -47,8 +47,6 @@ void changeSpeed() {
    testSpeed *= -1;
    Serial.print("ardNewSpeed: ");
    Serial.println(testSpeed);
-   //mcL.setSpeed(testSpeed);
-   //mcR.setSpeed(testSpeed);
    mc.setSpeed(testSpeed, testSpeed);  
 }
 
@@ -59,10 +57,10 @@ void test() {
 }
 
 void printSpeedData() {
-    /*Serial.print("L_req: ");
-    Serial.print(mcL._speed);
-    Serial.print("\tL_cur: ");
-    Serial.print(mcL._currentSpeed);*/
+    //Serial.print("L_req: ");
+    //Serial.println(mcL._speed);
+    //Serial.print("\tL_cur: ");
+    //Serial.print(mcL._currentSpeed);*/
     /*Serial.print("L_ind: ");    
     Serial.print(mcL._en.getIndex());
     Serial.print("\tR_ind: ");    

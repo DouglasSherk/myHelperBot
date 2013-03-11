@@ -42,7 +42,7 @@ void DualMotorController::setSpeed(int sL, int sR) {
         sR = -_maxSpeed;
     }
     
-    if (abs(sL - sR) > 500) { //if the robot is trying to turn in place, then use straight PWM instead of trying to use speed control
+    if (abs(sL + sR) > 500) { //if the robot is trying to turn in place, then use straight PWM instead of trying to use speed control
         _mL.setPWM(sL);
         _mR.setPWM(sR);
     }

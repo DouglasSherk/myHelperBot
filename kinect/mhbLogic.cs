@@ -168,7 +168,7 @@ namespace myHelperBot
       bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
 
       if (definitelyInStopGesture) {
-        //System.Diagnostics.Debugger.Break();
+        System.Diagnostics.Debugger.Break();
         possibleGoGesture = false;
         numSuccessiveStopGestures = 0;
       }
@@ -247,7 +247,7 @@ namespace myHelperBot
             (leftHand.Position.Y > startGoLeftHandY && rightHand.Position.Y > startGoRightHandY ||
              leftHand.Position.Z > startGoLeftHandZ && rightHand.Position.Z > startGoRightHandZ)) {
           definitelyInGoGesture = true;
-          // System.Diagnostics.Debugger.Break();
+          System.Diagnostics.Debugger.Break();
         }
 
         possibleGoGesture = false;
@@ -309,6 +309,60 @@ namespace myHelperBot
       return definitelyInSaveGesture;
     }
 
+    private bool IsInRelocateGesture(JointsCollection joints)
+    {
+      Joint leftHand = new Joint(),
+            rightHand = new Joint(),
+            leftShoulder = new Joint(),
+            rightShoulder = new Joint();
+
+      foreach (Joint joint in joints) {
+        switch (joint.ID) {
+          case JointID.HandLeft:
+            leftHand = joint;
+            break;
+          case JointID.HandRight:
+            rightHand = joint;
+            break;
+          case JointID.ShoulderLeft:
+            leftShoulder = joint;
+            break;
+          case JointID.ShoulderRight:
+            rightShoulder = joint;
+            break;
+        }
+      }
+
+      double handDist = DistanceJoints(leftHand, rightHand);
+
+      if (handDist <= RELOCATE_HAND_MAX_DIST &&
+          !possibleRelocateGestureLeftward && !possibleRelocateGestureRightward) {
+        if (!possibleRelocateGestureLeftward && leftHand.Position.X < leftShoulder.Position.X) {
+          possibleRelocateGestureLeftward = true;
+          startRelocateTime = DateTime.Now;
+        } else if (!possibleRelocateGestureRightward && rightHand.Position.X > rightShoulder.Position.X) {
+          possibleRelocateGestureRightward = true;
+          startRelocateTime = DateTime.Now;
+        }
+      }
+
+      bool definitelyInRelocateGesture = false;
+
+      if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
+          (DateTime.Now - startRelocateTime).TotalMilliseconds >= RELOCATE_INTERVAL) {
+        if (handDist <= RELOCATE_HAND_MAX_DIST && 
+            (possibleRelocateGestureLeftward && rightHand.Position.X > rightShoulder.Position.X) ||
+            (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
+          definitelyInRelocateGesture = true;
+          System.Diagnostics.Debugger.Break();
+        }
+
+        possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
+      }
+
+      return definitelyInRelocateGesture;
+    }
+
     private void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e) {
       SkeletonFrame skeletonFrame = e.SkeletonFrame;
 
@@ -322,7 +376,8 @@ namespace myHelperBot
           WriteHttpRequest(FindJoint(data.Joints, JointID.Spine),
                            IsInStopGesture(data.Joints),
                            IsInGoGesture(data.Joints),
-                           IsInSaveGesture(data.Joints));
+                           IsInSaveGesture(data.Joints),
+                           IsInRelocateGesture(data.Joints));
           break;
         }
       }
@@ -330,13 +385,14 @@ namespace myHelperBot
     #endregion Skeletal processing
 
     #region http
-    private void WriteHttpRequest(Joint joint, bool gestureStop, bool gestureGo, bool gestureSave) {
+    private void WriteHttpRequest(Joint joint, bool gestureStop, bool gestureGo, bool gestureSave, bool gestureRelocate) {
       if ((DateTime.Now - lastRequest).TotalMilliseconds > 25) {
         WebClient client = new WebClient();
         string request = "http://192.168.137.183/?data=" +
                          Convert.ToInt32(gestureStop) + ", " +
                          Convert.ToInt32(gestureGo) + ", " +
                          Convert.ToInt32(gestureSave) + ", " +
+                         Convert.ToInt32(gestureRelocate) + ", " +
                          joint.Position.X + ", " +
                          joint.Position.Y + ", " +
                          joint.Position.Z;
@@ -369,6 +425,9 @@ namespace myHelperBot
     private const double SAVE_HAND_START_DIST = 0.5;
     private const double SAVE_HAND_END_DIST = 0.2;
     private const int SAVE_INTERVAL = 750;
+
+    private const double RELOCATE_HAND_MAX_DIST = 0.3;
+    private const int RELOCATE_INTERVAL = 500;
     #endregion constants
 
     #region Private state
@@ -388,6 +447,10 @@ namespace myHelperBot
 
     private bool possibleSaveGesture = false;
     private DateTime startSaveTime;
+
+    private bool possibleRelocateGestureLeftward = false;
+    private bool possibleRelocateGestureRightward = false;
+    private DateTime startRelocateTime;
     #endregion Private state
   }
 }

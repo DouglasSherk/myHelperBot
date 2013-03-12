@@ -41,24 +41,30 @@ void MotorController::adjustPWM(int timeElapsed) {
     long currentIndex = _en.getIndex();
     
     _measuredSpeed = (currentIndex - _lastIndex)/(double(timeElapsed)/1000.00);
-        
-    if(_isForward ^ (_speed > 0)) {
-        if(abs(_measuredSpeed) < 500) {
-            _isForward = !_isForward; //robot is now going in same direction as motor power is asking.
-        }
-        else {
-            _measuredSpeed *= -1;
-            //Serial.print("inverted");
-        }
+    
+    /*Serial.print("\tpremeasured speed: ");
+    Serial.print(_measuredSpeed);*/
+    
+    if( (_speed > 0) ^ (_pwmValue > 0) ) {
+        _measuredSpeed *= -1;
     }
     
-    //Serial.print("\tmeasured speed: ");
-    //Serial.print(_measuredSpeed);
+    /*Serial.print("\tdesired speed: ");
+     Serial.print(_speed);
+     Serial.print("\tmeasured speed: ");
+     Serial.print(_measuredSpeed);*/
     
     int correction = (_speed-_measuredSpeed)/100; ///100
     
-    //Serial.print("\tcorrection: ");
-    //Serial.print(correction);
+    if(correction>MAX_CORRECTION) {
+        correction = MAX_CORRECTION;
+    }
+    else if(correction < -MAX_CORRECTION) {
+        correction = -MAX_CORRECTION;
+    }
+    
+    /*Serial.print("\tcorrection: ");
+     Serial.println(correction);*/
     
     _pwmValue += correction;
     if(_pwmValue < -255) {
@@ -68,8 +74,8 @@ void MotorController::adjustPWM(int timeElapsed) {
         _pwmValue = 255;
     }
     
-    //Serial.print("\tpwm: ");
-    //Serial.println(_pwmValue);
+    /*Serial.print("\tpwm: ");
+     Serial.println(_pwmValue);*/
     
     _ms.setPWM(_pwmValue);
     _lastIndex = currentIndex;
@@ -83,7 +89,7 @@ void MotorController::periodicUpdate(int timeElapsed) {
 
 // Update the encoder value
 void MotorController::updateEncoder() {
-    if(_speed > 0) {
+    if(_pwmValue > 0) {
         _en.updateIndex(true);
     }
     else {
@@ -115,7 +121,8 @@ void MotorController::setPWM(int speed) {
         powerToGetSpeed = ceil(powerInterpolated) * (speed > 0 ? 1 : -1);
     }
     _ms.setPWM(powerToGetSpeed);
-
+    _pwmValue = powerToGetSpeed;
+    
     //Serial.print("set pwm: ");
     //Serial.println(speed/double(MAX_SPEED)*255);
 }

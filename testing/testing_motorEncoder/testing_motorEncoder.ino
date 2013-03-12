@@ -1,33 +1,41 @@
-#define power1 8
-#define ground1 9
-#define index1 4
-#define power2 10
-#define ground2 11
-#define index2 5
-
-#include <Encoder.h>
-Encoder enL(10,11,5);
-Encoder enR(8,9,4);
+#include "MC33926MotorShield.h"
+MC33926MotorShield motorL(30, 22, 24, 2, 26, 28); //left
+MC33926MotorShield motorR(31, 23, 25, 3, 27, 29); //right
 
 #include "Timer.h"
 Timer t;
 
+#include "Encoder.h"
+Encoder enL(10,11,5);
+Encoder enR(8,9,4);
+
+#include "MotorController.h"
+MotorController mcL(motorL, enL);
+MotorController mcR(motorR, enR);
+
+#include "DualMotorController.h"
+DualMotorController mc(mcL, mcR);
+
+int testSpeed[] = {0, 2500, 0, -2500};
+int testSpeedIndex = 0;
+
 void setup() {
    Serial.begin(38400);
-/*   pinMode(index1, INPUT);
-   pinMode(ground1, OUTPUT);
-   digitalWrite(ground1, LOW);
-   pinMode(power1, OUTPUT);
-   digitalWrite(power1, HIGH);
-   
-   pinMode(index2, INPUT);
-   pinMode(ground2, OUTPUT);
-   digitalWrite(ground2, LOW);
-   pinMode(power2, OUTPUT);
-   digitalWrite(power2, HIGH);   */
+   motorL.init(); 
+   motorR.init();
    enL.init();
    enR.init();
+   mcL.init();
+   mcR.init(); 
    t.every(100,printEncoderValues);
+   t.every(2000,changeSpeed);
+}
+
+void changeSpeed() { //want to see if roobt position is about equal when it returns
+   testSpeedIndex = (testSpeedIndex + 1)%4;
+   Serial.print("ardNewSpeed: ");
+   Serial.println(testSpeed[testSpeedIndex]);
+   mc.setSpeed(testSpeed[testSpeedIndex], testSpeed[testSpeedIndex]);  
 }
 
 void printEncoderValues() {
@@ -36,62 +44,8 @@ void printEncoderValues() {
    Serial.print("\tR: ");
    Serial.println(enR.getIndex()); 
 }
-
-/*  int sumIndex1 = 0;
-  int sumIndex2 = 0;
-  
-  int lastIndex1 = 0;
-  int lastIndex2 = 0;
-  
-  int currentIndex1;
-  int currentIndex2;
-  
-  int numMissedX = 0;
-  int numMissedY = 0;
-  
-  int minMissed = 10000;*/
   
 void loop(){
-  enL.updateIndex(true);
-  enR.updateIndex(true);
-  t.update();
-  
-/*  currentIndex1 = digitalRead(index1);
-  currentIndex2 = digitalRead(index2);
-  
-  if (currentIndex1 != lastIndex1) {
-     lastIndex1 = currentIndex1;
-     sumIndex1 += 1; 
-  }
-  else {
-    numMissedX += 1; 
-  }
-  
-  if (currentIndex2 != lastIndex2) {
-     lastIndex2 = currentIndex2;
-     sumIndex2 += 1; 
-  }
-  else{
-   numMissedY += 1; 
-  }*/
-  
-  /*Serial.print("Index1: "); 
-  Serial.print(currentIndex1);
-  Serial.print("  ");
-  Serial.print(sumIndex1);
-  Serial.print("    Index2: "); 
-  Serial.print(currentIndex2);
-  Serial.print("  ");
-  Serial.println(sumIndex2);*/
-  
-/*  if(numMissedX > minMissed || numMissedY > minMissed) {
-     Serial.print("Index 1: ");
-     Serial.print(sumIndex1);
-     numMissedX = 0; 
-     
-     Serial.print("    Index 2: ");
-     Serial.println(sumIndex2); 
-     numMissedY = 0;
-  }*/
-  
+  mc.updateEncoders();
+  t.update();  
 }

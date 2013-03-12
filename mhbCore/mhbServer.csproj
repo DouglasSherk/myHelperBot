@@ -71,6 +71,7 @@
     <Compile Include="mhbCore.cs" />
     <Compile Include="mhbGlobal.cs" />
     <Compile Include="mhbKinect.cs" />
+    <Compile Include="mhbLogic.cs" />
     <Compile Include="mhbSerial.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

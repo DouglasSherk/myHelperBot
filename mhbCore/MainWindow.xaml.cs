@@ -67,10 +67,10 @@ namespace myHelperBot
       switch (e.Status)
       {
         case KinectStatus.Connected:
-          mCore.mKinect.Kinect = e.KinectRuntime;
+          mCore.SetKinect(e.KinectRuntime);
           break;
         case KinectStatus.Disconnected:
-          mCore.mKinect.Kinect = null;
+          mCore.SetKinect(null);
           break;
         default:
 
@@ -85,7 +85,7 @@ namespace myHelperBot
     {
       foreach (Runtime runtime in Runtime.Kinects)
       {
-        mCore.mKinect.Kinect = runtime;
+        mCore.SetKinect(runtime);
       }
       updateUI();
     }
@@ -94,7 +94,7 @@ namespace myHelperBot
     {
       foreach (object item in viewerHolder.Items)
       {
-        mCore.mKinect.Kinect = null;
+        mCore.SetKinect(null);
       }
       updateUI();
     }

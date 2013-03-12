@@ -30,7 +30,8 @@ class MotorController
 
         const static int MIN_POWER = 170;
         const static int MAX_POWER = 255;
-
+        const static int MAX_CORRECTION = 25;
+    
         Encoder &_en;
         MC33926MotorShield &_ms;
         void periodicUpdate(int timeElapsed);

@@ -104,13 +104,13 @@ void MotorController::setPWM(int speed) {
     if (speed) {
         // Calculate uninterpolated power, which is a direct linear
         // unit conversion from speed to power.
-        double powerUninterpolated = fabs(speed) / double(MAX_SPEED) * 255;
+        double powerUninterpolated = MAX_POWER * fabs(speed) / double(MAX_SPEED);
 
         // Linearly interpolate power from the minimum required to
         // actually move the motors to the maximum.
         double powerInterpolated =
             MIN_POWER +
-            double(MAX_POWER - MIN_POWER) / MAX_POWER;
+            powerUninterpolated * double(MAX_POWER - MIN_POWER) / MAX_POWER;
 
         powerToGetSpeed = ceil(powerInterpolated) * (speed > 0 ? 1 : -1);
     }

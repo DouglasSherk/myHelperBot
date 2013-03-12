@@ -51,7 +51,7 @@ void motorRCallback(const std_msgs::Int32& speed) {
 }
 
 void motorLCallback(const std_msgs::Int32& speed) {
-  rightSpeed = speed.data
+  rightSpeed = speed.data;
   dmc.setSpeed(leftSpeed, rightSpeed);
 }
 

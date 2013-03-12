@@ -40,7 +40,7 @@ void DualMotorController::setSpeed(int sL, int sR) {
         sR = -_maxSpeed;
     }
     
-    if (sL > 0 && sR > 0 && abs(sL - sR) < 500) {
+    if (sL > 1000 && sR > 1000 && abs(sL - sR) < 500) {
         Serial.println("sc YES");
         _mL.setSpeed(sL);
         _mR.setSpeed(-sR); //right motor is wired backwards

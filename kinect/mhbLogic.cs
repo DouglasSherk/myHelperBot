@@ -63,6 +63,13 @@ namespace myHelperBot
     }
     #endregion Initialization
 
+    #region Utils
+    private bool InRange(double val, double min, double max)
+    {
+      return val >= min && val <= max;
+    }
+    #endregion Utils
+
     #region Skeletal processing
     private Joint FindJoint(JointsCollection joints, JointID jointID)
     {
@@ -178,18 +185,10 @@ namespace myHelperBot
 
     private bool IsInGoGesture(JointsCollection joints)
     {
-      if (numSuccessiveStopGestures > 0) {
-        return false;
-      }
-
       Joint leftHand = new Joint(),
             rightHand = new Joint(),
-            leftWrist = new Joint(),
-            rightWrist = new Joint(),
-            leftElbow = new Joint(),
-            rightElbow = new Joint(),
-            spine = new Joint(),
-            head = new Joint();
+            leftShoulder = new Joint(),
+            rightShoulder = new Joint();
 
       foreach (Joint joint in joints) {
         switch (joint.ID) {
@@ -199,57 +198,48 @@ namespace myHelperBot
           case JointID.HandRight:
             rightHand = joint;
             break;
-          case JointID.ElbowLeft:
-            leftElbow = joint;
+          case JointID.ShoulderLeft:
+            leftShoulder = joint;
             break;
-          case JointID.ElbowRight:
-            rightElbow = joint;
-            break;
-          case JointID.WristLeft:
-            leftWrist = joint;
-            break;
-          case JointID.WristRight:
-            rightWrist = joint;
-            break;
-          case JointID.Head:
-            head = joint;
-            break;
-          case JointID.Spine:
-            spine = joint;
+          case JointID.ShoulderRight:
+            rightShoulder = joint;
             break;
           default:
             break;
         }
       }
 
-      double leftWristAngle = AngleJoints(leftHand, leftWrist, leftElbow, leftWrist);
-      double rightWristAngle = AngleJoints(rightHand, rightWrist, rightElbow, rightWrist);
       double handDist = DistanceJoints(leftHand, rightHand);
+      double leftHandDist = DistanceJoints(leftHand, leftShoulder);
+      double rightHandDist = DistanceJoints(rightHand, rightShoulder);
 
-      if (leftHand.Position.Y < head.Position.Y && rightHand.Position.Y < head.Position.Y &&
-          leftHand.Position.Y > spine.Position.Y && rightHand.Position.Y > spine.Position.Y &&
-          leftWristAngle >= GO_WRIST_START_ANGLE && rightWristAngle >= GO_WRIST_START_ANGLE &&
-          handDist < GO_HAND_MAX_DIST && !possibleGoGesture) {
+      if (!possibleGoGesture &&
+          InRange(handDist, GO_HAND_MIN_DIFF, GO_HAND_MAX_DIFF) &&
+          Math.Abs(leftHandDist - rightHandDist) <= GO_HAND_MAX_DIFF &&
+          InRange(leftHandDist, GO_HAND_START_MIN_DIST, GO_HAND_START_MAX_DIST) &&
+          InRange(rightHandDist, GO_HAND_START_MIN_DIST, GO_HAND_START_MAX_DIST) &&
+          leftHand.Position.Z < leftShoulder.Position.Z &&
+          rightHand.Position.Z < rightShoulder.Position.Z) {
         possibleGoGesture = true;
-        lastGoLeftWristAngle = leftWristAngle;
-        lastGoRightWristAngle = rightWristAngle;
-        startGoLeftHandY = leftHand.Position.Y;
-        startGoRightHandY = rightHand.Position.Y;
-        startGoLeftHandZ = leftHand.Position.Z;
-        startGoRightHandZ = rightHand.Position.Z;
         startGoTime = DateTime.Now;
       }
 
       bool definitelyInGoGesture = false;
 
-      if (possibleGoGesture && (DateTime.Now - startGoTime).TotalMilliseconds >= GO_INTERVAL) {
-        if (leftWristAngle < lastGoLeftWristAngle && rightWristAngle < lastGoRightWristAngle &&
-            (leftHand.Position.Y > startGoLeftHandY && rightHand.Position.Y > startGoRightHandY ||
-             leftHand.Position.Z > startGoLeftHandZ && rightHand.Position.Z > startGoRightHandZ)) {
-          definitelyInGoGesture = true;
-          //System.Diagnostics.Debugger.Break();
-        }
+      if (possibleGoGesture &&
+          InRange(handDist, GO_HAND_MIN_DIFF, GO_HAND_MAX_DIFF) &&
+          Math.Abs(leftHandDist - rightHandDist) <= GO_HAND_MAX_DIFF &&
+          InRange(leftHandDist, GO_HAND_END_MIN_DIST, GO_HAND_END_MAX_DIST) &&
+          InRange(rightHandDist, GO_HAND_END_MIN_DIST, GO_HAND_END_MAX_DIST) &&
+          leftHand.Position.Z < leftShoulder.Position.Z &&
+          rightHand.Position.Z < rightShoulder.Position.Z) {
+        definitelyInGoGesture = true;
+        possibleGoGesture = false;
+        System.Diagnostics.Debugger.Break();
+      }
 
+      if (possibleGoGesture &&
+          (DateTime.Now - startGoTime).TotalMilliseconds >= GO_INTERVAL) {
         possibleGoGesture = false;
       }
       
@@ -396,7 +386,7 @@ namespace myHelperBot
                          joint.Position.Y + ", " +
                          joint.Position.Z;
         try {
-          webClient.DownloadString(request);
+          //webClient.DownloadString(request);
         } catch {
 
         }
@@ -420,10 +410,13 @@ namespace myHelperBot
     private const double STOP_ELBOW_ANGLE_TOL = 10.0;
     private const double STOP_HAND_MIN_DIST = 0.5;
 
-    private const double GO_HAND_MAX_DIST = 0.4;
-    private const double GO_WRIST_START_ANGLE = 165.0;
-    private const double GO_WRIST_END_ANGLE = 145.0;
-    private const int GO_INTERVAL = 250;
+    private const double GO_HAND_MIN_DIFF = 0.25;
+    private const double GO_HAND_MAX_DIFF = 0.5;
+    private const double GO_HAND_START_MIN_DIST = 0.35;
+    private const double GO_HAND_START_MAX_DIST = 0.7;
+    private const double GO_HAND_END_MIN_DIST = 0.1;
+    private const double GO_HAND_END_MAX_DIST = 0.3;
+    private const int GO_INTERVAL = 500;
 
     private const double SAVE_HAND_START_DIST = 0.5;
     private const double SAVE_HAND_END_DIST = 0.2;

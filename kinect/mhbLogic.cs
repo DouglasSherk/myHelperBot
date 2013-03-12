@@ -175,7 +175,7 @@ namespace myHelperBot
       bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
 
       if (definitelyInStopGesture) {
-        //System.Diagnostics.Debugger.Break();
+        System.Diagnostics.Debugger.Break();
         possibleGoGesture = false;
         numSuccessiveStopGestures = 0;
       }
@@ -274,25 +274,27 @@ namespace myHelperBot
 
       double handDist = DistanceJoints(leftHand, rightHand);
 
-      if (!possibleSaveGesture) {
-        if (leftHand.Position.Y < centerShoulder.Position.Y &&
-            rightHand.Position.Y < centerShoulder.Position.Y &&
-            handDist >= SAVE_HAND_START_DIST) {
-          possibleSaveGesture = true;
-          startSaveTime = DateTime.Now;
-        }
+      if (!possibleSaveGesture &&
+          leftHand.Position.Y < centerShoulder.Position.Y &&
+          rightHand.Position.Y < centerShoulder.Position.Y &&
+          handDist >= SAVE_HAND_START_DIST) {
+        possibleSaveGesture = true;
+        startSaveTime = DateTime.Now;
       }
 
       bool definitelyInSaveGesture = false;
 
-      if (possibleSaveGesture && (DateTime.Now - startSaveTime).TotalMilliseconds >= SAVE_INTERVAL) {
-        if (leftHand.Position.Y < spine.Position.Y &&
-            rightHand.Position.Y < spine.Position.Y &&
-            handDist <= SAVE_HAND_END_DIST) {
-          definitelyInSaveGesture = true;
-          //System.Diagnostics.Debugger.Break();
-        }
+      if (possibleSaveGesture &&
+          leftHand.Position.Y < spine.Position.Y &&
+          rightHand.Position.Y < spine.Position.Y &&
+          handDist <= SAVE_HAND_END_DIST) {
+        definitelyInSaveGesture = true;
+        possibleSaveGesture = false;
+        System.Diagnostics.Debugger.Break();
+      }
 
+      if (possibleSaveGesture &&
+          (DateTime.Now - startSaveTime).TotalMilliseconds >= SAVE_INTERVAL) {
         possibleSaveGesture = false;
       }
 
@@ -339,14 +341,16 @@ namespace myHelperBot
       bool definitelyInRelocateGesture = false;
 
       if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
-          (DateTime.Now - startRelocateTime).TotalMilliseconds >= RELOCATE_INTERVAL) {
-        if (handDist <= RELOCATE_HAND_MAX_DIST && 
-            (possibleRelocateGestureLeftward && rightHand.Position.X > rightShoulder.Position.X) ||
-            (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
-          definitelyInRelocateGesture = true;
-          //System.Diagnostics.Debugger.Break();
-        }
+          handDist <= RELOCATE_HAND_MAX_DIST &&
+          (possibleRelocateGestureLeftward && rightHand.Position.X > rightShoulder.Position.X) ||
+          (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
+        definitelyInRelocateGesture = true;
+        possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
+        System.Diagnostics.Debugger.Break();
+      }
 
+      if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
+          (DateTime.Now - startRelocateTime).TotalMilliseconds >= RELOCATE_INTERVAL) {
         possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
       }
 
@@ -362,7 +366,7 @@ namespace myHelperBot
       }
 
       foreach (SkeletonData data in skeletonFrame.Skeletons) {
-        if (SkeletonTrackingState.NotTracked != data.TrackingState) {
+        if (SkeletonTrackingState.Tracked == data.TrackingState) {
           WriteHttpRequest(FindJoint(data.Joints, JointID.Spine),
                            IsInStopGesture(data.Joints),
                            IsInGoGesture(data.Joints),

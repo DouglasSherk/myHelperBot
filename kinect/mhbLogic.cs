@@ -179,7 +179,7 @@ namespace myHelperBot
       bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
 
       if (definitelyInStopGesture) {
-        System.Diagnostics.Debugger.Break();
+        //System.Diagnostics.Debugger.Break();
         possibleGoGesture = false;
         numSuccessiveStopGestures = 0;
       }
@@ -244,7 +244,7 @@ namespace myHelperBot
           rightHand.Position.Z < rightShoulder.Position.Z) {
         definitelyInGoGesture = true;
         possibleGoGesture = false;
-        System.Diagnostics.Debugger.Break();
+        //System.Diagnostics.Debugger.Break();
       }
 
       if (possibleGoGesture &&
@@ -303,7 +303,7 @@ namespace myHelperBot
           handDist <= SAVE_HAND_END_DIST) {
         definitelyInSaveGesture = true;
         possibleSaveGesture = false;
-        System.Diagnostics.Debugger.Break();
+        //System.Diagnostics.Debugger.Break();
       }
 
       if (possibleSaveGesture &&
@@ -363,7 +363,7 @@ namespace myHelperBot
           (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
         definitelyInRelocateGesture = true;
         possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
-        System.Diagnostics.Debugger.Break();
+        //System.Diagnostics.Debugger.Break();
       }
 
       if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
@@ -402,12 +402,12 @@ namespace myHelperBot
                          Convert.ToInt32(gestureStop) + ", " +
                          Convert.ToInt32(gestureGo) + ", " +
                          Convert.ToInt32(gestureSave) + ", " +
-                         //Convert.ToInt32(gestureRelocate) + ", " +
+                         Convert.ToInt32(gestureRelocate) + ", " +
                          joint.Position.X + ", " +
                          joint.Position.Y + ", " +
                          joint.Position.Z;
         try {
-          //webClient.DownloadString(request);
+          webClient.DownloadString(request);
         } catch {
 
         }

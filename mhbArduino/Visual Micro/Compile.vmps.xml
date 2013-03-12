@@ -1,0 +1,58 @@
+<VisualMicro>
+  <Program Name="mhbArduino" Ext=".pde" Location="C:\Common\myHelperBot\mhbArduino">
+    <Debug LocalPort="COM7" LocalPortSpeed="57600" RemotePortSpeed="57600" />
+    <Compile CompilerErrors="0" ConfigurationName="Debug" StopOnError="False" OptimiseLibs="True" OptimiseCore="True" BuildPath="C:\Users\dsherk\AppData\Local\VMicro\Arduino\Builds\mhbArduino\uno" IncludeDebug="0" IncludesDebug="0" SketchName="mhbArduino" IsCompiled="1" />
+    <Platform Name="Arduino">
+      <Board Name="uno" Description="Arduino Uno" CoreFolder="C:\Common\Arduino\hardware\arduino\cores\arduino" VariantFullPath="C:\Common\Arduino\hardware\arduino\variants\standard" bootloader.extended_fuses="0x05" bootloader.file="optiboot_atmega328.hex" bootloader.high_fuses="0xde" bootloader.lock_bits="0x0F" bootloader.low_fuses="0xff" bootloader.path="optiboot" bootloader.unlock_bits="0x3F" build.core="arduino" build.f_cpu="16000000L" build.mcu="atmega328p" build.variant="standard" build.variant.vmresolved="C:\Common\Arduino\hardware\arduino\variants\standard" name="Arduino Uno" upload.maximum_size="32256" upload.protocol="arduino" upload.speed="115200" />
+    </Platform>
+    <VCCodeModel>
+      <VCCodeMacros>
+        <VCCodeMacro Name="ARDUINO" Value="104" />
+        <VCCodeMacro Name="ARDUINO" Value="104" />
+        <VCCodeMacro Name="__AVR_ATmega328P__" Value="" />
+        <VCCodeMacro Name="__AVR_ATmega328P__" Value="" />
+        <VCCodeMacro Name="F_CPU" Value="16000000L" />
+        <VCCodeMacro Name="F_CPU" Value="16000000L" />
+        <VCCodeMacro Name="__AVR__" Value="" />
+        <VCCodeMacro Name="__AVR__" Value="" />
+        <VCCodeMacro Name="__cplusplus" Value="" />
+        <VCCodeMacro Name="__cplusplus" Value="" />
+        <VCCodeMacro Name="__attribute__" Value="" />
+        <VCCodeMacro Name="__attribute__" Value="" />
+        <VCCodeMacro Name="__inline__" Value="" />
+        <VCCodeMacro Name="__inline__" Value="" />
+        <VCCodeMacro Name="__asm__" Value="" />
+        <VCCodeMacro Name="__asm__" Value="" />
+        <VCCodeMacro Name="__extension__" Value="" />
+        <VCCodeMacro Name="__extension__" Value="" />
+        <VCCodeMacro Name="__ATTR_PURE__" Value="" />
+        <VCCodeMacro Name="__ATTR_PURE__" Value="" />
+        <VCCodeMacro Name="__ATTR_CONST__" Value="" />
+        <VCCodeMacro Name="__ATTR_CONST__" Value="" />
+        <VCCodeMacro Name="__inline__" Value="" />
+        <VCCodeMacro Name="__inline__" Value="" />
+        <VCCodeMacro Name="__asm__" Value="" />
+        <VCCodeMacro Name="__asm__" Value="" />
+        <VCCodeMacro Name="__volatile__" Value="" />
+        <VCCodeMacro Name="__volatile__" Value="" />
+        <VCCodeMacro Name="__builtin_va_list" Value="" />
+        <VCCodeMacro Name="__builtin_va_list" Value="" />
+        <VCCodeMacro Name="__builtin_va_start" Value="" />
+        <VCCodeMacro Name="__builtin_va_start" Value="" />
+        <VCCodeMacro Name="__builtin_va_end" Value="" />
+        <VCCodeMacro Name="__builtin_va_end" Value="" />
+        <VCCodeMacro Name="__DOXYGEN__" Value="" />
+        <VCCodeMacro Name="__DOXYGEN__" Value="" />
+        <VCCodeMacro Name="prog_void" Value="" />
+        <VCCodeMacro Name="prog_void" Value="" />
+        <VCCodeMacro Name="PGM_VOID_P" Value="int" />
+        <VCCodeMacro Name="PGM_VOID_P" Value="int" />
+        <VCCodeMacro Name="NOINLINE" Value="__attribute__((noinline))" />
+        <VCCodeMacro Name="NOINLINE" Value="__attribute__((noinline))" />
+      </VCCodeMacros>
+      <VCCodeVariables>
+        <VCCodeVariable Name="ledPin" />
+      </VCCodeVariables>
+    </VCCodeModel>
+  </Program>
+</VisualMicro>

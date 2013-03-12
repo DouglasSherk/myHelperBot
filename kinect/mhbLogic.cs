@@ -397,7 +397,7 @@ namespace myHelperBot
 
     #region http
     private void WriteHttpRequest(Joint joint, bool gestureStop, bool gestureGo, bool gestureSave, bool gestureRelocate) {
-      if ((DateTime.Now - lastRequest).TotalMilliseconds > 10) {
+      if ((DateTime.Now - lastRequest).TotalMilliseconds > 25) {
         string request = "http://192.168.137.183/?data=" +
                          Convert.ToInt32(gestureStop) + ", " +
                          Convert.ToInt32(gestureGo) + ", " +

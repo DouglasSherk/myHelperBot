@@ -11,5 +11,7 @@ namespace myHelperBot
 
     public static int gLeftSpeed = 0;
     public static int gRightSpeed = 0;
+
+    public static bool gStopped = false;
   }
 }

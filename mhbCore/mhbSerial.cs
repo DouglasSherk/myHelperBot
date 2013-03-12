@@ -21,10 +21,7 @@ namespace myHelperBot
     {
       while (true) {
         lock (mhbGlobal.gLock) {
-          //mSerialPort.WriteLine(mhbGlobal.gLeftSpeed.ToString() + ", " + mhbGlobal.gRightSpeed.ToString());
-          String data = "test\0";
-          Console.WriteLine(data);
-          mSerialPort.Write(data.ToCharArray(), 0, data.Length);
+          mSerialPort.WriteLine(mhbGlobal.gLeftSpeed.ToString() + ", " + mhbGlobal.gRightSpeed.ToString() + "\0");
         }
 
         Thread.Sleep(50);

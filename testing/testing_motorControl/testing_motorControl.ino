@@ -16,7 +16,8 @@ MotorController mcR(motorR, enR);
 #include "DualMotorController.h"
 DualMotorController mc(mcL, mcR);
 
-int testSpeed = 2500;
+int testSpeedIndex = 0;
+int testSpeed[] = {0, 2500, 0, -2500};
 
 void setup() {   
    Serial.begin(38400);
@@ -29,7 +30,7 @@ void setup() {
    pinMode(13, OUTPUT);
    t.every(100,test);
    //t.every(1000,printSpeedData);
-   t.every(2000,changeSpeed);
+   t.every(5000,changeSpeed);
    //mcL.setSpeed(testSpeed);
    //mcR.setSpeed(testSpeed);
    //mc.setSpeed(testSpeed, testSpeed);
@@ -38,16 +39,17 @@ void setup() {
 int count = 0;
 
 void loop() {         
-      mcL.updateEncoder();
-      mcR.updateEncoder();
+      mc.updateEncoders();
+      //mcL.updateEncoder();
+      //mcR.updateEncoder();
       t.update();
 }
 
 void changeSpeed() {
-   testSpeed *= -1;
+   testSpeedIndex = (testSpeedIndex+1)%4;
    Serial.print("ardNewSpeed: ");
-   Serial.println(testSpeed);
-   mc.setSpeed(testSpeed, testSpeed);  
+   Serial.println(testSpeed[testSpeedIndex]);
+   mc.setSpeed(testSpeed[testSpeedIndex], testSpeed[testSpeedIndex]);  
 }
 
 void test() {
@@ -57,20 +59,23 @@ void test() {
 }
 
 void printSpeedData() {
-    //Serial.print("L_req: ");
-    //Serial.println(mcL._speed);
+    Serial.print("\tL_speed: ");
+    Serial.print(mcL._speed);
+    Serial.print("\tL_speed: ");
+    Serial.print(mcR._speed);   
     //Serial.print("\tL_cur: ");
     //Serial.print(mcL._currentSpeed);*/
-    /*Serial.print("L_ind: ");    
-    Serial.print(mcL._en.getIndex());
-    Serial.print("\tR_ind: ");    
-    Serial.println(mcR._en.getIndex());*/
-   /* Serial.print("\tL_lastInd: ");    
-    Serial.print(mcL._lastIndex);
+    //Serial.print("L_ind: ");    
+    //Serial.print(enL.getIndex());
+    //Serial.print("\tR_ind: ");    
+    //Serial.print(enR.getIndex());
+    //Serial.print("\tL_lastInd: ");    
+    //Serial.print(mcL._lastIndex);
     Serial.print("\tL_pmw: ");
-    Serial.println(mcL._pwmValue);*/
-    /*Serial.print("\tR_req: ");
-    Serial.print(mcR._speed);
+    Serial.print(mcL._pwmValue);
+    //Serial.print("\tR_req: ");
+    //Serial.print(mcR._speed);
     Serial.print("\tR_pmw: ");
-    Serial.println(mcR._pwmValue);*/   
+    Serial.print(mcR._pwmValue);
+    Serial.println();   
 }

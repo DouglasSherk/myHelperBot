@@ -47,14 +47,14 @@ void test() {
 }
 
 void changeSpeed() { //want to see if roobt position is about equal when it returns
-   testSpeedIndex = (testSpeedIndex + 1)% ;
+   testSpeedIndex = (testSpeedIndex + 1)%4;
    Serial.print("ardNewSpeed: ");
-   Serial.println(testSpeed);
-   mc.setSpeed(testSpeed, testSpeed);  
+   Serial.println(testSpeed[testSpeedIndex]);
+   mc.setSpeed(testSpeed[testSpeedIndex], testSpeed[testSpeedIndex]);  
 }
 
 void updatePosition() {
-     me.updatePosition(enL.getDeltaIndex(),enR.getDeltaIndex());
+     me.updatePosition(enL.getDeltaIndex(),-enR.getDeltaIndex());
      Serial.print("(");
      Serial.print(me.getX());
      Serial.print(", ");
@@ -65,5 +65,9 @@ void updatePosition() {
      Serial.print("L_ind: ");    
      Serial.print(enL.getIndex());
      Serial.print("\tR_ind: ");    
-     Serial.println(enR.getIndex());
+     Serial.print(enR.getIndex());
+     Serial.print("\tLspeed: ");
+     Serial.print(mc._mL._speed);
+     Serial.print("\tRspeed: ");
+     Serial.println(mc._mR._speed);     
 }

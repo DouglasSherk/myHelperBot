@@ -1,7 +1,7 @@
 #include <GP2Y0A21YK0F.h>
 #include <DistanceGP2Y0A21YK.h>
 
-GP2Y0A21YK0F testSensor(A1);
+GP2Y0A21YK0F testSensor(A4);
 DistanceGP2Y0A21YK Dist;
 int distance;
 double distanceRaw, distanceCM;
@@ -10,7 +10,7 @@ double distanceVolt;
 void setup() 
 {
   Serial.begin(9600);
-  Dist.begin(A1);
+  Dist.begin(A4);
 }
 
 void loop()

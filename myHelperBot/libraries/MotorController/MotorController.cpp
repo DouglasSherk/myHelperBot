@@ -7,6 +7,8 @@
 
 #include "MotorController.h"
 
+#include <math.h>
+
 MotorController::MotorController(MC33926MotorShield &ms, Encoder &en)
   : _isForward(true),
     _en(en),
@@ -21,11 +23,11 @@ void MotorController::init() {
 void MotorController::setSpeed(int s) {
     _useSpeedControl = true;
     
-    if(s>_maxSpeed) {
-        _speed = _maxSpeed;
+    if(s>MAX_SPEED) {
+        _speed = MAX_SPEED;
     }
-    else if(s<-_maxSpeed) {
-        _speed = -_maxSpeed;
+    else if(s<-MAX_SPEED) {
+        _speed = -MAX_SPEED;
     }
     else {
         _speed = s;
@@ -89,13 +91,31 @@ void MotorController::updateEncoder() {
     }
 }
 
-// speed is in ticks/second
+// Takes speed in the same units as setSpeed (ticks/s).
+// While there's no direct conversions between these two since
+// what we're really setting in this function is the acceleration,
+// we can at least convert approximately so that both functions
+// behave similarly over short times. Note that a speed of 0 stops
+// the motors, and any speed above or below that should make it
+// barely begin to move.
 void MotorController::setPWM(int speed) {
-
     _useSpeedControl = false;
-    _ms.setPWM(speed/double(_maxSpeed)*255);
-    
+    int powerToGetSpeed = 0;
+    if (speed) {
+        // Calculate uninterpolated power, which is a direct linear
+        // unit conversion from speed to power.
+        double powerUninterpolated = MAX_POWER * fabs(speed) / double(MAX_SPEED);
+
+        // Linearly interpolate power from the minimum required to
+        // actually move the motors to the maximum.
+        double powerInterpolated =
+            MIN_POWER +
+            powerUninterpolated * double(MAX_POWER - MIN_POWER) / MAX_POWER;
+
+        powerToGetSpeed = ceil(powerInterpolated) * (speed > 0 ? 1 : -1);
+    }
+    _ms.setPWM(powerToGetSpeed);
+
     //Serial.print("set pwm: ");
-    //Serial.println(speed/double(_maxSpeed)*255);
-    
+    //Serial.println(speed/double(MAX_SPEED)*255);
 }

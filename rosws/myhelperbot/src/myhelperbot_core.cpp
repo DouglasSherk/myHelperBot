@@ -5,11 +5,11 @@
 
 #include <sstream>
 
-const float SPEED_NONE = 100.0;
-const float SPEED_MAX = 2500.0;
+const float SPEED_NONE = 0.0;
+const float SPEED_MAX = 5000.0;
 
-const float DISTANCE_MIN = 1.4;
-const float DISTANCE_MAX = 1.6;
+const float DISTANCE_MIN = 1.7;
+const float DISTANCE_MAX = 2.0;
 
 const float ROTATION_MIN = -0.2;
 const float ROTATION_MAX = 0.2;
@@ -17,7 +17,10 @@ const float ROTATION_MAX = 0.2;
 /** Map a rotation of 5.0 to max speed. */
 const float ROTATION_FACTOR = SPEED_MAX / 1.0;
 /** Map a distance of 5.0 to max speed. */
-const float DISTANCE_FACTOR = SPEED_MAX / 1.0;
+const float DISTANCE_FACTOR = SPEED_MAX / 2.0;
+
+const float MOTOR_RIGHT_FACTOR = 0.8;
+const float MOTOR_LEFT_FACTOR = 1.0;
 
 float gLastDistance = 0.0;
 float gLastRotation = 0.0;
@@ -26,8 +29,6 @@ float gDistance = 0.0;
 float gRotation = 0.0;
 
 bool gStopped = false;
-
-int gConsecutiveStop = 0;
 
 int gConsecutiveSame = 0;
 
@@ -41,7 +42,7 @@ void kinectCallback(const std_msgs::String::ConstPtr& msg)
   sscanf(msg->data.c_str(), "%i, %i, %i, %f, %f, %f",
          &stop, &go, &save, &distances[0], &distances[1], &distances[2]);
 
-  if (!gStopped && !!stop && ++gConsecutiveStop >= 5) { gStopped = true; gConsecutiveStop = 0; }
+  if (!gStopped && !!stop) { gStopped = true; }
   if (gStopped && !!go) { gStopped = false; }
 
   ROS_WARN(msg->data.c_str());
@@ -80,8 +81,7 @@ void ultrasonicCallback(const std_msgs::String::ConstPtr& msg)
 
 void calculateMotorSpeeds(int& motorR, int& motorL)
 {
-  // XXX: Remove these when we have motor speed control working.
-  const float MIN_SPEED = 1000.0, CLOSE_SPEED = 500.0;
+  const float CLOSE_SPEED = 1000.0;
 
   static int prevSpeed[2];
 
@@ -98,26 +98,26 @@ void calculateMotorSpeeds(int& motorR, int& motorL)
   float distanceGettingCloser = (float) (fabsf(gDistance) < fabsf(gLastDistance));
 
   if (gRotation > ROTATION_MAX) {
-    float propSpeed = MIN_SPEED + (gRotation - ROTATION_MAX) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
-    motorR = (int) propSpeed;
-    motorL = (int) -propSpeed;
-  } else if (gRotation < ROTATION_MIN) {
-    float propSpeed = MIN_SPEED + (ROTATION_MIN - gRotation) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
+    float propSpeed = (gRotation - ROTATION_MAX) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
+    if (propSpeed < 0.0) propSpeed = 0.0;
     motorR = (int) -propSpeed;
     motorL = (int) propSpeed;
+  } else if (gRotation < ROTATION_MIN) {
+    float propSpeed = (ROTATION_MIN - gRotation) * ROTATION_FACTOR - rotationGettingCloser * CLOSE_SPEED;
+    if (propSpeed < 0.0) propSpeed = 0.0;
+    motorR = (int) propSpeed;
+    motorL = (int) -propSpeed;
   } else if (gDistance > DISTANCE_MAX) {
-    float propSpeed = MIN_SPEED + (gDistance - DISTANCE_MAX) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
-    motorR = (int) propSpeed * 0.9;
+    float propSpeed = (gDistance - DISTANCE_MAX) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
+    if (propSpeed < 0.0) propSpeed = 0.0;
+    motorR = (int) propSpeed * MOTOR_RIGHT_FACTOR;
     motorL = (int) propSpeed;
   } else if (gDistance < DISTANCE_MIN) {
-    float propSpeed = MIN_SPEED + (DISTANCE_MIN - gDistance) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
-    motorR = (int) -propSpeed * 0.9;
+    float propSpeed = (DISTANCE_MIN - gDistance) * DISTANCE_FACTOR - distanceGettingCloser * CLOSE_SPEED;
+    if (propSpeed < 0.0) propSpeed = 0.0;
+    motorR = (int) -propSpeed * MOTOR_RIGHT_FACTOR;
     motorL = (int) -propSpeed;
   } 
-
-  // Max out throttle on start from stop.
-  // XXX: Remove these when we have motor speed control working.
-  if (prevSpeed[0] == 0 && prevSpeed[1] == 0 && motorR != 0 && motorL != 0) { motorR *= 999; motorL *= 999; }
 
   if (motorR < -SPEED_MAX) motorR = -SPEED_MAX;
   else if (motorR > SPEED_MAX) motorR = SPEED_MAX;

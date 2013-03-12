@@ -28,7 +28,7 @@ namespace myHelperBot
     public MainWindow()
     {
       InitializeComponent();
-      mLogic = new mhbKinect();
+      mCore = new mhbCore();
     }
 
     private void Window_Loaded(object sender, EventArgs e)
@@ -51,7 +51,7 @@ namespace myHelperBot
     #region UI
     private void updateUI()
     {
-      if (mLogic != null) {
+      if (mCore != null) {
         switchToAnotherKinectSensor.Visibility = System.Windows.Visibility.Visible;
         insertKinectSensor.Visibility = System.Windows.Visibility.Collapsed;
       } else {
@@ -67,10 +67,10 @@ namespace myHelperBot
       switch (e.Status)
       {
         case KinectStatus.Connected:
-          mLogic.Kinect = e.KinectRuntime;
+          mCore.mKinect.Kinect = e.KinectRuntime;
           break;
         case KinectStatus.Disconnected:
-          mLogic.Kinect = null;
+          mCore.mKinect.Kinect = null;
           break;
         default:
 
@@ -85,7 +85,7 @@ namespace myHelperBot
     {
       foreach (Runtime runtime in Runtime.Kinects)
       {
-        mLogic.Kinect = runtime;
+        mCore.mKinect.Kinect = runtime;
       }
       updateUI();
     }
@@ -94,14 +94,14 @@ namespace myHelperBot
     {
       foreach (object item in viewerHolder.Items)
       {
-        mLogic.Kinect = null;
+        mCore.mKinect.Kinect = null;
       }
       updateUI();
     }
     #endregion KinectViewer Utilities
 
     #region Private state
-    mhbKinect mLogic;
+    mhbCore mCore;
     #endregion Private state
   }
 }

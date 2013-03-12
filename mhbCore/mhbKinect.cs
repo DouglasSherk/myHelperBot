@@ -455,12 +455,6 @@ namespace myHelperBot
     private int numSuccessiveStopGestures = 0;
 
     private bool possibleGoGesture = false;
-    private double lastGoLeftWristAngle;
-    private double lastGoRightWristAngle;
-    private double startGoLeftHandY;
-    private double startGoRightHandY;
-    private double startGoLeftHandZ;
-    private double startGoRightHandZ;
     private DateTime startGoTime;
 
     private bool possibleSaveGesture = false;

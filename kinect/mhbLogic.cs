@@ -168,7 +168,7 @@ namespace myHelperBot
       bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
 
       if (definitelyInStopGesture) {
-        System.Diagnostics.Debugger.Break();
+        //System.Diagnostics.Debugger.Break();
         possibleGoGesture = false;
         numSuccessiveStopGestures = 0;
       }
@@ -247,7 +247,7 @@ namespace myHelperBot
             (leftHand.Position.Y > startGoLeftHandY && rightHand.Position.Y > startGoRightHandY ||
              leftHand.Position.Z > startGoLeftHandZ && rightHand.Position.Z > startGoRightHandZ)) {
           definitelyInGoGesture = true;
-          System.Diagnostics.Debugger.Break();
+          //System.Diagnostics.Debugger.Break();
         }
 
         possibleGoGesture = false;
@@ -300,7 +300,7 @@ namespace myHelperBot
             rightHand.Position.Y < spine.Position.Y &&
             handDist <= SAVE_HAND_END_DIST) {
           definitelyInSaveGesture = true;
-          System.Diagnostics.Debugger.Break();
+          //System.Diagnostics.Debugger.Break();
         }
 
         possibleSaveGesture = false;
@@ -354,7 +354,7 @@ namespace myHelperBot
             (possibleRelocateGestureLeftward && rightHand.Position.X > rightShoulder.Position.X) ||
             (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
           definitelyInRelocateGesture = true;
-          System.Diagnostics.Debugger.Break();
+          //System.Diagnostics.Debugger.Break();
         }
 
         possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
@@ -372,7 +372,7 @@ namespace myHelperBot
       }
 
       foreach (SkeletonData data in skeletonFrame.Skeletons) {
-        if (SkeletonTrackingState.Tracked == data.TrackingState) {
+        if (SkeletonTrackingState.NotTracked != data.TrackingState) {
           WriteHttpRequest(FindJoint(data.Joints, JointID.Spine),
                            IsInStopGesture(data.Joints),
                            IsInGoGesture(data.Joints),
@@ -386,19 +386,22 @@ namespace myHelperBot
 
     #region http
     private void WriteHttpRequest(Joint joint, bool gestureStop, bool gestureGo, bool gestureSave, bool gestureRelocate) {
-      if ((DateTime.Now - lastRequest).TotalMilliseconds > 25) {
-        WebClient client = new WebClient();
+      if ((DateTime.Now - lastRequest).TotalMilliseconds > 10) {
         string request = "http://192.168.137.183/?data=" +
                          Convert.ToInt32(gestureStop) + ", " +
                          Convert.ToInt32(gestureGo) + ", " +
                          Convert.ToInt32(gestureSave) + ", " +
-                         Convert.ToInt32(gestureRelocate) + ", " +
+                         //Convert.ToInt32(gestureRelocate) + ", " +
                          joint.Position.X + ", " +
                          joint.Position.Y + ", " +
                          joint.Position.Z;
+        try {
+          webClient.DownloadString(request);
+        } catch {
+
+        }
         Console.WriteLine(request);
         Console.ReadLine();
-        //client.DownloadString(request);
         lastRequest = DateTime.Now;
       }
     }
@@ -433,6 +436,7 @@ namespace myHelperBot
     #region Private state
     private KinectNui.Runtime _Kinect;
     private DateTime lastRequest;
+    private WebClient webClient = new WebClient();
 
     private int numSuccessiveStopGestures = 0;
 

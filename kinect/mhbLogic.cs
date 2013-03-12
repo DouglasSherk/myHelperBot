@@ -100,8 +100,12 @@ namespace myHelperBot
                        ((ignoreAxes & Axis.Z) == Axis.Z ? 0.0 : Math.Pow(a.Position.Z - b.Position.Z, 2.0)));
     }
 
-    private bool IsInStopGesture(JointsCollection joints)
+    private bool IsInStopGesture(SkeletonData data)
     {
+      if ((data.Quality &
+           (SkeletonQuality.ClippedTop | SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
+        return false;
+      }
       Joint head = new Joint(),
             spine = new Joint(),
             leftShoulder = new Joint(),
@@ -114,7 +118,7 @@ namespace myHelperBot
             leftElbow = new Joint(),
             rightElbow = new Joint();
 
-      foreach (Joint joint in joints) {
+      foreach (Joint joint in data.Joints) {
         switch (joint.ID) {
           case JointID.Head:
             head = joint;
@@ -183,14 +187,19 @@ namespace myHelperBot
       return definitelyInStopGesture;
     }
 
-    private bool IsInGoGesture(JointsCollection joints)
+    private bool IsInGoGesture(SkeletonData data)
     {
+      if ((data.Quality &
+           (SkeletonQuality.ClippedTop | SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
+        return false;
+      }
+
       Joint leftHand = new Joint(),
             rightHand = new Joint(),
             leftShoulder = new Joint(),
             rightShoulder = new Joint();
 
-      foreach (Joint joint in joints) {
+      foreach (Joint joint in data.Joints) {
         switch (joint.ID) {
           case JointID.HandLeft:
             leftHand = joint;
@@ -246,14 +255,18 @@ namespace myHelperBot
       return definitelyInGoGesture;
     }
 
-    private bool IsInSaveGesture(JointsCollection joints)
+    private bool IsInSaveGesture(SkeletonData data)
     {
+      if ((data.Quality &
+           (SkeletonQuality.ClippedTop | SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
+        return false;
+      }
       Joint leftHand = new Joint(),
       rightHand = new Joint(),
       spine = new Joint(),
       centerShoulder = new Joint();
 
-      foreach (Joint joint in joints) {
+      foreach (Joint joint in data.Joints) {
         switch (joint.ID) {
           case JointID.HandLeft:
             leftHand = joint;
@@ -301,14 +314,18 @@ namespace myHelperBot
       return definitelyInSaveGesture;
     }
 
-    private bool IsInRelocateGesture(JointsCollection joints)
+    private bool IsInRelocateGesture(SkeletonData data)
     {
+      if ((data.Quality &
+          (SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
+        return false;
+      }
       Joint leftHand = new Joint(),
             rightHand = new Joint(),
             leftShoulder = new Joint(),
             rightShoulder = new Joint();
 
-      foreach (Joint joint in joints) {
+      foreach (Joint joint in data.Joints) {
         switch (joint.ID) {
           case JointID.HandLeft:
             leftHand = joint;
@@ -368,10 +385,10 @@ namespace myHelperBot
       foreach (SkeletonData data in skeletonFrame.Skeletons) {
         if (SkeletonTrackingState.Tracked == data.TrackingState) {
           WriteHttpRequest(FindJoint(data.Joints, JointID.Spine),
-                           IsInStopGesture(data.Joints),
-                           IsInGoGesture(data.Joints),
-                           IsInSaveGesture(data.Joints),
-                           IsInRelocateGesture(data.Joints));
+                           IsInStopGesture(data),
+                           IsInGoGesture(data),
+                           IsInSaveGesture(data),
+                           IsInRelocateGesture(data));
           break;
         }
       }

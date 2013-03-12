@@ -386,12 +386,12 @@ namespace myHelperBot
           Point3D trackingPoint =
             new Point3D(trackingJoint.Position.X, trackingJoint.Position.Y, trackingJoint.Position.Z);
 
-          lock (mhbGlobal.gLock) {
-            mhbGlobal.gUserPosition = trackingPoint;
-            mhbGlobal.gIsInStopGesture |= IsInStopGesture(data);
-            mhbGlobal.gIsInGoGesture |= IsInGoGesture(data);
-            mhbGlobal.gIsInSaveGesture |= IsInSaveGesture(data);
-            mhbGlobal.gIsInRelocateGesture |= IsInRelocateGesture(data);
+          lock (mhbState.Lock) {
+            mhbState.g.userPosition = trackingPoint;
+            mhbState.g.isInStopGesture |= IsInStopGesture(data);
+            mhbState.g.isInGoGesture |= IsInGoGesture(data);
+            mhbState.g.isInSaveGesture |= IsInSaveGesture(data);
+            mhbState.g.isInRelocateGesture |= IsInRelocateGesture(data);
           }
 
           break;
@@ -400,7 +400,7 @@ namespace myHelperBot
 
       // Careful here! If anyone else tries to modify this, we're liable to overwrite them.
       // lock (mhbGlobal.lock) {
-      mhbGlobal.gIsTracking = isTracking;
+      mhbState.g.isTracking = isTracking;
       // }
     }
     #endregion Skeletal processing

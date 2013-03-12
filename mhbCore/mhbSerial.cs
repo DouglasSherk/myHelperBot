@@ -20,8 +20,9 @@ namespace myHelperBot
     public void loop()
     {
       while (true) {
-        lock (mhbGlobal.gLock) {
-          mSerialPort.WriteLine(mhbGlobal.gLeftSpeed.ToString() + ", " + mhbGlobal.gRightSpeed.ToString() + "\0");
+        lock (mhbState.Lock) {
+          mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
+                                mhbState.g.rightSpeed.ToString() + "\0");
         }
 
         Thread.Sleep(50);

@@ -1,6 +1,4 @@
 C:\Common\myHelperBot\mhbCore\bin\Debug\myHelperBot.exe.config
-C:\Common\myHelperBot\mhbCore\obj\Debug\myHelperBot.exe
-C:\Common\myHelperBot\mhbCore\obj\Debug\myHelperBot.pdb
 C:\Common\myHelperBot\mhbCore\bin\Debug\myHelperBot.exe
 C:\Common\myHelperBot\mhbCore\bin\Debug\myHelperBot.pdb
 C:\Common\myHelperBot\mhbCore\bin\Debug\INuiInstanceHelper.dll
@@ -10,3 +8,5 @@ C:\Common\myHelperBot\mhbCore\obj\Debug\MainWindow.g.cs
 C:\Common\myHelperBot\mhbCore\obj\Debug\App.g.cs
 C:\Common\myHelperBot\mhbCore\obj\Debug\myHelperBot_MarkupCompile.cache
 C:\Common\myHelperBot\mhbCore\obj\Debug\myHelperBot.g.resources
+C:\Common\myHelperBot\mhbCore\obj\Debug\myHelperBot.exe
+C:\Common\myHelperBot\mhbCore\obj\Debug\myHelperBot.pdb

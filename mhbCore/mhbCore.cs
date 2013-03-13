@@ -24,6 +24,10 @@ namespace myHelperBot
       mSerialThread = new Thread(new ThreadStart(mSerial.loop));
       mSerialThread.Name = "SerialThread";
       mSerialThread.Start();
+
+      mSoundThread = new Thread(new ThreadStart(mSound.loop));
+      mSoundThread.Name = "SoundThread";
+      mSoundThread.Start();
     }
 
     public void SetKinect(KinectNui.Runtime kinect)
@@ -55,7 +59,7 @@ namespace myHelperBot
     {
 #if DEBUG_GESTURES
       Console.WriteLine(message);
-      Console.Beep();
+      //Console.Beep();
 #endif
     }
 
@@ -78,10 +82,12 @@ namespace myHelperBot
     private mhbKinect mKinect = new mhbKinect();
     private mhbSerial mSerial = new mhbSerial();
     private mhbLogic mLogic = new mhbLogic();
+    private mhbSound mSound = new mhbSound();
 
     private Thread mSerialThread = null;
     private Thread mKinectThread = null;
     private Thread mLogicThread = null;
+    private Thread mSoundThread = null;
     #endregion
   }
 }

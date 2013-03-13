@@ -25,5 +25,8 @@ namespace myHelperBot
     public bool isInGoGesture = false;
     public bool isInSaveGesture = false;
     public bool isInRelocateGesture = false;
+
+    public bool playGoSound = false;
+    public bool playStopSound = false;
   }
 }

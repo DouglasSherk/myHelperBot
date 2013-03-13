@@ -30,11 +30,13 @@ namespace myHelperBot
         state.leftSpeed = SPEED_NONE;
         state.rightSpeed = SPEED_NONE;
 
-        if (state.isInStopGesture) {
+        if (state.isInStopGesture && !state.stopped) {
+          state.playStopSound = true;
           state.stopped = true;
         }
 
-        if (state.isInGoGesture) {
+        if (state.isInGoGesture && state.stopped) {
+          state.playGoSound = true;
           state.stopped = false;
         }
 

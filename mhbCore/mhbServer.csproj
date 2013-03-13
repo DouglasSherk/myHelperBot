@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="mhbCore.cs" />
+    <Compile Include="mhbSound.cs" />
     <Compile Include="mhbState.cs" />
     <Compile Include="mhbKinect.cs" />
     <Compile Include="mhbLogic.cs" />

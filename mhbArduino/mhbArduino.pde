@@ -28,8 +28,6 @@ void setup()
 	mcR.init();
 	mcL.init();
 
-	pinMode(13, OUTPUT);
-
 	unsigned int time = millis();
 	gMotorTimer = time + 100;
 }

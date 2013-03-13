@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Media.Media3D;
 
 namespace myHelperBot
@@ -15,25 +16,33 @@ namespace myHelperBot
 
     public void loop()
     {
-      mhbState state;
-      lock (mhbState.Lock) {
-        state = mhbState.g;
-      }
+      mhbCore.DebugThread("logic thread started");
 
-      Vector3D forwardVector = new Vector3D(0.0, 0.0, 1.0);
-      Vector3D userVector = new Vector3D(state.userPosition.X,
-                                         0.0 /** ignore elevation */,
-                                         state.userPosition.Z);
+      while (true) {
+        mhbCore.DebugThread("logic spin");
 
-      double rot = Vector3D.AngleBetween(forwardVector, userVector);
+        mhbState state;
+        lock (mhbState.Lock) {
+          state = mhbState.g;
+        }
 
-      if (rot > ROT_MAX) {
-        state.leftSpeed = userVector.X > 0.0 ? SPEED_MAX : -SPEED_MAX;
-        state.rightSpeed = userVector.X > 0.0 ? -SPEED_MAX : SPEED_MAX;
-      }
+        Vector3D forwardVector = new Vector3D(0.0, 0.0, 1.0);
+        Vector3D userVector = new Vector3D(state.userPosition.X,
+                                           0.0 /** ignore elevation */,
+                                           state.userPosition.Z);
 
-      lock (mhbState.Lock) {
-        mhbState.g = state;
+        double rot = Vector3D.AngleBetween(forwardVector, userVector);
+
+        if (rot > ROT_MAX) {
+          state.leftSpeed = userVector.X > 0.0 ? SPEED_MAX : -SPEED_MAX;
+          state.rightSpeed = userVector.X > 0.0 ? -SPEED_MAX : SPEED_MAX;
+        }
+
+        lock (mhbState.Lock) {
+          mhbState.g = state;
+        }
+
+        Thread.Sleep(10);
       }
     }
 

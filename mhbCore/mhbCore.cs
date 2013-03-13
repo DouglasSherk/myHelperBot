@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define DEBUG_THREADS
+//#define DEBUG_GESTURES
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,11 +15,13 @@ namespace myHelperBot
   {
     public mhbCore()
     {
-      mSerialThread = new Thread(new ThreadStart(mSerial.loop));
-      mSerialThread.Start();
-
       mLogicThread = new Thread(new ThreadStart(mLogic.loop));
+      mLogicThread.Name = "LogicThread";
       mLogicThread.Start();
+
+      mSerialThread = new Thread(new ThreadStart(mSerial.loop));
+      mSerialThread.Name = "SerialThread";
+      mSerialThread.Start();
     }
 
     public void SetKinect(KinectNui.Runtime kinect)
@@ -28,7 +33,30 @@ namespace myHelperBot
 
       mKinect.Set(kinect);
       mKinectThread = new Thread(new ThreadStart(mKinect.Init));
+      mKinectThread.Name = "KinectThread";
       mKinectThread.Start();
+    }
+
+    public static void DebugThread(string message)
+    {
+#if DEBUG_THREADS
+      Console.WriteLine(Thread.CurrentThread.Name + ": " + message);
+#endif
+    }
+
+    public static void DebugGesture(string message)
+    {
+#if DEBUG_GESTURES
+      Console.WriteLine(message);
+      Console.Beep();
+#endif
+    }
+
+    public static void DebugPrint(string message)
+    {
+#if DEBUG
+      Console.WriteLine(message);
+#endif
     }
 
     #region state

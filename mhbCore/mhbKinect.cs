@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Media.Media3D;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using Microsoft.Research.Kinect.Nui;
 using KinectNui = Microsoft.Research.Kinect.Nui;
@@ -32,9 +33,15 @@ namespace myHelperBot
 
     public void Init()
     {
+      mhbCore.DebugThread("kinect thread started");
+
       if (_Kinect != null) {
         InitRuntime();
         _Kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+      }
+
+      while (true) {
+        Thread.Sleep(1);
       }
     }
 
@@ -174,9 +181,9 @@ namespace myHelperBot
       bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
 
       if (definitelyInStopGesture) {
-        //System.Diagnostics.Debugger.Break();
         possibleGoGesture = false;
         numSuccessiveStopGestures = 0;
+        mhbCore.DebugGesture("Stop");
       }
 
       return definitelyInStopGesture;
@@ -239,7 +246,7 @@ namespace myHelperBot
           rightHand.Position.Z < rightShoulder.Position.Z) {
         definitelyInGoGesture = true;
         possibleGoGesture = false;
-        //System.Diagnostics.Debugger.Break();
+        mhbCore.DebugGesture("Go");
       }
 
       if (possibleGoGesture &&
@@ -298,7 +305,7 @@ namespace myHelperBot
           handDist <= SAVE_HAND_END_DIST) {
         definitelyInSaveGesture = true;
         possibleSaveGesture = false;
-        //System.Diagnostics.Debugger.Break();
+        mhbCore.DebugGesture("Save");
       }
 
       if (possibleSaveGesture &&
@@ -358,7 +365,7 @@ namespace myHelperBot
           (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
         definitelyInRelocateGesture = true;
         possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
-        //System.Diagnostics.Debugger.Break();
+        mhbCore.DebugGesture("Relocate");
       }
 
       if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
@@ -376,6 +383,8 @@ namespace myHelperBot
       if (skeletonFrame == null) {
         return;
       }
+
+      mhbCore.DebugThread("kinect skeleton frame");
 
       bool isTracking = false;
       foreach (SkeletonData data in skeletonFrame.Skeletons) {

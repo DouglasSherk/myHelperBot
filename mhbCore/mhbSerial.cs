@@ -19,7 +19,11 @@ namespace myHelperBot
 
     public void loop()
     {
+      mhbCore.DebugThread("serial thread started");
+
       while (true) {
+        mhbCore.DebugThread("serial spin");
+
         lock (mhbState.Lock) {
           mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
                                 mhbState.g.rightSpeed.ToString() + "\0");

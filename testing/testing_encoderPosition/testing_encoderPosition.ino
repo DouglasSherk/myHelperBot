@@ -6,8 +6,8 @@ MC33926MotorShield motorR(31, 23, 25, 3, 27, 29); //right
 Timer t;
 
 #include "Encoder.h"
-Encoder enL(10,11,5);
-Encoder enR(8,9,4);
+Encoder enL(9,10,11);
+Encoder enR(4,5,6);
 
 #include "MotorController.h"
 MotorController mcL(motorL, enL);
@@ -20,8 +20,8 @@ DualMotorController mc(mcL, mcR);
 #include <MappingEncoder.h>
 MappingEncoder me(178/2, 340, 2500);
 
-int testSpeed[] = {0, 2500, 0, -2500};
-int testSpeedIndex = 0;
+int testSpeed[] = {0, 1500, 0};
+int testSpeedIndex = -1;
 
 void setup() {   
    Serial.begin(38400);
@@ -32,7 +32,7 @@ void setup() {
    mcL.init();
    mcR.init();   
    t.every(100,test);
-   t.every(2000,changeSpeed);
+   t.every(1000,changeSpeed);
 }
 
 void loop() {         
@@ -47,10 +47,12 @@ void test() {
 }
 
 void changeSpeed() { //want to see if roobt position is about equal when it returns
-   testSpeedIndex = (testSpeedIndex + 1)%4;
+   testSpeedIndex +=1;
+   if(testSpeedIndex < 3){
    Serial.print("ardNewSpeed: ");
    Serial.println(testSpeed[testSpeedIndex]);
    mc.setSpeed(testSpeed[testSpeedIndex], testSpeed[testSpeedIndex]);  
+   }
 }
 
 void updatePosition() {
@@ -69,5 +71,5 @@ void updatePosition() {
      Serial.print("\tLspeed: ");
      Serial.print(mc._mL._speed);
      Serial.print("\tRspeed: ");
-     Serial.println(mc._mR._speed);     
+     Serial.println(mc._mR._speed);   
 }

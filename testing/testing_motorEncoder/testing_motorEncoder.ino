@@ -6,8 +6,8 @@ MC33926MotorShield motorR(31, 23, 25, 3, 27, 29); //right
 Timer t;
 
 #include "Encoder.h"
-Encoder enL(10,11,5);
-Encoder enR(8,9,4);
+Encoder enL(9,10,11);
+Encoder enR(4,5,6);
 
 #include "MotorController.h"
 MotorController mcL(motorL, enL);

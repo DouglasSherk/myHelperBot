@@ -1,12 +1,9 @@
-﻿Build started 3/12/2013 2:50:26 AM.
-     1>Project "C:\Common\myHelperBot\mhbArduino\mhbArduino.vcxproj" on node 2 (build target(s)).
-     1>InitializeBuildStatus:
-         Creating "Debug\mhbArduino.unsuccessfulbuild" because "AlwaysCreate" was specified.
-       FinalizeBuildStatus:
-         Deleting file "Debug\mhbArduino.unsuccessfulbuild".
-         Touching "Debug\mhbArduino.lastbuildstate".
-     1>Done Building Project "C:\Common\myHelperBot\mhbArduino\mhbArduino.vcxproj" (build target(s)).
+﻿Build started 3/13/2013 1:18:19 AM.
+     1>Project "C:\Common\myHelperBot\mhbArduino\mhbArduino.vcxproj" on node 2 (clean target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\mhbArduino.lastbuildstate".
+     1>Done Building Project "C:\Common\myHelperBot\mhbArduino\mhbArduino.vcxproj" (clean target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.01
+Time Elapsed 00:00:00.03

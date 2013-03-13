@@ -1,11 +1,13 @@
 ﻿//#define DEBUG_THREADS
-//#define DEBUG_GESTURES
+#define DEBUG_GESTURES
+//#define DEBUG_TRACKING
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Media.Media3D;
 using Microsoft.Research.Kinect.Nui;
 using KinectNui = Microsoft.Research.Kinect.Nui;
 
@@ -26,6 +28,7 @@ namespace myHelperBot
 
     public void SetKinect(KinectNui.Runtime kinect)
     {
+      return;
       if (mKinectThread != null) {
         mKinectThread.Abort();
         mKinectThread = null;
@@ -49,6 +52,14 @@ namespace myHelperBot
 #if DEBUG_GESTURES
       Console.WriteLine(message);
       Console.Beep();
+#endif
+    }
+
+    public static void DebugTracking(Point3D position, int leftSpeed, int rightSpeed, string message)
+    {
+#if DEBUG_TRACKING
+      Console.WriteLine(message + " %(" + leftSpeed + ", " + rightSpeed + ") @(" +
+        Math.Round(position.X, 2) + ", " + Math.Round(position.Y, 2) + ", " + Math.Round(position.Z, 2) + ")");
 #endif
     }
 

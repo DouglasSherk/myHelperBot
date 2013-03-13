@@ -1,9 +1,9 @@
 ﻿<Window x:Class="myHelperBot.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Kinect Skeletal Viewer (WPF)" Icon="SkeletalViewer.ico"
-        WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight"
-        Loaded="Window_Loaded" Closed="Window_Closed">
+        Icon="SkeletalViewer.ico" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight"
+        Loaded="Window_Loaded" Closed="Window_Closed"
+        Title="Kinect Skeletal Viewer (WPF)">
     <Window.Resources>
         <!-- enables scrolling on ItemsControl -->
         <ControlTemplate x:Key="ScrollingItemsControl" TargetType="ItemsControl">

@@ -11,7 +11,8 @@ namespace myHelperBot
   {
     public mhbLogic()
     {
-
+      ROT_FACTOR *= SPEED_MAX;
+      DIST_FACTOR *= SPEED_MAX;
     }
 
     public void loop()
@@ -26,17 +27,74 @@ namespace myHelperBot
           state = mhbState.g;
         }
 
-        Vector3D forwardVector = new Vector3D(0.0, 0.0, 1.0);
-        Vector3D userVector = new Vector3D(state.userPosition.X,
-                                           0.0 /** ignore elevation */,
-                                           state.userPosition.Z);
+        state.leftSpeed = SPEED_NONE;
+        state.rightSpeed = SPEED_NONE;
 
-        double rot = Vector3D.AngleBetween(forwardVector, userVector);
-
-        if (rot > ROT_MAX) {
-          state.leftSpeed = userVector.X > 0.0 ? SPEED_MAX : -SPEED_MAX;
-          state.rightSpeed = userVector.X > 0.0 ? -SPEED_MAX : SPEED_MAX;
+        if (state.isInStopGesture) {
+          state.stopped = true;
         }
+
+        if (state.isInGoGesture) {
+          state.stopped = false;
+        }
+
+        if (state.isTracking && !state.stopped) {
+          Vector3D forwardVector = new Vector3D(0.0, 0.0, 1.0);
+          Vector3D userVector = new Vector3D(state.userPosition.X,
+                                             0.0 /** ignore elevation */,
+                                             state.userPosition.Z);
+
+          double rot = Vector3D.AngleBetween(forwardVector, userVector);
+          double dist =
+            Math.Sqrt(Math.Pow(state.userPosition.X, 2.0) + Math.Pow(state.userPosition.Z, 2.0));
+
+          bool rotGettingCloser = rot < mPreviousRot;
+          bool distGettingCloser = dist > DIST_MAX ? dist < mPreviousDist : dist > mPreviousDist;
+
+          if (rot > ROT_MAX) {
+            state.leftSpeed = state.rightSpeed =
+              Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
+            state.leftSpeed *= userVector.X > 0.0 ? 1 : -1;
+            state.rightSpeed *= userVector.Y > 0.0 ? -1 : 1;
+
+            mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
+                                  "rotation over max (" + (userVector.X > 0.0 ? "ccw" : "cw") + ")");
+
+            if (rotGettingCloser) {
+              state.leftSpeed = Math.Sign(state.leftSpeed) * (Math.Abs(state.leftSpeed) - SPEED_REDUCE);
+            }
+          } else if (dist > DIST_MAX) {
+            state.leftSpeed = state.rightSpeed =
+              Convert.ToInt32((dist - DIST_MAX) * DIST_FACTOR);
+            mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
+                                  "distance over max");
+          } else if (dist < DIST_MIN) {
+            state.leftSpeed = state.rightSpeed =
+              Convert.ToInt32((DIST_MIN - dist) * DIST_FACTOR);
+            mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
+                                  "distance under min");
+          }
+
+          if (state.leftSpeed < -SPEED_MAX) {
+            state.leftSpeed = -SPEED_MAX;
+          } else if (state.leftSpeed > SPEED_MAX) {
+            state.leftSpeed = SPEED_MAX;
+          }
+
+          if (state.rightSpeed < -SPEED_MAX) {
+            state.rightSpeed = -SPEED_MAX;
+          } else if (state.rightSpeed > SPEED_MAX) {
+            state.rightSpeed = SPEED_MAX;
+          }
+
+          mPreviousRot = rot;
+          mPreviousDist = dist;
+        }
+
+        state.isInGoGesture = false;
+        state.isInRelocateGesture = false;
+        state.isInSaveGesture = false;
+        state.isInStopGesture = false;
 
         lock (mhbState.Lock) {
           mhbState.g = state;
@@ -46,15 +104,20 @@ namespace myHelperBot
       }
     }
 
-    private int SPEED_NONE = 0;
-    private int SPEED_MAX = 5000;
+    private const int SPEED_NONE = 0;
+    /** Amount to reduce speed when getting closer. */
+    private const int SPEED_REDUCE = 1000;
+    private const int SPEED_MAX = 5000;
 
-    private double DIST_MIN = 1.7;
-    private double DIST_MAX = 2.0;
+    private const double DIST_MIN = 1.7;
+    private const double DIST_MAX = 2.0;
 
-    private double ROT_MAX = 10.0;
+    private const double ROT_MAX = 10.0;
 
     private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 1.0;
     private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 2.0;
+
+    private double mPreviousRot;
+    private double mPreviousDist;
   }
 }

@@ -54,15 +54,20 @@ namespace myHelperBot
           if (rot > ROT_MAX) {
             state.leftSpeed = state.rightSpeed =
               Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
-            state.leftSpeed *= userVector.X > 0.0 ? 1 : -1;
-            state.rightSpeed *= userVector.Y > 0.0 ? -1 : 1;
+            state.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
+            state.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
+
+            if (rotGettingCloser) {
+              if (Math.Abs(state.leftSpeed) > SPEED_REDUCE) {
+                state.leftSpeed = Math.Sign(state.leftSpeed) * (Math.Abs(state.leftSpeed) - SPEED_REDUCE);
+              }
+              if (Math.Abs(state.rightSpeed) > SPEED_REDUCE) {
+                state.rightSpeed = Math.Sign(state.rightSpeed) * (Math.Abs(state.rightSpeed) - SPEED_REDUCE);
+              }
+            }
 
             mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
                                   "rotation over max (" + (userVector.X > 0.0 ? "ccw" : "cw") + ")");
-
-            if (rotGettingCloser) {
-              state.leftSpeed = Math.Sign(state.leftSpeed) * (Math.Abs(state.leftSpeed) - SPEED_REDUCE);
-            }
           } else if (dist > DIST_MAX) {
             state.leftSpeed = state.rightSpeed =
               Convert.ToInt32((dist - DIST_MAX) * DIST_FACTOR);
@@ -70,7 +75,7 @@ namespace myHelperBot
                                   "distance over max");
           } else if (dist < DIST_MIN) {
             state.leftSpeed = state.rightSpeed =
-              Convert.ToInt32((DIST_MIN - dist) * DIST_FACTOR);
+              -1 * Convert.ToInt32((DIST_MIN - dist) * DIST_FACTOR);
             mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
                                   "distance under min");
           }
@@ -114,7 +119,7 @@ namespace myHelperBot
 
     private const double ROT_MAX = 10.0;
 
-    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 1.0;
+    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 30.0;
     private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 2.0;
 
     private double mPreviousRot;

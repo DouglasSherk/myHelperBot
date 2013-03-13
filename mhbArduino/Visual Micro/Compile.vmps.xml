@@ -10,7 +10,7 @@
         <VCCodeMacro Name="MOTOR_INTERVAL" Value="100" />
         <VCCodeMacro Name="ARDUINO" Value="104" />
         <VCCodeMacro Name="ARDUINO" Value="104" />
-        <VCCodeMacro Name="__AVR_ATmega328P__" Value="" />
+        <VCCodeMacro Name="__AVR_ATmega2560__" Value="" />
         <VCCodeMacro Name="__AVR_ATmega328P__" Value="" />
         <VCCodeMacro Name="F_CPU" Value="16000000L" />
         <VCCodeMacro Name="F_CPU" Value="16000000L" />

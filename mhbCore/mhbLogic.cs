@@ -39,7 +39,7 @@ namespace myHelperBot
         }
 
         if (state.isTracking && !state.stopped) {
-          Vector3D forwardVector = new Vector3D(0.0, 0.0, 1.0);
+          Vector3D forwardVector = new Vector3D(0.0, 0.0, 10.0);
           Vector3D userVector = new Vector3D(state.userPosition.X,
                                              0.0 /** ignore elevation */,
                                              state.userPosition.Z);
@@ -56,6 +56,13 @@ namespace myHelperBot
               Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
             state.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
             state.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
+
+            if (dist > DIST_MIN) {
+              double leftSpeed = state.leftSpeed / (dist + 2.0);
+              double rightSpeed = state.rightSpeed / (dist + 2.0);
+              state.leftSpeed = Convert.ToInt32(leftSpeed);
+              state.rightSpeed = Convert.ToInt32(rightSpeed);
+            }
 
             if (rotGettingCloser) {
               if (Math.Abs(state.leftSpeed) > SPEED_REDUCE) {

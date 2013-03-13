@@ -46,7 +46,8 @@ namespace myHelperBot
                                              0.0 /** ignore elevation */,
                                              state.userPosition.Z);
 
-          double rot = Vector3D.AngleBetween(forwardVector, userVector);
+          //double rot = Vector3D.AngleBetween(forwardVector, userVector);
+          double rot = Math.Abs(50.0 * state.userPosition.X / state.userPosition.Z);
           double dist =
             Math.Sqrt(Math.Pow(state.userPosition.X, 2.0) + Math.Pow(state.userPosition.Z, 2.0));
 
@@ -59,12 +60,14 @@ namespace myHelperBot
             state.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
             state.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
 
+            /*
             if (dist > DIST_MIN) {
-              double leftSpeed = state.leftSpeed / (dist + 5.0);
-              double rightSpeed = state.rightSpeed / (dist + 5.0);
+              double leftSpeed = state.leftSpeed / (dist + 100.0);
+              double rightSpeed = state.rightSpeed / (dist + 100.0);
               state.leftSpeed = Convert.ToInt32(leftSpeed);
               state.rightSpeed = Convert.ToInt32(rightSpeed);
             }
+             */
 
             if (rotGettingCloser) {
               if (Math.Abs(state.leftSpeed) > SPEED_REDUCE) {
@@ -123,13 +126,13 @@ namespace myHelperBot
     private const int SPEED_REDUCE = 1000;
     private const int SPEED_MAX = 5000;
 
-    private const double DIST_MIN = 1.7;
-    private const double DIST_MAX = 2.0;
+    private const double DIST_MIN = 1.5;
+    private const double DIST_MAX = 1.7;
 
     private const double ROT_MAX = 10.0;
 
     private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 30.0;
-    private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 2.0;
+    private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 0.3;
 
     private double mPreviousRot;
     private double mPreviousDist;

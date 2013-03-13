@@ -51,7 +51,7 @@ void loop()
 		int leftSpeed, rightSpeed;
 		sscanf(data, "%d, %d", &leftSpeed, &rightSpeed);
 
-		dmc.setSpeed(leftSpeed, rightSpeed);
+		dmc.setSpeed(leftSpeed, rightSpeed, true);
 	}
 
 	unsigned int time = millis();

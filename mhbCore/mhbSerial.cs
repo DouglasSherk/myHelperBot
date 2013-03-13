@@ -53,7 +53,7 @@ namespace myHelperBot
         mLastConnectAttempt = DateTime.Now;
 
         mSerialPort = new SerialPort();
-        mSerialPort.PortName = "COM7";
+        mSerialPort.PortName = "COM8";
         mSerialPort.BaudRate = 57600;
         mSerialPort.Open();
 

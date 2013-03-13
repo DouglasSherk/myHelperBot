@@ -58,8 +58,8 @@ namespace myHelperBot
             state.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
 
             if (dist > DIST_MIN) {
-              double leftSpeed = state.leftSpeed / (dist + 2.0);
-              double rightSpeed = state.rightSpeed / (dist + 2.0);
+              double leftSpeed = state.leftSpeed / (dist + 5.0);
+              double rightSpeed = state.rightSpeed / (dist + 5.0);
               state.leftSpeed = Convert.ToInt32(leftSpeed);
               state.rightSpeed = Convert.ToInt32(rightSpeed);
             }

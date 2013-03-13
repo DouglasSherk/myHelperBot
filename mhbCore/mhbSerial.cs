@@ -11,14 +11,7 @@ namespace myHelperBot
   {
     public mhbSerial()
     {
-      try {
-        mSerialPort = new SerialPort();
-        mSerialPort.PortName = "COM8";
-        mSerialPort.BaudRate = 57600;
-        mSerialPort.Open();
-      } catch {
-        Console.WriteLine("Serial not connected");
-      }
+      Init();
     }
 
     public void loop()
@@ -28,25 +21,58 @@ namespace myHelperBot
       while (true) {
         mhbCore.DebugThread("serial spin");
 
+        if (mSerialPort != null && !mSerialPort.IsOpen) {
+          mSerialPort.Close();
+          mSerialPort.Dispose();
+          mSerialPort = null;
+        }
+
         if (mSerialPort == null) {
-          Console.WriteLine("Serial thread terminating");
-          return;
-        }
-
-        lock (mhbState.Lock) {
-          try {
-            mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
-                                  mhbState.g.rightSpeed.ToString() + "\0");
-          } catch {
-            Console.WriteLine("Serial not connected, thread terminating");
-            return;
+          Thread.Sleep(SERIAL_INTERVAL);
+          Init();
+        } else {
+          lock (mhbState.Lock) {
+            try {
+              mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
+                                    mhbState.g.rightSpeed.ToString() + "\0");
+            }
+            catch {
+              Console.WriteLine("Serial not connected, retrying in " + SERIAL_INTERVAL/1000 + "s...");
+              mSerialPort = null;
+            }
           }
-        }
 
-        Thread.Sleep(50);
+          Thread.Sleep(50);
+        }
       }
     }
 
+    private void Init()
+    {
+      try {
+        mLastConnectAttempt = DateTime.Now;
+
+        mSerialPort = new SerialPort();
+        mSerialPort.PortName = "COM7";
+        mSerialPort.BaudRate = 57600;
+        mSerialPort.Open();
+
+        if (!mSerialPort.IsOpen) {
+          throw new Exception();
+        }
+
+        mhbCore.DebugPrint("Serial connection established");
+      }
+      catch {
+        Console.WriteLine("Serial not connected, retrying in " + SERIAL_INTERVAL/1000 + "s...");
+        mSerialPort = null;
+      }
+    }
+
+    private const int SERIAL_INTERVAL = 3000;
+
     private SerialPort mSerialPort;
+
+    private DateTime mLastConnectAttempt;
   }
 }

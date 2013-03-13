@@ -41,10 +41,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Common\Arduino\hardware\arduino\cores\arduino;C:\Common\Arduino\hardware\arduino\variants\standard;C:\Common\myHelperBot\mhbArduino\libraries\MC33926MotorShield;C:\Common\myHelperBot\mhbArduino\libraries\MC33926MotorShield\utility;C:\Common\myHelperBot\mhbArduino\libraries\Encoder;C:\Common\myHelperBot\mhbArduino\libraries\Encoder\utility;C:\Common\myHelperBot\mhbArduino\libraries\MotorController;C:\Common\myHelperBot\mhbArduino\libraries\MotorController\utility;C:\Common\myHelperBot\mhbArduino\libraries\DualMotorController;C:\Common\myHelperBot\mhbArduino\libraries\DualMotorController\utility;c:\common\arduino\hardware\tools\avr\avr\include\;c:\common\arduino\hardware\tools\avr\avr\include\avr\;c:\common\arduino\hardware\tools\avr\avr\;c:\common\arduino\hardware\tools\avr\lib\gcc\avr\4.3.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Common\Arduino\hardware\arduino\cores\arduino;C:\Common\Arduino\hardware\arduino\variants\mega;C:\Common\myHelperBot\mhbArduino\libraries\MC33926MotorShield;C:\Common\myHelperBot\mhbArduino\libraries\MC33926MotorShield\utility;C:\Common\myHelperBot\mhbArduino\libraries\Encoder;C:\Common\myHelperBot\mhbArduino\libraries\Encoder\utility;C:\Common\myHelperBot\mhbArduino\libraries\MotorController;C:\Common\myHelperBot\mhbArduino\libraries\MotorController\utility;C:\Common\myHelperBot\mhbArduino\libraries\DualMotorController;C:\Common\myHelperBot\mhbArduino\libraries\DualMotorController\utility;c:\common\arduino\hardware\tools\avr\avr\include\;c:\common\arduino\hardware\tools\avr\avr\include\avr\;c:\common\arduino\hardware\tools\avr\avr\;c:\common\arduino\hardware\tools\avr\lib\gcc\avr\4.3.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>C:\Common\myHelperBot\mhbArduino\Visual Micro\.mhbArduino.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>ARDUINO=104;__AVR_ATmega328P__;F_CPU=16000000L;__AVR__;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ARDUINO=104;__AVR_ATmega2560__;F_CPU=16000000L;__AVR__;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -77,7 +77,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties arduino.upload.port="COM7" />
+      <UserProperties arduino.upload.port="COM8" arduino.board.name="mega2560" arduino.board.desc="Arduino Mega 2560 or Mega ADK" arduino.board.property_bag="mega2560.name=Arduino Mega 2560 or Mega ADK&#xD;&#xA;mega2560.upload.protocol=wiring&#xD;&#xA;mega2560.upload.maximum_size=258048&#xD;&#xA;mega2560.upload.speed=115200&#xD;&#xA;mega2560.bootloader.low_fuses=0xFF&#xD;&#xA;mega2560.bootloader.high_fuses=0xD8&#xD;&#xA;mega2560.bootloader.extended_fuses=0xFD&#xD;&#xA;mega2560.bootloader.path=stk500v2&#xD;&#xA;mega2560.bootloader.file=stk500boot_v2_mega2560.hex&#xD;&#xA;mega2560.bootloader.unlock_bits=0x3F&#xD;&#xA;mega2560.bootloader.lock_bits=0x0F&#xD;&#xA;mega2560.build.mcu=atmega2560&#xD;&#xA;mega2560.build.f_cpu=16000000L&#xD;&#xA;mega2560.build.core=arduino&#xD;&#xA;mega2560.build.variant=mega&#xD;&#xA;" arduino.build.mcu="atmega2560" arduino.build.f_cpu="16000000L" arduino.build.core="arduino" arduino.upload.protocol="wiring" arduino.upload.speed="115200" arduino.upload.maximum_size="258048" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

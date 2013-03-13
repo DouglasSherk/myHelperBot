@@ -11,10 +11,14 @@ namespace myHelperBot
   {
     public mhbSerial()
     {
-      mSerialPort = new SerialPort();
-      mSerialPort.PortName = "COM8";
-      mSerialPort.BaudRate = 57600;
-      mSerialPort.Open();
+      try {
+        mSerialPort = new SerialPort();
+        mSerialPort.PortName = "COM8";
+        mSerialPort.BaudRate = 57600;
+        mSerialPort.Open();
+      } catch {
+        Console.WriteLine("Serial not connected");
+      }
     }
 
     public void loop()
@@ -24,9 +28,19 @@ namespace myHelperBot
       while (true) {
         mhbCore.DebugThread("serial spin");
 
+        if (mSerialPort == null) {
+          Console.WriteLine("Serial thread terminating");
+          return;
+        }
+
         lock (mhbState.Lock) {
-          mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
-                                mhbState.g.rightSpeed.ToString() + "\0");
+          try {
+            mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
+                                  mhbState.g.rightSpeed.ToString() + "\0");
+          } catch {
+            Console.WriteLine("Serial not connected, thread terminating");
+            return;
+          }
         }
 
         Thread.Sleep(50);

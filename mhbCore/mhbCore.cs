@@ -28,7 +28,6 @@ namespace myHelperBot
 
     public void SetKinect(KinectNui.Runtime kinect)
     {
-      return;
       if (mKinectThread != null) {
         mKinectThread.Abort();
         mKinectThread = null;
@@ -38,6 +37,11 @@ namespace myHelperBot
       mKinectThread = new Thread(new ThreadStart(mKinect.Init));
       mKinectThread.Name = "KinectThread";
       mKinectThread.Start();
+    }
+
+    public bool HasKinect()
+    {
+      return mKinect._Kinect != null;
     }
 
     public static void DebugThread(string message)

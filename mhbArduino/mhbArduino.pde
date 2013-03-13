@@ -1,15 +1,70 @@
-int ledPin = 13;                 // LED connected to digital pin 13
+#define MOTOR_INTERVAL 100
+
+#include "MC33926MotorShield.h"
+MC33926MotorShield motorL(30, 22, 24, 2, 26, 28);
+MC33926MotorShield motorR(31, 23, 25, 3, 27, 29);
+
+#include "Encoder.h"
+Encoder enL(10,11,5);
+Encoder enR(8,9,4);
+
+#include "MotorController.h"
+MotorController mcL(motorL, enL);
+MotorController mcR(motorR, enR);
+
+#include "DualMotorController.h"
+DualMotorController dmc(mcL, mcR);
+
+unsigned long gMotorTimer;
 
 void setup()
 {
-  pinMode(ledPin, OUTPUT);      // sets the digital pin as output
+	Serial.begin(57600);
+
+	motorL.init();
+	motorR.init();
+	enL.init();
+	enR.init();
+	mcR.init();
+	mcL.init();
+
+	pinMode(13, OUTPUT);
+
+	unsigned int time = millis();
+	gMotorTimer = time + 100;
 }
 
 void loop()
 {
-  digitalWrite(ledPin, HIGH);   // sets the LED on
-  delay(1000);                  // waits for a second
-  digitalWrite(ledPin, LOW);    // sets the LED off
-  delay(1000);                  // waits for a second
+	char data[256];
+	int i;
+
+	while (Serial.available())
+	{
+		i = 1;
+		data[0] = (char)Serial.read();
+		
+		while (data[i - 1] != '\0') {
+			if (Serial.available()) {
+				data[i++] = (char)Serial.read();
+			}
+		}
+
+		int leftSpeed, rightSpeed;
+		sscanf(data, "%d, %d", &leftSpeed, &rightSpeed);
+
+		dmc.setSpeed(leftSpeed, rightSpeed);
+	}
+
+	unsigned int time = millis();
+
+	dmc.updateEncoders();
+
+	// Motor timed code.
+	if (time - gMotorTimer > MOTOR_INTERVAL) {
+		mcR.periodicUpdate(time - gMotorTimer);
+		mcL.periodicUpdate(time - gMotorTimer);
+		gMotorTimer = time;
+	}
 }
  

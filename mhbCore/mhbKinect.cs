@@ -19,6 +19,25 @@ namespace myHelperBot
       lastRequest = DateTime.Now;
     }
 
+    public void Set(KinectNui.Runtime kinect)
+    {
+      //Clean up existing runtime if we are being set to null, or a new Runtime.
+      if (_Kinect != null) {
+        _Kinect.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+        _Kinect.Uninitialize();
+      }
+
+      _Kinect = kinect;
+    }
+
+    public void Init()
+    {
+      if (_Kinect != null) {
+        InitRuntime();
+        _Kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+      }
+    }
+
     public RuntimeOptions RuntimeOptions { get; private set; }
 
     private void InitRuntime() {
@@ -34,30 +53,6 @@ namespace myHelperBot
         //skeletonPanel.Visibility = skeletalViewerAvailable ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
         if (RuntimeOptions.HasFlag(RuntimeOptions.UseSkeletalTracking)) {
           _Kinect.SkeletonEngine.TransformSmooth = true;
-        }
-      }
-    }
-
-    public void ReInitRuntime()
-    {
-        // Will call Uninitialize followed by Initialize.
-        this.Kinect = this.Kinect;
-    }
-
-    public KinectNui.Runtime Kinect {
-      get { return _Kinect; }
-      set {
-        //Clean up existing runtime if we are being set to null, or a new Runtime.
-        if (_Kinect != null) {
-          _Kinect.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
-          _Kinect.Uninitialize();
-        }
-
-        _Kinect = value;
-
-        if (_Kinect != null) {
-          InitRuntime();
-          _Kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
         }
       }
     }
@@ -382,41 +377,33 @@ namespace myHelperBot
         return;
       }
 
+      bool isTracking = false;
       foreach (SkeletonData data in skeletonFrame.Skeletons) {
         if (SkeletonTrackingState.Tracked == data.TrackingState) {
-          WriteHttpRequest(FindJoint(data.Joints, JointID.Spine),
-                           IsInStopGesture(data),
-                           IsInGoGesture(data),
-                           IsInSaveGesture(data),
-                           IsInRelocateGesture(data));
+          isTracking = true;
+
+          Joint trackingJoint = FindJoint(data.Joints, JointID.Spine);
+          Point3D trackingPoint =
+            new Point3D(trackingJoint.Position.X, trackingJoint.Position.Y, trackingJoint.Position.Z);
+
+          lock (mhbState.Lock) {
+            mhbState.g.userPosition = trackingPoint;
+            mhbState.g.isInStopGesture |= IsInStopGesture(data);
+            mhbState.g.isInGoGesture |= IsInGoGesture(data);
+            mhbState.g.isInSaveGesture |= IsInSaveGesture(data);
+            mhbState.g.isInRelocateGesture |= IsInRelocateGesture(data);
+          }
+
           break;
         }
       }
+
+      // Careful here! If anyone else tries to modify this, we're liable to overwrite them.
+      // lock (mhbGlobal.lock) {
+      mhbState.g.isTracking = isTracking;
+      // }
     }
     #endregion Skeletal processing
-
-    #region http
-    private void WriteHttpRequest(Joint joint, bool gestureStop, bool gestureGo, bool gestureSave, bool gestureRelocate) {
-      if ((DateTime.Now - lastRequest).TotalMilliseconds > 25) {
-        string request = "http://192.168.137.183/?data=" +
-                         Convert.ToInt32(gestureStop) + ", " +
-                         Convert.ToInt32(gestureGo) + ", " +
-                         Convert.ToInt32(gestureSave) + ", " +
-                         Convert.ToInt32(gestureRelocate) + ", " +
-                         joint.Position.X + ", " +
-                         joint.Position.Y + ", " +
-                         joint.Position.Z;
-        try {
-          webClient.DownloadString(request);
-        } catch {
-
-        }
-        Console.WriteLine(request);
-        Console.ReadLine();
-        lastRequest = DateTime.Now;
-      }
-    }
-    #endregion http
 
     #region constants
     private enum Axis {
@@ -448,19 +435,13 @@ namespace myHelperBot
     #endregion constants
 
     #region Private state
-    private KinectNui.Runtime _Kinect;
+    public KinectNui.Runtime _Kinect;
     private DateTime lastRequest;
     private WebClient webClient = new WebClient();
 
     private int numSuccessiveStopGestures = 0;
 
     private bool possibleGoGesture = false;
-    private double lastGoLeftWristAngle;
-    private double lastGoRightWristAngle;
-    private double startGoLeftHandY;
-    private double startGoRightHandY;
-    private double startGoLeftHandZ;
-    private double startGoRightHandZ;
     private DateTime startGoTime;
 
     private bool possibleSaveGesture = false;

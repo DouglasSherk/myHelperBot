@@ -7,6 +7,7 @@
     </Platform>
     <VCCodeModel>
       <VCCodeMacros>
+        <VCCodeMacro Name="MOTOR_INTERVAL" Value="100" />
         <VCCodeMacro Name="ARDUINO" Value="104" />
         <VCCodeMacro Name="ARDUINO" Value="104" />
         <VCCodeMacro Name="__AVR_ATmega328P__" Value="" />
@@ -51,7 +52,7 @@
         <VCCodeMacro Name="NOINLINE" Value="__attribute__((noinline))" />
       </VCCodeMacros>
       <VCCodeVariables>
-        <VCCodeVariable Name="ledPin" />
+        <VCCodeVariable Name="motorL" />
       </VCCodeVariables>
     </VCCodeModel>
   </Program>

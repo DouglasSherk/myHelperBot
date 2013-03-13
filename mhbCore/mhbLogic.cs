@@ -55,19 +55,14 @@ namespace myHelperBot
           bool distGettingCloser = dist > DIST_MAX ? dist < mPreviousDist : dist > mPreviousDist;
 
           if (rot > ROT_MAX) {
+            if (dist > DIST_MAX) {
+              rot = ROT_FORWARD;
+            }
+
             state.leftSpeed = state.rightSpeed =
               Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
             state.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
             state.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
-
-            /*
-            if (dist > DIST_MIN) {
-              double leftSpeed = state.leftSpeed / (dist + 100.0);
-              double rightSpeed = state.rightSpeed / (dist + 100.0);
-              state.leftSpeed = Convert.ToInt32(leftSpeed);
-              state.rightSpeed = Convert.ToInt32(rightSpeed);
-            }
-             */
 
             if (rotGettingCloser) {
               if (Math.Abs(state.leftSpeed) > SPEED_REDUCE) {
@@ -130,8 +125,9 @@ namespace myHelperBot
     private const double DIST_MAX = 1.7;
 
     private const double ROT_MAX = 10.0;
+    private const double ROT_FORWARD = 15.0;
 
-    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 30.0;
+    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 35.0;
     private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 0.3;
 
     private double mPreviousRot;

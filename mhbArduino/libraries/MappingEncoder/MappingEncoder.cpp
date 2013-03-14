@@ -19,8 +19,8 @@ MappingEncoder::MappingEncoder(int rad, int sep, int tpr) {
 void MappingEncoder::updatePosition(int leftTicks, int rightTicks) {
     
     //convert ticks to mm.
-    double left = (2*M_PI*_rad/_tpr)*leftTicks;
-    double right = (2*M_PI*_rad/_tpr)*rightTicks;
+    double left = -(2*M_PI*_rad/_tpr)*leftTicks; //negative so that going forward gives positive position.
+    double right = -(2*M_PI*_rad/_tpr)*rightTicks;
 
     double dS = (left + right)/2;
     double dHeading = (right - left)/_sep;

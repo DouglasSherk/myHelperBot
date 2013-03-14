@@ -23,7 +23,7 @@ void loop() {
    Serial.print(digitalRead(motorR._INV));
    Serial.print("\n");*/
    
-      motorR.setPWM(180);
-      motorL.setPWM(-180);
+      motorR.setPWM(255);
+      motorL.setPWM(-255);
 
 }

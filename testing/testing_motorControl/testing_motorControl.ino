@@ -17,7 +17,8 @@ MotorController mcR(motorR, enR);
 DualMotorController mc(mcL, mcR);
 
 int testSpeedIndex = 0;
-int testSpeed[] = {0, 625, 0, -625};
+int testSpeedL[] = {0, -1250, 0, 1250};
+int testSpeedR[] = {0, 1250, 0, 1250};
 
 void setup() {   
    Serial.begin(38400);
@@ -29,7 +30,7 @@ void setup() {
    mcR.init();   
    pinMode(13, OUTPUT);
    t.every(100,test);
-   t.every(5000,changeSpeed);
+   t.every(3000,changeSpeed);
 }
 
 int count = 0;
@@ -42,8 +43,8 @@ void loop() {
 void changeSpeed() {
    testSpeedIndex = (testSpeedIndex+1)%4;
    Serial.print("ardNewSpeed: ");
-   Serial.println(testSpeed[testSpeedIndex]);
-   mc.setSpeed(testSpeed[testSpeedIndex], testSpeed[testSpeedIndex]);  
+   //Serial.println(testSpeed[testSpeedIndex]);
+   mc.setSpeed(testSpeedL[testSpeedIndex], testSpeedR[testSpeedIndex]);  
 }
 
 void test() {

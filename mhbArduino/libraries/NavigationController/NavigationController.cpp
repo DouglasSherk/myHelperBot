@@ -30,7 +30,7 @@ NavigationController::handleMotors()
   double heading = mMappingEncoder.getHeading();
 
   if (abs(x) <= POSITION_TOL && abs(y) <= POSITION_TOL &&
-      fabs(heading) <= HEADING_TOL) {
+      fabs(heading - mOptimalReturnAngle) <= HEADING_TOL) {
     mMoveToSavedVector = false;
     return false;
   }
@@ -57,6 +57,6 @@ NavigationController::moveToSavedVector()
   int y = mMappingEncoder.getY();
   double heading = mMappingEncoder.getHeading();
 
-  //mMoveToSavedVector = true;
+  mMoveToSavedVector = true;
   mOptimalReturnAngle = atan2(y, x);
 }

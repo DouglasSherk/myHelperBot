@@ -41,9 +41,9 @@ protected:
   const static double POSITION_TOL = 300;
 
   /** Power to set on motors when turning. */
-  const static int MOTOR_POWER_TURN = 190;
+  const static int MOTOR_POWER_TURN = 2000;
   /** Power to set on motors when moving forward. */
-  const static int MOTOR_POWER_FORWARD = 190;
+  const static int MOTOR_POWER_FORWARD = 2000;
 
   DualMotorController &mDualMotorController;
   MappingEncoder &mMappingEncoder;

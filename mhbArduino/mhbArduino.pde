@@ -28,8 +28,6 @@ void setup()
 	mcR.init();
 	mcL.init();
 
-	pinMode(13, OUTPUT);
-
 	unsigned int time = millis();
 	gMotorTimer = time + 100;
 }
@@ -53,7 +51,7 @@ void loop()
 		int leftSpeed, rightSpeed;
 		sscanf(data, "%d, %d", &leftSpeed, &rightSpeed);
 
-		dmc.setSpeed(leftSpeed, rightSpeed);
+		dmc.setSpeed(leftSpeed, rightSpeed, true);
 	}
 
 	unsigned int time = millis();

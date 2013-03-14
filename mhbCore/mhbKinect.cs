@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Media.Media3D;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using Microsoft.Research.Kinect.Nui;
 using KinectNui = Microsoft.Research.Kinect.Nui;
@@ -32,9 +33,15 @@ namespace myHelperBot
 
     public void Init()
     {
+      mhbCore.DebugThread("kinect thread started");
+
       if (_Kinect != null) {
         InitRuntime();
         _Kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+      }
+
+      while (true) {
+        Thread.Sleep(1);
       }
     }
 
@@ -174,9 +181,9 @@ namespace myHelperBot
       bool definitelyInStopGesture = numSuccessiveStopGestures >= STOP_SUCCESSIVE_GESTURES;
 
       if (definitelyInStopGesture) {
-        //System.Diagnostics.Debugger.Break();
         possibleGoGesture = false;
         numSuccessiveStopGestures = 0;
+        mhbCore.DebugGesture("Stop");
       }
 
       return definitelyInStopGesture;
@@ -239,7 +246,7 @@ namespace myHelperBot
           rightHand.Position.Z < rightShoulder.Position.Z) {
         definitelyInGoGesture = true;
         possibleGoGesture = false;
-        //System.Diagnostics.Debugger.Break();
+        mhbCore.DebugGesture("Go");
       }
 
       if (possibleGoGesture &&
@@ -298,7 +305,7 @@ namespace myHelperBot
           handDist <= SAVE_HAND_END_DIST) {
         definitelyInSaveGesture = true;
         possibleSaveGesture = false;
-        //System.Diagnostics.Debugger.Break();
+        mhbCore.DebugGesture("Save");
       }
 
       if (possibleSaveGesture &&
@@ -312,13 +319,16 @@ namespace myHelperBot
     private bool IsInRelocateGesture(SkeletonData data)
     {
       if ((data.Quality &
-          (SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
+          (SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0 ||
+          possibleGoGesture) {
         return false;
       }
+
       Joint leftHand = new Joint(),
             rightHand = new Joint(),
             leftShoulder = new Joint(),
-            rightShoulder = new Joint();
+            rightShoulder = new Joint(),
+            spine = new Joint();
 
       foreach (Joint joint in data.Joints) {
         switch (joint.ID) {
@@ -334,12 +344,20 @@ namespace myHelperBot
           case JointID.ShoulderRight:
             rightShoulder = joint;
             break;
+          case JointID.Spine:
+            spine = joint;
+            break;
         }
       }
 
       double handDist = DistanceJoints(leftHand, rightHand);
+      double leftShoulderDist = DistanceJoints(leftHand, leftShoulder);
+      double rightShoulderDist = DistanceJoints(rightHand, rightShoulder);
 
       if (handDist <= RELOCATE_HAND_MAX_DIST &&
+          leftHand.Position.Y > spine.Position.Y && rightHand.Position.Y > spine.Position.Y &&
+          leftHand.Position.Y < leftShoulder.Position.Y && rightHand.Position.Y < rightShoulder.Position.Y &&
+          leftShoulderDist >= RELOCATE_SHOULDER_MIN_DIST && rightShoulderDist >= RELOCATE_SHOULDER_MIN_DIST &&
           !possibleRelocateGestureLeftward && !possibleRelocateGestureRightward) {
         if (!possibleRelocateGestureLeftward && leftHand.Position.X < leftShoulder.Position.X) {
           possibleRelocateGestureLeftward = true;
@@ -354,11 +372,14 @@ namespace myHelperBot
 
       if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
           handDist <= RELOCATE_HAND_MAX_DIST &&
+          leftHand.Position.Y > spine.Position.Y && rightHand.Position.Y > spine.Position.Y &&
+          leftHand.Position.Y < leftShoulder.Position.Y && rightHand.Position.Y < rightShoulder.Position.Y &&
+          leftShoulderDist >= RELOCATE_SHOULDER_MIN_DIST && rightShoulderDist >= RELOCATE_SHOULDER_MIN_DIST &&
           (possibleRelocateGestureLeftward && rightHand.Position.X > rightShoulder.Position.X) ||
           (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
         definitelyInRelocateGesture = true;
         possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
-        //System.Diagnostics.Debugger.Break();
+        mhbCore.DebugGesture("Relocate");
       }
 
       if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
@@ -376,6 +397,8 @@ namespace myHelperBot
       if (skeletonFrame == null) {
         return;
       }
+
+      mhbCore.DebugThread("kinect skeleton frame");
 
       bool isTracking = false;
       foreach (SkeletonData data in skeletonFrame.Skeletons) {
@@ -431,6 +454,7 @@ namespace myHelperBot
     private const int SAVE_INTERVAL = 750;
 
     private const double RELOCATE_HAND_MAX_DIST = 0.3;
+    private const double RELOCATE_SHOULDER_MIN_DIST = 0.2;
     private const int RELOCATE_INTERVAL = 500;
     #endregion constants
 

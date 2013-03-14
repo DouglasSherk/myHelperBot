@@ -1,0 +1,2 @@
+C:\Common\myHelperBot\mhbCore\bin\Release\myHelperBot.exe.config
+C:\Common\myHelperBot\mhbCore\obj\Release\myHelperBot.exe

@@ -11,24 +11,68 @@ namespace myHelperBot
   {
     public mhbSerial()
     {
-      mSerialPort = new SerialPort();
-      mSerialPort.PortName = "COM7";
-      mSerialPort.BaudRate = 57600;
-      mSerialPort.Open();
+      Init();
     }
 
     public void loop()
     {
+      mhbCore.DebugThread("serial thread started");
+
       while (true) {
-        lock (mhbState.Lock) {
-          mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
-                                mhbState.g.rightSpeed.ToString() + "\0");
+        mhbCore.DebugThread("serial spin");
+
+        if (mSerialPort != null && !mSerialPort.IsOpen) {
+          mSerialPort.Close();
+          mSerialPort.Dispose();
+          mSerialPort = null;
         }
 
-        Thread.Sleep(50);
+        if (mSerialPort == null) {
+          Thread.Sleep(SERIAL_INTERVAL);
+          Init();
+        } else {
+          lock (mhbState.Lock) {
+            try {
+              mSerialPort.WriteLine(mhbState.g.motors.leftSpeed.ToString() + ", " +
+                                    mhbState.g.motors.rightSpeed.ToString() + "\0");
+            }
+            catch {
+              Console.WriteLine("Serial not connected, retrying in " + SERIAL_INTERVAL/1000 + "s...");
+              mSerialPort = null;
+            }
+          }
+
+          Thread.Sleep(50);
+        }
       }
     }
 
+    private void Init()
+    {
+      try {
+        mLastConnectAttempt = DateTime.Now;
+
+        mSerialPort = new SerialPort();
+        mSerialPort.PortName = "COM8";
+        mSerialPort.BaudRate = 57600;
+        mSerialPort.Open();
+
+        if (!mSerialPort.IsOpen) {
+          throw new Exception();
+        }
+
+        mhbCore.DebugPrint("Serial connection established");
+      }
+      catch {
+        Console.WriteLine("Serial not connected, retrying in " + SERIAL_INTERVAL/1000 + "s...");
+        mSerialPort = null;
+      }
+    }
+
+    private const int SERIAL_INTERVAL = 3000;
+
     private SerialPort mSerialPort;
+
+    private DateTime mLastConnectAttempt;
   }
 }

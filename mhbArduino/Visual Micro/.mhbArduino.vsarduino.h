@@ -1,6 +1,6 @@
-//Board = Arduino Uno
+//Board = Arduino Mega 2560 or Mega ADK
 #define ARDUINO 104
-#define __AVR_ATmega328P__
+#define __AVR_ATmega2560__
 #define F_CPU 16000000L
 #define __AVR__
 #define __cplusplus
@@ -27,6 +27,6 @@ extern "C" void __cxa_pure_virtual() {}
 //already defined in arduno.h
 //already defined in arduno.h
 
-#include "C:\Common\Arduino\hardware\arduino\variants\standard\pins_arduino.h" 
+#include "C:\Common\Arduino\hardware\arduino\variants\mega\pins_arduino.h" 
 #include "C:\Common\Arduino\hardware\arduino\cores\arduino\arduino.h"
 #include "C:\Common\myHelperBot\mhbArduino\mhbArduino.pde"

@@ -1,9 +1,9 @@
-/////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////
 //
 // This module contains code to do Kinect NUI initialization and
 // processing and also to display NUI streams on screen.
 //
-// Copyright � Microsoft Corporation.  All rights reserved.  
+// Copyright © Microsoft Corporation.  All rights reserved.  
 // This code is licensed under the terms of the 
 // Microsoft Kinect for Windows SDK (Beta) 
 // License Agreement: http://kinectforwindows.org/KinectSDK-ToU
@@ -15,6 +15,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using Microsoft.Research.Kinect.Nui;
 
 namespace myHelperBot
@@ -25,47 +26,35 @@ namespace myHelperBot
   public partial class MainWindow : Window
   {
     #region ctor & Window events
-    public MainWindow()
-    {
+    public MainWindow() {
       InitializeComponent();
       mCore = new mhbCore();
     }
 
-    private void Window_Loaded(object sender, EventArgs e)
-    {
-      //Watch for Kinects connecting, disconnecting - and gracefully handle them.
+    private void Window_Loaded(object sender, RoutedEventArgs e) {
       Runtime.Kinects.StatusChanged += new EventHandler<StatusChangedEventArgs>(Kinects_StatusChanged);
 
-      //create a KinectViewer for each Kinect that is found.
-      CreateAllKinectViewers();
-
-      WindowState = WindowState.Minimized;
+      CreateKinect();
     }
 
-    private void Window_Closed(object sender, EventArgs e)
-    {
-      CleanUpAllKinectViewers();
+    private void Window_Closed(object sender, EventArgs e) {
+      DestroyKinect();
     }
     #endregion ctor & Window events
 
     #region UI
-    private void updateUI()
-    {
-      if (mCore != null) {
-        switchToAnotherKinectSensor.Visibility = System.Windows.Visibility.Visible;
-        insertKinectSensor.Visibility = System.Windows.Visibility.Collapsed;
+    private void updateUI() {
+      if (mCore.HasKinect()) {
+        this.Background = Brushes.Green;
       } else {
-        switchToAnotherKinectSensor.Visibility = System.Windows.Visibility.Collapsed;
-        insertKinectSensor.Visibility = System.Windows.Visibility.Visible;
+        this.Background = Brushes.Red;
       }
     }
     #endregion UI
 
     #region Kinect discovery + setup
-    private void Kinects_StatusChanged(object sender, StatusChangedEventArgs e)
-    {
-      switch (e.Status)
-      {
+    private void Kinects_StatusChanged(object sender, StatusChangedEventArgs e) {
+      switch (e.Status) {
         case KinectStatus.Connected:
           mCore.SetKinect(e.KinectRuntime);
           break;
@@ -81,21 +70,16 @@ namespace myHelperBot
     #endregion Kinect discovery + setup
 
     #region KinectViewer Utilities
-    private void CreateAllKinectViewers()
-    {
-      foreach (Runtime runtime in Runtime.Kinects)
-      {
+    private void CreateKinect() {
+      foreach (Runtime runtime in Runtime.Kinects) {
         mCore.SetKinect(runtime);
+        break;
       }
       updateUI();
     }
 
-    private void CleanUpAllKinectViewers()
-    {
-      foreach (object item in viewerHolder.Items)
-      {
-        mCore.SetKinect(null);
-      }
+    private void DestroyKinect() {
+      mCore.SetKinect(null);
       updateUI();
     }
     #endregion KinectViewer Utilities

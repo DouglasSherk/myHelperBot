@@ -20,7 +20,7 @@ class DualMotorController
         //PUBLIC METHODS
         void init();
         void updateEncoders();
-        void setSpeed(int sL, int sR);
+        void setSpeed(int sL, int sR, bool forceNoSpeedControl = false);
 
         //private:
         MotorController &_mL;

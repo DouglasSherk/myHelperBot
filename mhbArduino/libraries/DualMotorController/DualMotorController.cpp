@@ -26,7 +26,7 @@ void DualMotorController::updateEncoders() {
 }
 
 // sL is in requested speed in ticks/second
-void DualMotorController::setSpeed(int sL, int sR) {
+void DualMotorController::setSpeed(int sL, int sR, bool forceNoSpeedControl) {
     if (sL > _maxSpeed) {
         sL = _maxSpeed;
     }
@@ -40,14 +40,14 @@ void DualMotorController::setSpeed(int sL, int sR) {
         sR = -_maxSpeed;
     }
     
-    if (sL > 1000 && sR > 1000 && abs(sL - sR) < 500) {
+    if (!forceNoSpeedControl && sL > 1000 && sR > 1000 && abs(sL - sR) < 500) {
         //Serial.println("sc YES");
         _mL.setSpeed(sL);
-        _mR.setSpeed(sR); //right motor is wired backwards
+        _mR.setSpeed(sR);
     }
     else {//if the robot is trying to turn in place, then use straight PWM instead of trying to use speed control
         //Serial.println("sc NO");
         _mL.setPWM(sL);
-        _mR.setPWM(sR); //right motor is wired backwards
+        _mR.setPWM(sR);
     }
 }

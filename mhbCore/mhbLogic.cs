@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Media.Media3D;
 
 namespace myHelperBot
@@ -10,42 +11,155 @@ namespace myHelperBot
   {
     public mhbLogic()
     {
-
+      ROT_FACTOR *= SPEED_MAX;
+      DIST_FACTOR *= SPEED_MAX;
     }
 
     public void loop()
     {
-      mhbState state;
-      lock (mhbState.Lock) {
-        state = mhbState.g;
-      }
+      mhbCore.DebugThread("logic thread started");
 
-      Vector3D forwardVector = new Vector3D(0.0, 0.0, 1.0);
-      Vector3D userVector = new Vector3D(state.userPosition.X,
-                                         0.0 /** ignore elevation */,
-                                         state.userPosition.Z);
+      while (true) {
+        mhbCore.DebugThread("logic spin");
 
-      double rot = Vector3D.AngleBetween(forwardVector, userVector);
+        mhbState state;
+        lock (mhbState.Lock) {
+          state = mhbState.g;
+        }
 
-      if (rot > ROT_MAX) {
-        state.leftSpeed = userVector.X > 0.0 ? SPEED_MAX : -SPEED_MAX;
-        state.rightSpeed = userVector.X > 0.0 ? -SPEED_MAX : SPEED_MAX;
-      }
+        state.motors.leftSpeed = SPEED_NONE;
+        state.motors.rightSpeed = SPEED_NONE;
 
-      lock (mhbState.Lock) {
-        mhbState.g = state;
+        if (state.isInStopGesture && !state.stopped) {
+          state.playStopSound = true;
+          state.stopped = true;
+        }
+
+        if (state.isInGoGesture && state.stopped) {
+          state.playGoSound = true;
+          state.stopped = false;
+        }
+
+        if (state.isInSaveGesture && !state.isReplaying) {
+          state.playSaveSound = true;
+        }
+
+        if (state.isInRelocateGesture && !state.isReplaying) {
+          state.playRelocateSound = true;
+          state.isReplaying = true;
+        }
+
+        if (state.isReplaying) {
+          state.motors = mSavedSpeeds.Dequeue();
+          state.motors.leftSpeed *= -1;
+          state.motors.rightSpeed *= -1;
+          if (mSavedSpeeds.Count == 0) {
+            state.isReplaying = false;
+            state.stopped = true;
+          }
+        } else if (state.isTracking && !state.stopped) {
+          Vector3D forwardVector = new Vector3D(0.0, 0.0, 10.0);
+          // XXX: Try z^2
+          Vector3D userVector = new Vector3D(state.userPosition.X,
+                                             0.0 /** ignore elevation */,
+                                             state.userPosition.Z);
+
+          //double rot = Vector3D.AngleBetween(forwardVector, userVector);
+          double rot = Math.Abs(50.0 * state.userPosition.X / state.userPosition.Z);
+          double dist =
+            Math.Sqrt(Math.Pow(state.userPosition.X, 2.0) + Math.Pow(state.userPosition.Z, 2.0));
+
+          bool rotGettingCloser = rot < mPreviousRot;
+          bool distGettingCloser = dist > DIST_MAX ? dist < mPreviousDist : dist > mPreviousDist;
+
+          if (rot > ROT_MAX && dist < DIST_MAX_TURN) {
+            if (dist > DIST_MAX) {
+              rot = ROT_FORWARD;
+            }
+
+            state.motors.leftSpeed = state.motors.rightSpeed =
+              Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
+            state.motors.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
+            state.motors.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
+
+            if (rotGettingCloser) {
+              if (Math.Abs(state.motors.leftSpeed) > SPEED_REDUCE) {
+                state.motors.leftSpeed = Math.Sign(state.motors.leftSpeed) * (Math.Abs(state.motors.leftSpeed) - SPEED_REDUCE);
+              }
+              if (Math.Abs(state.motors.rightSpeed) > SPEED_REDUCE) {
+                state.motors.rightSpeed = Math.Sign(state.motors.rightSpeed) * (Math.Abs(state.motors.rightSpeed) - SPEED_REDUCE);
+              }
+            }
+
+            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
+                                  "rotation over max (" + (userVector.X > 0.0 ? "ccw" : "cw") + ")");
+          } else if (dist > DIST_MAX) {
+            state.motors.leftSpeed = state.motors.rightSpeed =
+              Convert.ToInt32((dist - DIST_MAX) * DIST_FACTOR);
+            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
+                                  "distance over max");
+          } else if (dist < DIST_MIN) {
+            state.motors.leftSpeed = state.motors.rightSpeed =
+              -1 * Convert.ToInt32((DIST_MIN - dist) * DIST_FACTOR);
+            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
+                                  "distance under min");
+          }
+
+          if (state.motors.leftSpeed < -SPEED_MAX) {
+            state.motors.leftSpeed = -SPEED_MAX;
+          } else if (state.motors.leftSpeed > SPEED_MAX) {
+            state.motors.leftSpeed = SPEED_MAX;
+          }
+
+          if (state.motors.rightSpeed < -SPEED_MAX) {
+            state.motors.rightSpeed = -SPEED_MAX;
+          } else if (state.motors.rightSpeed > SPEED_MAX) {
+            state.motors.rightSpeed = SPEED_MAX;
+          }
+
+          mPreviousRot = rot;
+          mPreviousDist = dist;
+
+          mhbMotors currentMotors = new mhbMotors();
+          currentMotors = state.motors;
+          mSavedSpeeds.Enqueue(currentMotors);
+          // Don't allow more than 10000 records (10 seconds).
+          if (mSavedSpeeds.Count >= 10000) {
+            mSavedSpeeds.Dequeue();
+          }
+        }
+
+        state.isInGoGesture = false;
+        state.isInRelocateGesture = false;
+        state.isInSaveGesture = false;
+        state.isInStopGesture = false;
+
+        lock (mhbState.Lock) {
+          mhbState.g = state;
+        }
+
+        Thread.Sleep(10);
       }
     }
 
-    private int SPEED_NONE = 0;
-    private int SPEED_MAX = 5000;
+    private const int SPEED_NONE = 0;
+    /** Amount to reduce speed when getting closer. */
+    private const int SPEED_REDUCE = 500;
+    private const int SPEED_MAX = 2500;
 
-    private double DIST_MIN = 1.7;
-    private double DIST_MAX = 2.0;
+    private const double DIST_MIN = 1.5;
+    private const double DIST_MAX = 1.7;
+    private const double DIST_MAX_TURN = 2.5;
 
-    private double ROT_MAX = 10.0;
+    private const double ROT_MAX = 10.0;
+    private const double ROT_FORWARD = 12.0;
 
-    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 1.0;
-    private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 2.0;
+    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 60.0;
+    private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 0.3;
+
+    private double mPreviousRot;
+    private double mPreviousDist;
+
+    private Queue<mhbMotors> mSavedSpeeds = new Queue<mhbMotors>();
   }
 }

@@ -54,7 +54,7 @@ namespace myHelperBot
           bool rotGettingCloser = rot < mPreviousRot;
           bool distGettingCloser = dist > DIST_MAX ? dist < mPreviousDist : dist > mPreviousDist;
 
-          if (rot > ROT_MAX) {
+          if (rot > ROT_MAX && dist < DIST_MAX_TURN) {
             if (dist > DIST_MAX) {
               rot = ROT_FORWARD;
             }
@@ -123,11 +123,12 @@ namespace myHelperBot
 
     private const double DIST_MIN = 1.5;
     private const double DIST_MAX = 1.7;
+    private const double DIST_MAX_TURN = 2.5;
 
     private const double ROT_MAX = 10.0;
-    private const double ROT_FORWARD = 15.0;
+    private const double ROT_FORWARD = 12.0;
 
-    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 45.0;
+    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 60.0;
     private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 0.3;
 
     private double mPreviousRot;

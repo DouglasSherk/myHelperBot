@@ -32,9 +32,24 @@ namespace myHelperBot
           Init();
         } else {
           lock (mhbState.Lock) {
+            SaveState saveState = SaveState.None;
+            if (mhbState.g.startSavingVector) {
+              saveState = SaveState.StartSavingVector;
+            } else if (mhbState.g.moveToSavedVector) {
+              saveState = SaveState.MoveToSavedVector;
+            }
+
+            mhbState.g.startSavingVector = false;
+            mhbState.g.moveToSavedVector = false;
+
+            string serialMessage = (int)saveState + ", " +
+                                   mhbState.g.motors.leftSpeed.ToString() + ", " +
+                                   mhbState.g.motors.rightSpeed.ToString() + "\0";
+
+            mhbCore.DebugSerial(mSerialPort, serialMessage);
+
             try {
-              mSerialPort.WriteLine(mhbState.g.motors.leftSpeed.ToString() + ", " +
-                                    mhbState.g.motors.rightSpeed.ToString() + "\0");
+              mSerialPort.WriteLine(serialMessage);
             }
             catch {
               Console.WriteLine("Serial not connected, retrying in " + SERIAL_INTERVAL/1000 + "s...");
@@ -74,5 +89,12 @@ namespace myHelperBot
     private SerialPort mSerialPort;
 
     private DateTime mLastConnectAttempt;
+
+    private enum SaveState
+    {
+      None = 0,
+      StartSavingVector = 1,
+      MoveToSavedVector = 2,
+    }
   }
 }

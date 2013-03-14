@@ -24,6 +24,7 @@ class MappingEncoder
         int getX();
         int getY();
         double getHeading();
+        void resetPositionAndHeading();
 
     private:
         int _x;

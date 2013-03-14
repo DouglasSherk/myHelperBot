@@ -31,6 +31,9 @@ namespace myHelperBot
     public bool isInSaveGesture = false;
     public bool isInRelocateGesture = false;
 
+    public bool startSavingVector = false;
+    public bool moveToSavedVector = false;
+
     public bool playGoSound = false;
     public bool playStopSound = false;
     public bool playSaveSound = false;

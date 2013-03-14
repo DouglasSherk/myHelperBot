@@ -35,10 +35,10 @@ void MappingEncoder::updatePosition(int leftTicks, int rightTicks) {
     Serial.println(dY);
 
     _heading += dHeading;
-    while(_heading <= -2*M_PI){
+    while(_heading < -M_PI){
       _heading += 2*M_PI;
     }
-    while(_heading >= 2*M_PI) {
+    while(_heading > M_PI) {
       _heading -= 2*M_PI;
     }
 
@@ -56,4 +56,9 @@ int MappingEncoder::getY() {
 
 double MappingEncoder::getHeading() {
     return _heading; 
+}
+
+void MappingEncoder::resetPositionAndHeading() {
+    _heading = 0.0;
+    _x = _y = 0;
 }

@@ -1,9 +1,11 @@
 ﻿//#define DEBUG_THREADS
-#define DEBUG_GESTURES
-#define DEBUG_TRACKING
+//#define DEBUG_GESTURES
+//#define DEBUG_TRACKING
+#define DEBUG_SERIAL
 
 using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -68,6 +70,13 @@ namespace myHelperBot
 #if DEBUG_TRACKING
       Console.WriteLine(message + " %(" + leftSpeed + ", " + rightSpeed + ") @(" +
         Math.Round(position.X, 2) + ", " + Math.Round(position.Y, 2) + ", " + Math.Round(position.Z, 2) + ")");
+#endif
+    }
+
+    public static void DebugSerial(SerialPort port, string message)
+    {
+#if DEBUG_SERIAL
+      Console.WriteLine(port.PortName + "(" + port.IsOpen + "): " + message);
 #endif
     }
 

@@ -1,3 +1,4 @@
+#include <DistanceGP2Y0A21YK.h>
 #define MOTOR_INTERVAL 100
 
 #include "MC33926MotorShield.h"
@@ -15,7 +16,20 @@ MotorController mcR(motorR, enR);
 #include "DualMotorController.h"
 DualMotorController dmc(mcL, mcR);
 
+#include "MappingEncoder.h"
+MappingEncoder me(178/2, 340, 1250);
+
+#include "NavigationController.h"
+NavigationController nc(dmc, me);
+
 unsigned long gMotorTimer;
+
+enum SaveState
+{
+  SaveState_None = 0,
+  SaveState_StartSavingVector = 1,
+  SaveState_MoveToSavedVector = 2,
+};
 
 void setup()
 {
@@ -36,6 +50,21 @@ void loop()
 {
 	char data[256];
 	int i;
+  
+	unsigned int time = millis();
+
+  dmc.updateEncoders();
+
+	// Motor timed code.
+	if (time - gMotorTimer > MOTOR_INTERVAL) {
+		mcR.periodicUpdate(time - gMotorTimer);
+		mcL.periodicUpdate(time - gMotorTimer);
+		gMotorTimer = time;
+	}
+
+  if (nc.handleMotors()) {
+    return;
+  }
 
 	while (Serial.available())
 	{
@@ -48,21 +77,22 @@ void loop()
 			}
 		}
 
+    SaveState saveState;
 		int leftSpeed, rightSpeed;
-		sscanf(data, "%d, %d", &leftSpeed, &rightSpeed);
+		sscanf(data, "%d, %d, %d", &saveState, &leftSpeed, &rightSpeed);
 
 		dmc.setSpeed(leftSpeed, rightSpeed, true);
-	}
 
-	unsigned int time = millis();
-
-	dmc.updateEncoders();
-
-	// Motor timed code.
-	if (time - gMotorTimer > MOTOR_INTERVAL) {
-		mcR.periodicUpdate(time - gMotorTimer);
-		mcL.periodicUpdate(time - gMotorTimer);
-		gMotorTimer = time;
+    switch (saveState) {
+    case SaveState_None:
+      break;
+    case SaveState_StartSavingVector:
+      nc.startSavingVector();
+      break;
+    case SaveState_MoveToSavedVector:
+      nc.moveToSavedVector();
+      break;
+    }
 	}
 }
  

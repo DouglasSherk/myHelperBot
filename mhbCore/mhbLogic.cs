@@ -50,9 +50,13 @@ namespace myHelperBot
         }
 
         if (state.isReplaying) {
-          state.motors = mSavedSpeeds.Dequeue();
-          state.motors.leftSpeed *= -1;
-          state.motors.rightSpeed *= -1;
+          state.motors = mSavedSpeeds.Pop();
+
+          //if (Math.Sign(state.motors.leftSpeed) == Math.Sign(state.motors.rightSpeed)) {
+            state.motors.leftSpeed *= -1;
+            state.motors.rightSpeed *= -1;
+          //}
+
           if (mSavedSpeeds.Count == 0) {
             state.isReplaying = false;
             state.stopped = true;
@@ -120,12 +124,15 @@ namespace myHelperBot
           mPreviousRot = rot;
           mPreviousDist = dist;
 
-          mhbMotors currentMotors = new mhbMotors();
-          currentMotors = state.motors;
-          mSavedSpeeds.Enqueue(currentMotors);
-          // Don't allow more than 10000 records (10 seconds).
-          if (mSavedSpeeds.Count >= 10000) {
-            mSavedSpeeds.Dequeue();
+          if (state.motors.leftSpeed != SPEED_NONE && state.motors.rightSpeed != SPEED_NONE) {
+            mhbMotors currentMotors = new mhbMotors();
+            currentMotors.leftSpeed = state.motors.leftSpeed;
+            currentMotors.rightSpeed = state.motors.rightSpeed;
+            mSavedSpeeds.Push(currentMotors);
+            // Don't allow more than 10000 records (10 seconds).
+            if (mSavedSpeeds.Count >= 10000) {
+              mSavedSpeeds.Pop();
+            }
           }
         }
 
@@ -160,6 +167,6 @@ namespace myHelperBot
     private double mPreviousRot;
     private double mPreviousDist;
 
-    private Queue<mhbMotors> mSavedSpeeds = new Queue<mhbMotors>();
+    private Stack <mhbMotors> mSavedSpeeds = new Stack<mhbMotors>();
   }
 }

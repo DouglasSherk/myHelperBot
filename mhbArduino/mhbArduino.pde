@@ -5,8 +5,8 @@ MC33926MotorShield motorL(30, 22, 24, 2, 26, 28);
 MC33926MotorShield motorR(31, 23, 25, 3, 27, 29);
 
 #include "Encoder.h"
-Encoder enL(10,11,5);
-Encoder enR(8,9,4);
+Encoder enL(9, 10, 11, 12, 13);
+Encoder enR(4, 5, 6, 7, 8);
 
 #include "MotorController.h"
 MotorController mcL(motorL, enL);

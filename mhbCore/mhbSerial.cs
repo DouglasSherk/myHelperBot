@@ -33,8 +33,8 @@ namespace myHelperBot
         } else {
           lock (mhbState.Lock) {
             try {
-              mSerialPort.WriteLine(mhbState.g.leftSpeed.ToString() + ", " +
-                                    mhbState.g.rightSpeed.ToString() + "\0");
+              mSerialPort.WriteLine(mhbState.g.motors.leftSpeed.ToString() + ", " +
+                                    mhbState.g.motors.rightSpeed.ToString() + "\0");
             }
             catch {
               Console.WriteLine("Serial not connected, retrying in " + SERIAL_INTERVAL/1000 + "s...");

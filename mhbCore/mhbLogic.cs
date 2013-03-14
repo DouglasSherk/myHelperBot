@@ -27,8 +27,8 @@ namespace myHelperBot
           state = mhbState.g;
         }
 
-        state.leftSpeed = SPEED_NONE;
-        state.rightSpeed = SPEED_NONE;
+        state.motors.leftSpeed = SPEED_NONE;
+        state.motors.rightSpeed = SPEED_NONE;
 
         if (state.isInStopGesture && !state.stopped) {
           state.playStopSound = true;
@@ -38,6 +38,15 @@ namespace myHelperBot
         if (state.isInGoGesture && state.stopped) {
           state.playGoSound = true;
           state.stopped = false;
+        }
+
+        if (state.isInSaveGesture && !state.isReplaying) {
+          state.playSaveSound = true;
+        }
+
+        if (state.isInRelocateGesture && !state.isReplaying) {
+          state.playRelocateSound = true;
+          state.isReplaying = true;
         }
 
         if (state.isTracking && !state.stopped) {
@@ -59,44 +68,44 @@ namespace myHelperBot
               rot = ROT_FORWARD;
             }
 
-            state.leftSpeed = state.rightSpeed =
+            state.motors.leftSpeed = state.motors.rightSpeed =
               Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
-            state.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
-            state.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
+            state.motors.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
+            state.motors.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
 
             if (rotGettingCloser) {
-              if (Math.Abs(state.leftSpeed) > SPEED_REDUCE) {
-                state.leftSpeed = Math.Sign(state.leftSpeed) * (Math.Abs(state.leftSpeed) - SPEED_REDUCE);
+              if (Math.Abs(state.motors.leftSpeed) > SPEED_REDUCE) {
+                state.motors.leftSpeed = Math.Sign(state.motors.leftSpeed) * (Math.Abs(state.motors.leftSpeed) - SPEED_REDUCE);
               }
-              if (Math.Abs(state.rightSpeed) > SPEED_REDUCE) {
-                state.rightSpeed = Math.Sign(state.rightSpeed) * (Math.Abs(state.rightSpeed) - SPEED_REDUCE);
+              if (Math.Abs(state.motors.rightSpeed) > SPEED_REDUCE) {
+                state.motors.rightSpeed = Math.Sign(state.motors.rightSpeed) * (Math.Abs(state.motors.rightSpeed) - SPEED_REDUCE);
               }
             }
 
-            mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
+            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
                                   "rotation over max (" + (userVector.X > 0.0 ? "ccw" : "cw") + ")");
           } else if (dist > DIST_MAX) {
-            state.leftSpeed = state.rightSpeed =
+            state.motors.leftSpeed = state.motors.rightSpeed =
               Convert.ToInt32((dist - DIST_MAX) * DIST_FACTOR);
-            mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
+            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
                                   "distance over max");
           } else if (dist < DIST_MIN) {
-            state.leftSpeed = state.rightSpeed =
+            state.motors.leftSpeed = state.motors.rightSpeed =
               -1 * Convert.ToInt32((DIST_MIN - dist) * DIST_FACTOR);
-            mhbCore.DebugTracking(state.userPosition, state.leftSpeed, state.rightSpeed,
+            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
                                   "distance under min");
           }
 
-          if (state.leftSpeed < -SPEED_MAX) {
-            state.leftSpeed = -SPEED_MAX;
-          } else if (state.leftSpeed > SPEED_MAX) {
-            state.leftSpeed = SPEED_MAX;
+          if (state.motors.leftSpeed < -SPEED_MAX) {
+            state.motors.leftSpeed = -SPEED_MAX;
+          } else if (state.motors.leftSpeed > SPEED_MAX) {
+            state.motors.leftSpeed = SPEED_MAX;
           }
 
-          if (state.rightSpeed < -SPEED_MAX) {
-            state.rightSpeed = -SPEED_MAX;
-          } else if (state.rightSpeed > SPEED_MAX) {
-            state.rightSpeed = SPEED_MAX;
+          if (state.motors.rightSpeed < -SPEED_MAX) {
+            state.motors.rightSpeed = -SPEED_MAX;
+          } else if (state.motors.rightSpeed > SPEED_MAX) {
+            state.motors.rightSpeed = SPEED_MAX;
           }
 
           mPreviousRot = rot;
@@ -133,5 +142,7 @@ namespace myHelperBot
 
     private double mPreviousRot;
     private double mPreviousDist;
+
+    private Queue<mhbMotors> mSavedSpeeds = new Queue<mhbMotors>();
   }
 }

@@ -26,10 +26,14 @@ namespace myHelperBot
           mGoSound.Play();
         } else if (state.playStopSound) {
           mStopSound.Play();
+        } else if (state.playRelocateSound) {
+          mRelocateSound.Play();
         }
 
         state.playGoSound = false;
         state.playStopSound = false;
+        state.playSaveSound = false;
+        state.playRelocateSound = false;
 
         lock (mhbState.Lock) {
           mhbState.g = state;
@@ -41,5 +45,6 @@ namespace myHelperBot
 
     private SoundPlayer mGoSound = new SoundPlayer(Path.Combine(Directory.GetCurrentDirectory(), "../../../sounds/go.wav"));
     private SoundPlayer mStopSound = new SoundPlayer(Path.Combine(Directory.GetCurrentDirectory(), "../../../sounds/stop.wav"));
+    private SoundPlayer mRelocateSound = new SoundPlayer(Path.Combine(Directory.GetCurrentDirectory(), "../../../sounds/relocate.wav"));
   }
 }

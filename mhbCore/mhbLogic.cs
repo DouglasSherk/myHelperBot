@@ -49,8 +49,17 @@ namespace myHelperBot
           state.isReplaying = true;
         }
 
-        if (state.isTracking && !state.stopped) {
+        if (state.isReplaying) {
+          state.motors = mSavedSpeeds.Dequeue();
+          state.motors.leftSpeed *= -1;
+          state.motors.rightSpeed *= -1;
+          if (mSavedSpeeds.Count == 0) {
+            state.isReplaying = false;
+            state.stopped = true;
+          }
+        } else if (state.isTracking && !state.stopped) {
           Vector3D forwardVector = new Vector3D(0.0, 0.0, 10.0);
+          // XXX: Try z^2
           Vector3D userVector = new Vector3D(state.userPosition.X,
                                              0.0 /** ignore elevation */,
                                              state.userPosition.Z);
@@ -110,6 +119,14 @@ namespace myHelperBot
 
           mPreviousRot = rot;
           mPreviousDist = dist;
+
+          mhbMotors currentMotors = new mhbMotors();
+          currentMotors = state.motors;
+          mSavedSpeeds.Enqueue(currentMotors);
+          // Don't allow more than 10000 records (10 seconds).
+          if (mSavedSpeeds.Count >= 10000) {
+            mSavedSpeeds.Dequeue();
+          }
         }
 
         state.isInGoGesture = false;
@@ -127,8 +144,8 @@ namespace myHelperBot
 
     private const int SPEED_NONE = 0;
     /** Amount to reduce speed when getting closer. */
-    private const int SPEED_REDUCE = 1000;
-    private const int SPEED_MAX = 5000;
+    private const int SPEED_REDUCE = 500;
+    private const int SPEED_MAX = 2500;
 
     private const double DIST_MIN = 1.5;
     private const double DIST_MAX = 1.7;

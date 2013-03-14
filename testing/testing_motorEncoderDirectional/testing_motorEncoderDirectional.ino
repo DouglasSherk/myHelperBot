@@ -1,6 +1,6 @@
-#define index1 9
-#define chA 10
-#define chB 11
+#define index1 11
+#define chA 12
+#define chB 13
 
 void setup() {
    Serial.begin(38400);
@@ -30,8 +30,8 @@ void setup() {
 void loop(){
   
   currentIndex = digitalRead(index1);
-  currentchA = digitalRead(chA);
-  currentchB = digitalRead(chB);
+  //currentchA = digitalRead(chA);
+  //currentchB = digitalRead(chB);
   
   
   

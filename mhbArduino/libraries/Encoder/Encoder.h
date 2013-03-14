@@ -15,12 +15,11 @@ class Encoder
 {
     public:
         //CONSTRUCTORS
-        Encoder();
-        Encoder(unsigned char VIN, unsigned char GR, unsigned char IN);
+        Encoder(unsigned char VIN, unsigned char GR, unsigned char IN, unsigned char CHA, unsigned char CHB);
     
         //PUBLIC METHODS
         void init();
-        void updateIndex(bool forward);
+        void updateIndex();
         long getIndex();
         long getDeltaIndex();
 
@@ -28,9 +27,11 @@ class Encoder
         unsigned char _VIN;
         unsigned char _GR;
         unsigned char _IN;
+        unsigned char _CHA;
+        unsigned char _CHB;
         long _sumIndex;
         long _lastSumIndex;
-        long _lastIndex;
+        long _lastCHA;
 };
 
 #endif

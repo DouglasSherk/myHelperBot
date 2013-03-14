@@ -41,7 +41,6 @@ class MotorController
         long _lastIndex;
         int _measuredSpeed;
         bool _useSpeedControl;
-        bool _isForward; //true is forwards, false is backwards
 };
 
 #endif

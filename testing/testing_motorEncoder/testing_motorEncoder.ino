@@ -6,8 +6,8 @@ MC33926MotorShield motorR(31, 23, 25, 3, 27, 29); //right
 Timer t;
 
 #include "Encoder.h"
-Encoder enL(9,10,11);
-Encoder enR(4,5,6);
+Encoder enL(9,10,11,12,13);
+Encoder enR(4,5,6,7,8);
 
 #include "MotorController.h"
 MotorController mcL(motorL, enL);
@@ -28,7 +28,7 @@ void setup() {
    mcL.init();
    mcR.init(); 
    t.every(100,printEncoderValues);
-   t.every(2000,changeSpeed);
+   //t.every(2000,changeSpeed);
 }
 
 void changeSpeed() { //want to see if roobt position is about equal when it returns

@@ -6,8 +6,8 @@ MC33926MotorShield motorR(31, 23, 25, 3, 27, 29); //right
 Timer t;
 
 #include "Encoder.h"
-Encoder enL(9,10,11);
-Encoder enR(4,5,6);
+Encoder enL(9,10,11,12,13);
+Encoder enR(4,5,6,7,8);
 
 #include "MotorController.h"
 MotorController mcL(motorL, enL);
@@ -17,7 +17,7 @@ MotorController mcR(motorR, enR);
 DualMotorController mc(mcL, mcR);
 
 int testSpeedIndex = 0;
-int testSpeed[] = {0, 1500, 0, -1500};
+int testSpeed[] = {0, 625, 0, -625};
 
 void setup() {   
    Serial.begin(38400);
@@ -29,19 +29,13 @@ void setup() {
    mcR.init();   
    pinMode(13, OUTPUT);
    t.every(100,test);
-   //t.every(1000,printSpeedData);
-   t.every(2000,changeSpeed);
-   //mcL.setSpeed(testSpeed);
-   //mcR.setSpeed(testSpeed);
-   //mc.setSpeed(testSpeed, testSpeed);
+   t.every(5000,changeSpeed);
 }
 
 int count = 0;
 
 void loop() {         
       mc.updateEncoders();
-      //mcL.updateEncoder();
-      //mcR.updateEncoder();
       t.update();
 }
 
@@ -53,7 +47,7 @@ void changeSpeed() {
 }
 
 void test() {
-  printSpeedData();
+  //printSpeedData();
   mcL.periodicUpdate(100);
   mcR.periodicUpdate(100);
 }

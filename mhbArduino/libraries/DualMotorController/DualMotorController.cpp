@@ -41,13 +41,13 @@ void DualMotorController::setSpeed(int sL, int sR) {
     }
     
     if (sL > 1000 && sR > 1000 && abs(sL - sR) < 500) {
-        Serial.println("sc YES");
+        //Serial.println("sc YES");
         _mL.setSpeed(sL);
-        _mR.setSpeed(-sR); //right motor is wired backwards
+        _mR.setSpeed(sR); //right motor is wired backwards
     }
     else {//if the robot is trying to turn in place, then use straight PWM instead of trying to use speed control
-        Serial.println("sc NO");
+        //Serial.println("sc NO");
         _mL.setPWM(sL);
-        _mR.setPWM(-sR); //right motor is wired backwards
+        _mR.setPWM(sR); //right motor is wired backwards
     }
 }

@@ -10,13 +10,12 @@
 #include <math.h>
 
 MotorController::MotorController(MC33926MotorShield &ms, Encoder &en)
-  : _isForward(true),
-    _en(en),
+  : _en(en),
     _ms(ms) {
 }
 
 void MotorController::init() {
-    //nothing here yet
+    //nothing here.
 }
 
 // Update the requested MotorController speed in ticks/second
@@ -32,8 +31,6 @@ void MotorController::setSpeed(int s) {
     else {
         _speed = s;
     }
-    //Serial.print("set speed: ");
-    //Serial.println(_speed);
 }
 
 // adjust the pwm to get closer to the desired speed. timeElapsed is in milliseconds.
@@ -42,19 +39,15 @@ void MotorController::adjustPWM(int timeElapsed) {
     
     _measuredSpeed = (currentIndex - _lastIndex)/(double(timeElapsed)/1000.00);
     
-    /*Serial.print("\tpremeasured speed: ");
-    Serial.print(_measuredSpeed);*/
-    
-    if( (_speed > 0) ^ (_pwmValue > 0) ) {
-        _measuredSpeed *= -1;
-    }
-    
-    /*Serial.print("\tdesired speed: ");
-     Serial.print(_speed);
-     Serial.print("\tmeasured speed: ");
-     Serial.print(_measuredSpeed);*/
-    
+    Serial.print("_speed: ");
+    Serial.print(_speed);
+    Serial.print("\tmeasured: ");
+    Serial.print(_measuredSpeed);
+        
     int correction = (_speed-_measuredSpeed)/100; ///100
+    
+    Serial.print("\tcorrection: ");
+    Serial.print(correction);
     
     if(correction>MAX_CORRECTION) {
         correction = MAX_CORRECTION;
@@ -62,9 +55,6 @@ void MotorController::adjustPWM(int timeElapsed) {
     else if(correction < -MAX_CORRECTION) {
         correction = -MAX_CORRECTION;
     }
-    
-    /*Serial.print("\tcorrection: ");
-     Serial.println(correction);*/
     
     _pwmValue += correction;
     if(_pwmValue < -255) {
@@ -74,8 +64,8 @@ void MotorController::adjustPWM(int timeElapsed) {
         _pwmValue = 255;
     }
     
-    /*Serial.print("\tpwm: ");
-     Serial.println(_pwmValue);*/
+    Serial.print("\tpwm: ");
+    Serial.println(_pwmValue);
     
     _ms.setPWM(_pwmValue);
     _lastIndex = currentIndex;
@@ -89,12 +79,7 @@ void MotorController::periodicUpdate(int timeElapsed) {
 
 // Update the encoder value
 void MotorController::updateEncoder() {
-    if(_pwmValue > 0) {
-        _en.updateIndex(true);
-    }
-    else {
-        _en.updateIndex(false);
-    }
+    _en.updateIndex();
 }
 
 // Takes speed in the same units as setSpeed (ticks/s).

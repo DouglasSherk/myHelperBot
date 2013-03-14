@@ -38,7 +38,5 @@ namespace myHelperBot
     public bool playStopSound = false;
     public bool playSaveSound = false;
     public bool playRelocateSound = false;
-
-    public bool isReplaying = false;
   }
 }

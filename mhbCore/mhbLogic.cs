@@ -40,28 +40,15 @@ namespace myHelperBot
           state.stopped = false;
         }
 
-        if (state.isInSaveGesture && !state.isReplaying) {
-          state.playSaveSound = true;
+        if (state.isInSaveGesture) {
+          state.startSavingVector = true;
         }
 
-        if (state.isInRelocateGesture && !state.isReplaying) {
-          state.playRelocateSound = true;
-          state.isReplaying = true;
+        if (state.isInRelocateGesture) {
+          state.moveToSavedVector = true;
         }
 
-        if (state.isReplaying) {
-          state.motors = mSavedSpeeds.Pop();
-
-          //if (Math.Sign(state.motors.leftSpeed) == Math.Sign(state.motors.rightSpeed)) {
-            state.motors.leftSpeed *= -1;
-            state.motors.rightSpeed *= -1;
-          //}
-
-          if (mSavedSpeeds.Count == 0) {
-            state.isReplaying = false;
-            state.stopped = true;
-          }
-        } else if (state.isTracking && !state.stopped) {
+        if (state.isTracking && !state.stopped) {
           Vector3D forwardVector = new Vector3D(0.0, 0.0, 10.0);
           // XXX: Try z^2
           Vector3D userVector = new Vector3D(state.userPosition.X,
@@ -123,17 +110,6 @@ namespace myHelperBot
 
           mPreviousRot = rot;
           mPreviousDist = dist;
-
-          if (state.motors.leftSpeed != SPEED_NONE && state.motors.rightSpeed != SPEED_NONE) {
-            mhbMotors currentMotors = new mhbMotors();
-            currentMotors.leftSpeed = state.motors.leftSpeed;
-            currentMotors.rightSpeed = state.motors.rightSpeed;
-            mSavedSpeeds.Push(currentMotors);
-            // Don't allow more than 10000 records (10 seconds).
-            if (mSavedSpeeds.Count >= 10000) {
-              mSavedSpeeds.Pop();
-            }
-          }
         }
 
         state.isInGoGesture = false;
@@ -166,7 +142,5 @@ namespace myHelperBot
 
     private double mPreviousRot;
     private double mPreviousDist;
-
-    private Stack <mhbMotors> mSavedSpeeds = new Stack<mhbMotors>();
   }
 }

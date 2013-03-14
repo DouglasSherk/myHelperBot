@@ -1,7 +1,0 @@
-<launch>
-  <node pkg="myhelperbot" type="myhelperbot_core" name="myhelperbot_core" output="screen">
-  </node>
-
-  <node pkg="myhelperbot" type="myhelperbot_file" name="myhelperbot_file" output="screen">
-  </node>
-</launch>

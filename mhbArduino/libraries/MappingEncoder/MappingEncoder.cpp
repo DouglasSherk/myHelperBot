@@ -27,12 +27,12 @@ void MappingEncoder::updatePosition(int leftTicks, int rightTicks) {
     int dX = dS*cos(_heading+dHeading/2);
     int dY = dS*sin(_heading+dHeading/2);
 
-    Serial.print("dHeading: ");
-    Serial.print(dHeading);
-    Serial.print("\tdX: ");
-    Serial.print(dX);
-    Serial.print("\tdY: ");
-    Serial.println(dY);
+    //Serial.print("dHeading: ");
+    //Serial.print(dHeading);
+    //Serial.print("\tdX: ");
+    //Serial.print(dX);
+    //Serial.print("\tdY: ");
+    //Serial.println(dY);
 
     _heading += dHeading;
     while(_heading < -M_PI){

@@ -20,6 +20,9 @@ class NavigationController
 public:
   NavigationController(DualMotorController &dualMotorController, MappingEncoder &mappingEncoder);
 
+  // XXX: Update comments.
+  bool isHandlingMotors();
+
   /**
    * Main loop should call this to see if NC is going to intercept outside motor commands. This also
    * acts as the loop function for NC so that it can adjust the current position and orientation if
@@ -35,15 +38,19 @@ public:
   void moveToSavedVector();
 
 protected:
+  double CalculateOptimalReturnAngle(int x, int y);
+
   /** Tolerance on the heading before exiting the move-to-saved-vector state, in rads. */
-  const static double HEADING_TOL = 0.5;
+  const static double HEADING_TOL = 0.1;
   /** Tolerance on the position before exiting the move-to-saved-vector state, in mm. */
-  const static double POSITION_TOL = 300;
+  const static double POSITION_TOL = 200;
 
   /** Power to set on motors when turning. */
-  const static int MOTOR_POWER_TURN = 2000;
+  const static int MOTOR_POWER_TURN = 1500;
   /** Power to set on motors when moving forward. */
-  const static int MOTOR_POWER_FORWARD = 2000;
+  const static int MOTOR_POWER_FORWARD = 5000;
+  /** Power to set on motors when not moving. */
+  const static int MOTOR_POWER_NONE = 0;
 
   DualMotorController &mDualMotorController;
   MappingEncoder &mMappingEncoder;

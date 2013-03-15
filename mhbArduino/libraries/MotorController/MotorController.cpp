@@ -105,6 +105,10 @@ void MotorController::setPWM(int speed) {
 
         powerToGetSpeed = ceil(powerInterpolated) * (speed > 0 ? 1 : -1);
     }
+
+    if (powerToGetSpeed > MAX_POWER) powerToGetSpeed = MAX_POWER;
+    else if (powerToGetSpeed < -MAX_POWER) powerToGetSpeed = -MAX_POWER;
+
     _ms.setPWM(powerToGetSpeed);
     _pwmValue = powerToGetSpeed;
     

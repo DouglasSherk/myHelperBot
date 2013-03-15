@@ -47,6 +47,9 @@ void setup()
 	gMotorTimer = time + 100;
 }
 
+bool state1 = false;
+bool state2 = false;
+
 void loop()
 {
 	char data[256];
@@ -60,22 +63,31 @@ void loop()
 	if (time - gMotorTimer > MOTOR_INTERVAL) {
 		mcR.periodicUpdate(time - gMotorTimer);
 		mcL.periodicUpdate(time - gMotorTimer);
-    me.updatePosition(mcL._en.getDeltaIndex(), mcR._en.getDeltaIndex());
-		gMotorTimer = time;
-
-      Serial.println("----");
-  Serial.println(dmc._mL._en.getIndex());
-  Serial.println(dmc._mR._en.getIndex());
-  Serial.println("----");
+    me.updatePosition(mcL._en.getDeltaIndex(), -mcR._en.getDeltaIndex());
+    nc.handleMotors();
+    gMotorTimer = time;
 	}
 
-  if (nc.handleMotors()) {
+  if (nc.isHandlingMotors()) {
     return;
+  }
+
+  if (!state1) {
+    Serial.println("state1");
+    state1 = true;
+    nc.startSavingVector();
+  }
+
+  if (time > 10000 && !state2) {
+    Serial.println("state2");
+    state2 = true;
+    nc.moveToSavedVector();
   }
 
 	while (Serial.available())
 	{
     gDataTimer = time;
+    break;
 
 		i = 1;
 		data[0] = (char)Serial.read();
@@ -91,7 +103,7 @@ void loop()
 		int leftSpeed, rightSpeed;
 		sscanf(data, "%d, %d, %d", &saveState, &leftSpeed, &rightSpeed);
 
-		dmc.setSpeed(leftSpeed, rightSpeed, true);
+		//dmc.setSpeed(leftSpeed, rightSpeed, true);
 
     switch (saveState) {
     case SaveState_None:
@@ -105,8 +117,8 @@ void loop()
     }
 	}
 
-  if (time - gDataTimer > DATA_INTERVAL) {
-    dmc.setSpeed(0, 0, true);
-  }
+  //if (time - gDataTimer > DATA_INTERVAL) {
+  //  dmc.setSpeed(0, 0, true);
+  //}
 }
  

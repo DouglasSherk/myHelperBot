@@ -48,18 +48,11 @@ NavigationController::handleMotors()
   unsigned int time = millis();
   static unsigned int lastTime;
   if (time - lastTime > 500) {
-    Serial.println("---");
-    Serial.println(heading);
-    Serial.println(mOptimalReturnAngle);
-    Serial.println(x);
-    Serial.println(y);
-    Serial.println("---");
     lastTime = time;
 
     if (abs(x) <= POSITION_TOL && abs(y) <= POSITION_TOL) {
       mDualMotorController.setSpeed(MOTOR_POWER_NONE, MOTOR_POWER_NONE, true);
       mMoveToSavedVector = false;
-      Serial.println("done turning");
       return false;
     }
   }
@@ -67,14 +60,8 @@ NavigationController::handleMotors()
   if (fabs(heading - mOptimalReturnAngle) > HEADING_TOL) {
     int sign = !((heading - mOptimalReturnAngle < M_PI) ^ (heading > mOptimalReturnAngle)) ? 1 : -1;
     mDualMotorController.setSpeed(sign * MOTOR_POWER_TURN, -1 * sign * MOTOR_POWER_TURN, true);
-    if (lastTime == time) {
-      Serial.println("too rotated");
-    }
   } else /** if (abs(x) > POSITION_TOL || abs(y) > POSITION_TOL) */ {
     mDualMotorController.setSpeed(MOTOR_POWER_FORWARD, MOTOR_POWER_FORWARD, true);
-    if (lastTime == time) {
-      Serial.println("too far");
-    }
   }
 
   return true;
@@ -83,7 +70,6 @@ NavigationController::handleMotors()
 void
 NavigationController::startSavingVector()
 {
-  Serial.println("saved");
   mMappingEncoder.resetPositionAndHeading();
 }
 

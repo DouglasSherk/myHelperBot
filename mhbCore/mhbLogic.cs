@@ -25,99 +25,97 @@ namespace myHelperBot
         mhbState state;
         lock (mhbState.Lock) {
           state = mhbState.g;
-        }
 
-        state.motors.leftSpeed = SPEED_NONE;
-        state.motors.rightSpeed = SPEED_NONE;
+          state.motors.leftSpeed = SPEED_NONE;
+          state.motors.rightSpeed = SPEED_NONE;
 
-        if (state.isInStopGesture && !state.stopped) {
-          state.playStopSound = true;
-          state.stopped = true;
-        }
+          if (state.isInStopGesture && !state.stopped) {
+            state.playStopSound = true;
+            state.stopped = true;
+          }
 
-        if (state.isInGoGesture && state.stopped) {
-          state.playGoSound = true;
-          state.stopped = false;
-        }
+          if (state.isInGoGesture && state.stopped) {
+            state.playGoSound = true;
+            state.stopped = false;
+          }
 
-        if (state.isInSaveGesture) {
-          state.startSavingVector = true;
-        }
+          if (state.isInSaveGesture) {
+            state.startSavingVector = true;
+          }
 
-        if (state.isInRelocateGesture) {
-          state.moveToSavedVector = true;
-        }
+          if (state.isInRelocateGesture) {
+            state.moveToSavedVector = true;
+          }
 
-        if (state.isTracking && !state.stopped) {
-          Vector3D forwardVector = new Vector3D(0.0, 0.0, 10.0);
-          // XXX: Try z^2
-          Vector3D userVector = new Vector3D(state.userPosition.X,
-                                             0.0 /** ignore elevation */,
-                                             state.userPosition.Z);
+          if (state.isTracking && !state.stopped) {
+            Vector3D forwardVector = new Vector3D(0.0, 0.0, 10.0);
+            // XXX: Try z^2
+            Vector3D userVector = new Vector3D(state.userPosition.X,
+                                               0.0 /** ignore elevation */,
+                                               state.userPosition.Z);
 
-          //double rot = Vector3D.AngleBetween(forwardVector, userVector);
-          double rot = Math.Abs(50.0 * state.userPosition.X / state.userPosition.Z);
-          double dist =
-            Math.Sqrt(Math.Pow(state.userPosition.X, 2.0) + Math.Pow(state.userPosition.Z, 2.0));
+            //double rot = Vector3D.AngleBetween(forwardVector, userVector);
+            double rot = Math.Abs(50.0 * state.userPosition.X / state.userPosition.Z);
+            double dist =
+              Math.Sqrt(Math.Pow(state.userPosition.X, 2.0) + Math.Pow(state.userPosition.Z, 2.0));
 
-          bool rotGettingCloser = rot < mPreviousRot;
-          bool distGettingCloser = dist > DIST_MAX ? dist < mPreviousDist : dist > mPreviousDist;
+            bool rotGettingCloser = rot < mPreviousRot;
+            bool distGettingCloser = dist > DIST_MAX ? dist < mPreviousDist : dist > mPreviousDist;
 
-          if (rot > ROT_MAX && dist < DIST_MAX_TURN) {
-            if (dist > DIST_MAX) {
-              rot = ROT_FORWARD;
+            if (rot > ROT_MAX && dist < DIST_MAX_TURN) {
+              if (dist > DIST_MAX) {
+                rot = ROT_FORWARD;
+              }
+
+              state.motors.leftSpeed = state.motors.rightSpeed =
+                Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
+              state.motors.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
+              state.motors.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
+
+              if (rotGettingCloser) {
+                if (Math.Abs(state.motors.leftSpeed) > SPEED_REDUCE) {
+                  state.motors.leftSpeed = Math.Sign(state.motors.leftSpeed) * (Math.Abs(state.motors.leftSpeed) - SPEED_REDUCE);
+                }
+                if (Math.Abs(state.motors.rightSpeed) > SPEED_REDUCE) {
+                  state.motors.rightSpeed = Math.Sign(state.motors.rightSpeed) * (Math.Abs(state.motors.rightSpeed) - SPEED_REDUCE);
+                }
+              }
+
+              mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
+                                    "rotation over max (" + (userVector.X > 0.0 ? "ccw" : "cw") + ")");
+            } else if (dist > DIST_MAX) {
+              state.motors.leftSpeed = state.motors.rightSpeed =
+                Convert.ToInt32((dist - DIST_MAX) * DIST_FACTOR);
+              mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
+                                    "distance over max");
+            } else if (dist < DIST_MIN) {
+              state.motors.leftSpeed = state.motors.rightSpeed =
+                -1 * Convert.ToInt32((DIST_MIN - dist) * DIST_FACTOR);
+              mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
+                                    "distance under min");
             }
 
-            state.motors.leftSpeed = state.motors.rightSpeed =
-              Convert.ToInt32((rot - ROT_MAX) * ROT_FACTOR);
-            state.motors.leftSpeed *= userVector.X > 0.0 ? -1 : 1;
-            state.motors.rightSpeed *= userVector.X > 0.0 ? 1 : -1;
-
-            if (rotGettingCloser) {
-              if (Math.Abs(state.motors.leftSpeed) > SPEED_REDUCE) {
-                state.motors.leftSpeed = Math.Sign(state.motors.leftSpeed) * (Math.Abs(state.motors.leftSpeed) - SPEED_REDUCE);
-              }
-              if (Math.Abs(state.motors.rightSpeed) > SPEED_REDUCE) {
-                state.motors.rightSpeed = Math.Sign(state.motors.rightSpeed) * (Math.Abs(state.motors.rightSpeed) - SPEED_REDUCE);
-              }
+            if (state.motors.leftSpeed < -SPEED_MAX) {
+              state.motors.leftSpeed = -SPEED_MAX;
+            } else if (state.motors.leftSpeed > SPEED_MAX) {
+              state.motors.leftSpeed = SPEED_MAX;
             }
 
-            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
-                                  "rotation over max (" + (userVector.X > 0.0 ? "ccw" : "cw") + ")");
-          } else if (dist > DIST_MAX) {
-            state.motors.leftSpeed = state.motors.rightSpeed =
-              Convert.ToInt32((dist - DIST_MAX) * DIST_FACTOR);
-            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
-                                  "distance over max");
-          } else if (dist < DIST_MIN) {
-            state.motors.leftSpeed = state.motors.rightSpeed =
-              -1 * Convert.ToInt32((DIST_MIN - dist) * DIST_FACTOR);
-            mhbCore.DebugTracking(state.userPosition, state.motors.leftSpeed, state.motors.rightSpeed,
-                                  "distance under min");
+            if (state.motors.rightSpeed < -SPEED_MAX) {
+              state.motors.rightSpeed = -SPEED_MAX;
+            } else if (state.motors.rightSpeed > SPEED_MAX) {
+              state.motors.rightSpeed = SPEED_MAX;
+            }
+
+            mPreviousRot = rot;
+            mPreviousDist = dist;
           }
 
-          if (state.motors.leftSpeed < -SPEED_MAX) {
-            state.motors.leftSpeed = -SPEED_MAX;
-          } else if (state.motors.leftSpeed > SPEED_MAX) {
-            state.motors.leftSpeed = SPEED_MAX;
-          }
+          state.isInGoGesture = false;
+          state.isInRelocateGesture = false;
+          state.isInSaveGesture = false;
+          state.isInStopGesture = false;
 
-          if (state.motors.rightSpeed < -SPEED_MAX) {
-            state.motors.rightSpeed = -SPEED_MAX;
-          } else if (state.motors.rightSpeed > SPEED_MAX) {
-            state.motors.rightSpeed = SPEED_MAX;
-          }
-
-          mPreviousRot = rot;
-          mPreviousDist = dist;
-        }
-
-        state.isInGoGesture = false;
-        state.isInRelocateGesture = false;
-        state.isInSaveGesture = false;
-        state.isInStopGesture = false;
-
-        lock (mhbState.Lock) {
           mhbState.g = state;
         }
 

@@ -46,9 +46,9 @@ protected:
   const static double POSITION_TOL = 200;
 
   /** Power to set on motors when turning. */
-  const static int MOTOR_POWER_TURN = 1500;
+  const static int MOTOR_POWER_TURN = 2500;
   /** Power to set on motors when moving forward. */
-  const static int MOTOR_POWER_FORWARD = 5000;
+  const static int MOTOR_POWER_FORWARD = 3000;
   /** Power to set on motors when not moving. */
   const static int MOTOR_POWER_NONE = 0;
 

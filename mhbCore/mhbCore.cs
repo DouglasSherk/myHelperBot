@@ -1,5 +1,5 @@
 ﻿//#define DEBUG_THREADS
-//#define DEBUG_GESTURES
+#define DEBUG_GESTURES
 //#define DEBUG_TRACKING
 #define DEBUG_SERIAL
 

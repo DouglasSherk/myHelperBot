@@ -76,6 +76,7 @@ void loop()
 				data[i++] = (char)Serial.read();
 			}
 		}
+    data[i - 1] = '\0';
 
     SaveState saveState;
 		int leftSpeed, rightSpeed;

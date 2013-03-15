@@ -1,7 +1,7 @@
 ﻿//#define DEBUG_THREADS
-#define DEBUG_GESTURES
+//#define DEBUG_GESTURES
 //#define DEBUG_TRACKING
-//#define DEBUG_SERIAL
+#define DEBUG_SERIAL
 
 using System;
 using System.Collections.Generic;
@@ -69,7 +69,7 @@ namespace myHelperBot
     {
 #if DEBUG_TRACKING
       Console.WriteLine(message + " %(" + leftSpeed + ", " + rightSpeed + ") @(" +
-        Math.Round(position.X, 2) + ", " + Math.Round(position.Y, 2) + ", " + Math.Round(position.Z, 2) + ")");
+        Math.Round(position.X, 2) + ", " + Math.Round(position.Y, 2) + ", " + Math.Round(position.Z, 2) + ")\n");
 #endif
     }
 

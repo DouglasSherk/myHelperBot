@@ -14,6 +14,19 @@ namespace myHelperBot
       Init();
     }
 
+    /** This has to be above DataReceivedHandler for some reason. */
+    private SerialPort mSerialPort;
+
+    private void DataReceivedHandler(object obj,
+                                     SerialDataReceivedEventArgs e)
+    {
+      lock (mSerialPort) {
+        Thread.Sleep(50);
+        string message = mSerialPort.ReadExisting();
+        mhbCore.DebugSerial(mSerialPort, message);
+      }
+    }
+
     public void loop()
     {
       mhbCore.DebugThread("serial thread started");
@@ -42,14 +55,16 @@ namespace myHelperBot
             mhbState.g.startSavingVector = false;
             mhbState.g.moveToSavedVector = false;
 
-            string serialMessage = (int)saveState + ", " +
+            string sendingMessage = (int)saveState + ", " +
                                    mhbState.g.motors.leftSpeed.ToString() + ", " +
-                                   mhbState.g.motors.rightSpeed.ToString() + "\0";
+                                   mhbState.g.motors.rightSpeed.ToString() + "*";
 
-            mhbCore.DebugSerial(mSerialPort, serialMessage);
+            //mhbCore.DebugSerial(mSerialPort, sendingMessage.Replace("*", string.Empty));
 
             try {
-              mSerialPort.WriteLine(serialMessage);
+              lock (mSerialPort) {
+                mSerialPort.WriteLine(sendingMessage);
+              }
             }
             catch {
               Console.WriteLine("Serial not connected, retrying in " + SERIAL_INTERVAL/1000 + "s...");
@@ -69,8 +84,15 @@ namespace myHelperBot
 
         mSerialPort = new SerialPort();
         mSerialPort.PortName = "COM8";
-        mSerialPort.BaudRate = 57600;
+        mSerialPort.DataBits = 8;
+        mSerialPort.BaudRate = 115200;
         mSerialPort.Open();
+
+        mSerialPort.DtrEnable = true;
+
+        mSerialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+        Thread.Sleep(2000);
 
         if (!mSerialPort.IsOpen) {
           throw new Exception();
@@ -85,8 +107,6 @@ namespace myHelperBot
     }
 
     private const int SERIAL_INTERVAL = 3000;
-
-    private SerialPort mSerialPort;
 
     private DateTime mLastConnectAttempt;
 

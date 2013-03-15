@@ -32,13 +32,16 @@ NavigationController::handleMotors()
   if (abs(x) <= POSITION_TOL && abs(y) <= POSITION_TOL &&
       fabs(heading - mOptimalReturnAngle) <= HEADING_TOL) {
     mMoveToSavedVector = false;
+    Serial.println("done turning");
     return false;
   }
 
   if (fabs(heading - mOptimalReturnAngle) > HEADING_TOL) {
     mDualMotorController.setSpeed(MOTOR_POWER_TURN, -MOTOR_POWER_TURN, true);
+    Serial.println("too rotated");
   } else /** if (abs(x) > POSITION_TOL || abs(y) > POSITION_TOL) */ {
     mDualMotorController.setSpeed(MOTOR_POWER_FORWARD, MOTOR_POWER_FORWARD, true);
+    Serial.println("too far");
   }
 
   return true;
@@ -59,4 +62,6 @@ NavigationController::moveToSavedVector()
 
   mMoveToSavedVector = true;
   mOptimalReturnAngle = atan2(y, x);
+
+  Serial.println(mOptimalReturnAngle);
 }

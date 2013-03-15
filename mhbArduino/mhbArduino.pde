@@ -33,7 +33,7 @@ enum SaveState
 
 void setup()
 {
-	Serial.begin(57600);
+	Serial.begin(115200);
 
 	motorL.init();
 	motorR.init();
@@ -71,7 +71,7 @@ void loop()
 		i = 1;
 		data[0] = (char)Serial.read();
 		
-		while (data[i - 1] != '\0') {
+		while (data[i - 1] != '*') {
 			if (Serial.available()) {
 				data[i++] = (char)Serial.read();
 			}

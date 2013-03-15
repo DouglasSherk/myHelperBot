@@ -1,5 +1,5 @@
-#include <DistanceGP2Y0A21YK.h>
 #define MOTOR_INTERVAL 100
+#define DATA_INTERVAL 1000
 
 #include "MC33926MotorShield.h"
 MC33926MotorShield motorL(30, 22, 24, 2, 26, 28);
@@ -23,6 +23,7 @@ MappingEncoder me(178/2, 340, 1250);
 NavigationController nc(dmc, me);
 
 unsigned long gMotorTimer;
+unsigned long gDataTimer;
 
 enum SaveState
 {
@@ -59,7 +60,13 @@ void loop()
 	if (time - gMotorTimer > MOTOR_INTERVAL) {
 		mcR.periodicUpdate(time - gMotorTimer);
 		mcL.periodicUpdate(time - gMotorTimer);
+    me.updatePosition(mcL._en.getDeltaIndex(), mcR._en.getDeltaIndex());
 		gMotorTimer = time;
+
+      Serial.println("----");
+  Serial.println(dmc._mL._en.getIndex());
+  Serial.println(dmc._mR._en.getIndex());
+  Serial.println("----");
 	}
 
   if (nc.handleMotors()) {
@@ -68,6 +75,8 @@ void loop()
 
 	while (Serial.available())
 	{
+    gDataTimer = time;
+
 		i = 1;
 		data[0] = (char)Serial.read();
 		
@@ -95,5 +104,9 @@ void loop()
       break;
     }
 	}
+
+  if (time - gDataTimer > DATA_INTERVAL) {
+    dmc.setSpeed(0, 0, true);
+  }
 }
  

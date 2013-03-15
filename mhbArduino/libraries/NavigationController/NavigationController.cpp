@@ -50,6 +50,7 @@ NavigationController::handleMotors()
 void
 NavigationController::startSavingVector()
 {
+  Serial.println("saved");
   mMappingEncoder.resetPositionAndHeading();
 }
 
@@ -62,6 +63,9 @@ NavigationController::moveToSavedVector()
 
   mMoveToSavedVector = true;
   mOptimalReturnAngle = atan2(y, x);
-
+  
+  Serial.println(x);
+  Serial.println(y);
+  Serial.println(heading);
   Serial.println(mOptimalReturnAngle);
 }

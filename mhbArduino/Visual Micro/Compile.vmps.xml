@@ -8,6 +8,7 @@
     <VCCodeModel>
       <VCCodeMacros>
         <VCCodeMacro Name="MOTOR_INTERVAL" Value="100" />
+        <VCCodeMacro Name="DATA_INTERVAL" Value="1000" />
         <VCCodeMacro Name="ARDUINO" Value="104" />
         <VCCodeMacro Name="ARDUINO" Value="104" />
         <VCCodeMacro Name="__AVR_ATmega2560__" Value="" />

@@ -78,31 +78,24 @@ NavigationController::handleMotors()
 void
 NavigationController::startSavingVector()
 {
-  //if (mMoveToSavedVector) {
-  //  return;
-  //}
+  if (mMoveToSavedVector) {
+    return;
+  }
 
   mMappingEncoder.resetPositionAndHeading();
-  //mSavingVector = true;
+  mSavingVector = true;
 }
 
 void
 NavigationController::moveToSavedVector()
 {
-  //if (!mSavingVector) {
-  //  return;
-  //}
-
-  int x = mMappingEncoder.getX();
-  int y = mMappingEncoder.getY();
-  double heading = mMappingEncoder.getHeading();
+  if (!mSavingVector) {
+    return;
+  }
 
   mMoveToSavedVector = true;
-  //mSavingVector = false;
-  
-  Serial.println(x);
-  Serial.println(y);
-  Serial.println(heading);
+  mSavingVector = false;
+  mTurnStartTime = 0;
 }
 
 void

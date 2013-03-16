@@ -40,10 +40,12 @@ namespace myHelperBot
           }
 
           if (state.isInSaveGesture) {
+            state.playSaveSound = true;
             state.startSavingVector = true;
           }
 
           if (state.isInRelocateGesture) {
+            state.playRelocateSound = true;
             state.moveToSavedVector = true;
             state.stopped = true;
           }

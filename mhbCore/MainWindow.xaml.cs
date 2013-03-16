@@ -16,7 +16,6 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Microsoft.Research.Kinect.Nui;
 
 namespace myHelperBot
 {
@@ -32,13 +31,11 @@ namespace myHelperBot
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e) {
-      Runtime.Kinects.StatusChanged += new EventHandler<StatusChangedEventArgs>(Kinects_StatusChanged);
-
-      CreateKinect();
+      mCore.InitKinect();
     }
 
     private void Window_Closed(object sender, EventArgs e) {
-      DestroyKinect();
+
     }
     #endregion ctor & Window events
 
@@ -51,38 +48,6 @@ namespace myHelperBot
       }
     }
     #endregion UI
-
-    #region Kinect discovery + setup
-    private void Kinects_StatusChanged(object sender, StatusChangedEventArgs e) {
-      switch (e.Status) {
-        case KinectStatus.Connected:
-          mCore.SetKinect(e.KinectRuntime);
-          break;
-        case KinectStatus.Disconnected:
-          mCore.SetKinect(null);
-          break;
-        default:
-
-          break;
-      }
-      updateUI();
-    }
-    #endregion Kinect discovery + setup
-
-    #region KinectViewer Utilities
-    private void CreateKinect() {
-      foreach (Runtime runtime in Runtime.Kinects) {
-        mCore.SetKinect(runtime);
-        break;
-      }
-      updateUI();
-    }
-
-    private void DestroyKinect() {
-      mCore.SetKinect(null);
-      updateUI();
-    }
-    #endregion KinectViewer Utilities
 
     #region Private state
     mhbCore mCore;

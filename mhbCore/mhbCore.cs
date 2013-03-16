@@ -1,7 +1,7 @@
 ﻿//#define DEBUG_THREADS
 #define DEBUG_GESTURES
-//#define DEBUG_TRACKING
-#define DEBUG_SERIAL
+#define DEBUG_TRACKING
+//#define DEBUG_SERIAL
 
 using System;
 using System.Collections.Generic;
@@ -10,8 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Media.Media3D;
-using Microsoft.Research.Kinect.Nui;
-using KinectNui = Microsoft.Research.Kinect.Nui;
+using Microsoft.Kinect;
 
 namespace myHelperBot
 {
@@ -32,22 +31,14 @@ namespace myHelperBot
       mSoundThread.Start();
     }
 
-    public void SetKinect(KinectNui.Runtime kinect)
+    public void InitKinect() 
     {
-      if (mKinectThread != null) {
-        mKinectThread.Abort();
-        mKinectThread = null;
-      }
-
-      mKinect.Set(kinect);
-      mKinectThread = new Thread(new ThreadStart(mKinect.Init));
-      mKinectThread.Name = "KinectThread";
-      mKinectThread.Start();
+      mKinect.InitKinect();
     }
 
     public bool HasKinect()
     {
-      return mKinect._Kinect != null;
+      return true;
     }
 
     public static void DebugThread(string message)
@@ -94,7 +85,8 @@ namespace myHelperBot
     private mhbSound mSound = new mhbSound();
 
     private Thread mSerialThread = null;
-    private Thread mKinectThread = null;
+    /** The Kinect has its own threading implementation. */
+    /** private Thread mKinectThread = null; */
     private Thread mLogicThread = null;
     private Thread mSoundThread = null;
     #endregion

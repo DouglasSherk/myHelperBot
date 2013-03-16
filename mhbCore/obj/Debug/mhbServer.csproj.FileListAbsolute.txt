@@ -1,7 +1,6 @@
 C:\Common\myHelperBot\mhbCore\bin\Debug\myHelperBot.exe.config
 C:\Common\myHelperBot\mhbCore\bin\Debug\myHelperBot.exe
 C:\Common\myHelperBot\mhbCore\bin\Debug\myHelperBot.pdb
-C:\Common\myHelperBot\mhbCore\bin\Debug\INuiInstanceHelper.dll
 C:\Common\myHelperBot\mhbCore\obj\Debug\ResolveAssemblyReference.cache
 C:\Common\myHelperBot\mhbCore\obj\Debug\MainWindow.baml
 C:\Common\myHelperBot\mhbCore\obj\Debug\MainWindow.g.cs

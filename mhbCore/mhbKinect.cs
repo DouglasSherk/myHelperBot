@@ -6,8 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using Microsoft.Research.Kinect.Nui;
-using KinectNui = Microsoft.Research.Kinect.Nui;
+using Microsoft.Kinect;
 
 namespace myHelperBot
 {
@@ -16,50 +15,37 @@ namespace myHelperBot
     #region Initialization
     public mhbKinect()
     {
-        //InitializeComponent();
       lastRequest = DateTime.Now;
     }
 
-    public void Set(KinectNui.Runtime kinect)
+    ~mhbKinect()
     {
-      //Clean up existing runtime if we are being set to null, or a new Runtime.
-      if (_Kinect != null) {
-        _Kinect.SkeletonFrameReady -= new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
-        _Kinect.Uninitialize();
-      }
-
-      _Kinect = kinect;
-    }
-
-    public void Init()
-    {
-      mhbCore.DebugThread("kinect thread started");
-
-      if (_Kinect != null) {
-        InitRuntime();
-        _Kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
-      }
-
-      while (true) {
-        Thread.Sleep(1);
+      if (mKinect != null) {
+        mKinect.Stop();
       }
     }
 
-    public RuntimeOptions RuntimeOptions { get; private set; }
+    public void InitKinect()
+    {
+      foreach (var potentialSensor in KinectSensor.KinectSensors) {
+        if (potentialSensor.Status == KinectStatus.Connected) {
+          this.mKinect = potentialSensor;
+          break;
+        }
+      }
 
-    private void InitRuntime() {
-      //Some Runtimes' status will be NotPowered, or some other error state. Only want to Initialize the runtime, if it is connected.
-      if (_Kinect.Status == KinectStatus.Connected) {
-        bool skeletalViewerAvailable = true; // IsSkeletalViewerAvailable;
+      if (this.mKinect != null) {
+        // Turn on the skeleton stream to receive skeleton frames
+        this.mKinect.SkeletonStream.Enable();
 
-        // NOTE:  Skeletal tracking only works on one Kinect per process right now.
-        RuntimeOptions = skeletalViewerAvailable ?
-                             RuntimeOptions.UseDepthAndPlayerIndex | RuntimeOptions.UseSkeletalTracking | RuntimeOptions.UseColor
-                             : RuntimeOptions.UseDepth | RuntimeOptions.UseColor;
-        _Kinect.Initialize(RuntimeOptions);
-        //skeletonPanel.Visibility = skeletalViewerAvailable ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
-        if (RuntimeOptions.HasFlag(RuntimeOptions.UseSkeletalTracking)) {
-          _Kinect.SkeletonEngine.TransformSmooth = true;
+        // Add an event handler to be called whenever there is new color frame data
+        this.mKinect.SkeletonFrameReady += this.SensorSkeletonFrameReady;
+
+        // Start the sensor!
+        try {
+          this.mKinect.Start();
+        } catch {
+          this.mKinect = null;
         }
       }
     }
@@ -73,10 +59,10 @@ namespace myHelperBot
     #endregion Utils
 
     #region Skeletal processing
-    private Joint FindJoint(JointsCollection joints, JointID jointID)
+    private Joint FindJoint(JointCollection joints, JointType JointType)
     {
       foreach (Joint joint in joints) {
-        if (joint.ID == jointID) {
+        if (joint.JointType == JointType) {
           return joint;
         }
       }
@@ -102,12 +88,8 @@ namespace myHelperBot
                        ((ignoreAxes & Axis.Z) == Axis.Z ? 0.0 : Math.Pow(a.Position.Z - b.Position.Z, 2.0)));
     }
 
-    private bool IsInStopGesture(SkeletonData data)
+    private bool IsInStopGesture(Skeleton data)
     {
-      if ((data.Quality &
-           (SkeletonQuality.ClippedTop | SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
-        return false;
-      }
       Joint head = new Joint(),
             spine = new Joint(),
             leftShoulder = new Joint(),
@@ -121,42 +103,49 @@ namespace myHelperBot
             rightElbow = new Joint();
 
       foreach (Joint joint in data.Joints) {
-        switch (joint.ID) {
-          case JointID.Head:
+        bool lowQuality = joint.TrackingState == JointTrackingState.NotTracked;
+
+        switch (joint.JointType) {
+          case JointType.Head:
             head = joint;
             break;
-          case JointID.Spine:
+          case JointType.Spine:
             spine = joint;
             break;
-          case JointID.HandLeft:
+          case JointType.HandLeft:
             leftHand = joint;
             break;
-          case JointID.HandRight:
+          case JointType.HandRight:
             rightHand = joint;
             break;
-          case JointID.WristLeft:
+          case JointType.WristLeft:
             leftWrist = joint;
             break;
-          case JointID.WristRight:
+          case JointType.WristRight:
             rightWrist = joint;
             break;
-          case JointID.ElbowLeft:
+          case JointType.ElbowLeft:
             leftElbow = joint;
             break;
-          case JointID.ElbowRight:
+          case JointType.ElbowRight:
             rightElbow = joint;
             break;
-          case JointID.ShoulderLeft:
+          case JointType.ShoulderLeft:
             leftShoulder = joint;
             break;
-          case JointID.ShoulderRight:
+          case JointType.ShoulderRight:
             rightShoulder = joint;
             break;
-          case JointID.ShoulderCenter:
+          case JointType.ShoulderCenter:
             centerShoulder = joint;
             break;
           default:
+            lowQuality = false;
             break;
+        }
+
+        if (lowQuality) {
+          return false;
         }
       }
 
@@ -189,34 +178,36 @@ namespace myHelperBot
       return definitelyInStopGesture;
     }
 
-    private bool IsInGoGesture(SkeletonData data)
+    private bool IsInGoGesture(Skeleton data)
     {
-      if ((data.Quality &
-           (SkeletonQuality.ClippedTop | SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
-        return false;
-      }
-
       Joint leftHand = new Joint(),
             rightHand = new Joint(),
             leftShoulder = new Joint(),
             rightShoulder = new Joint();
 
       foreach (Joint joint in data.Joints) {
-        switch (joint.ID) {
-          case JointID.HandLeft:
+        bool lowQuality = joint.TrackingState == JointTrackingState.NotTracked;
+
+        switch (joint.JointType) {
+          case JointType.HandLeft:
             leftHand = joint;
             break;
-          case JointID.HandRight:
+          case JointType.HandRight:
             rightHand = joint;
             break;
-          case JointID.ShoulderLeft:
+          case JointType.ShoulderLeft:
             leftShoulder = joint;
             break;
-          case JointID.ShoulderRight:
+          case JointType.ShoulderRight:
             rightShoulder = joint;
             break;
           default:
+            lowQuality = false;
             break;
+        }
+
+        if (lowQuality) {
+          return false;
         }
       }
 
@@ -257,33 +248,36 @@ namespace myHelperBot
       return definitelyInGoGesture;
     }
 
-    private bool IsInSaveGesture(SkeletonData data)
+    private bool IsInSaveGesture(Skeleton data)
     {
-      if ((data.Quality &
-           (SkeletonQuality.ClippedTop | SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0) {
-        return false;
-      }
       Joint leftHand = new Joint(),
       rightHand = new Joint(),
       spine = new Joint(),
       centerShoulder = new Joint();
 
       foreach (Joint joint in data.Joints) {
-        switch (joint.ID) {
-          case JointID.HandLeft:
+        bool lowQuality = joint.TrackingState == JointTrackingState.NotTracked;
+
+        switch (joint.JointType) {
+          case JointType.HandLeft:
             leftHand = joint;
             break;
-          case JointID.HandRight:
+          case JointType.HandRight:
             rightHand = joint;
             break;
-          case JointID.Spine:
+          case JointType.Spine:
             spine = joint;
             break;
-          case JointID.ShoulderCenter:
+          case JointType.ShoulderCenter:
             centerShoulder = joint;
             break;
           default:
+            lowQuality = false;
             break;
+        }
+
+        if (lowQuality) {
+          return false;
         }
       }
 
@@ -316,11 +310,9 @@ namespace myHelperBot
       return definitelyInSaveGesture;
     }
 
-    private bool IsInRelocateGesture(SkeletonData data)
+    private bool IsInRelocateGesture(Skeleton data)
     {
-      if ((data.Quality &
-          (SkeletonQuality.ClippedLeft | SkeletonQuality.ClippedRight)) != 0 ||
-          possibleGoGesture) {
+      if (possibleGoGesture) {
         return false;
       }
 
@@ -331,22 +323,31 @@ namespace myHelperBot
             spine = new Joint();
 
       foreach (Joint joint in data.Joints) {
-        switch (joint.ID) {
-          case JointID.HandLeft:
+        bool lowQuality = joint.TrackingState == JointTrackingState.NotTracked;
+
+        switch (joint.JointType) {
+          case JointType.HandLeft:
             leftHand = joint;
             break;
-          case JointID.HandRight:
+          case JointType.HandRight:
             rightHand = joint;
             break;
-          case JointID.ShoulderLeft:
+          case JointType.ShoulderLeft:
             leftShoulder = joint;
             break;
-          case JointID.ShoulderRight:
+          case JointType.ShoulderRight:
             rightShoulder = joint;
             break;
-          case JointID.Spine:
+          case JointType.Spine:
             spine = joint;
             break;
+          default:
+            lowQuality = false;
+            break;
+        }
+
+        if (lowQuality) {
+          return false;
         }
       }
 
@@ -390,22 +391,25 @@ namespace myHelperBot
       return definitelyInRelocateGesture;
     }
 
-    private void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e) {
-      SkeletonFrame skeletonFrame = e.SkeletonFrame;
-
-      //KinectSDK TODO: this shouldn't be needed, but if power is removed from the Kinect, you may still get an event here, but skeletonFrame will be null.
-      if (skeletonFrame == null) {
-        return;
-      }
-
+    private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+    {
       mhbCore.DebugThread("kinect skeleton frame");
 
+      Skeleton[] skeletons = new Skeleton[0];
+
+      using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame()) {
+        if (skeletonFrame != null) {
+          skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
+          skeletonFrame.CopySkeletonDataTo(skeletons);
+        }
+      }
+
       bool isTracking = false;
-      foreach (SkeletonData data in skeletonFrame.Skeletons) {
+      foreach (Skeleton data in skeletons) {
         if (SkeletonTrackingState.Tracked == data.TrackingState) {
           isTracking = true;
 
-          Joint trackingJoint = FindJoint(data.Joints, JointID.Spine);
+          Joint trackingJoint = FindJoint(data.Joints, JointType.Spine);
           Point3D trackingPoint =
             new Point3D(trackingJoint.Position.X, trackingJoint.Position.Y, trackingJoint.Position.Z);
 
@@ -459,7 +463,7 @@ namespace myHelperBot
     #endregion constants
 
     #region Private state
-    public KinectNui.Runtime _Kinect;
+    private KinectSensor mKinect = null;
     private DateTime lastRequest;
     private WebClient webClient = new WebClient();
 

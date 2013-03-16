@@ -42,12 +42,14 @@ namespace myHelperBot
           if (state.isInSaveGesture) {
             state.playSaveSound = true;
             state.startSavingVector = true;
+            state.isSaving = true;
           }
 
-          if (state.isInRelocateGesture) {
+          if (state.isInRelocateGesture && state.isSaving) {
             state.playRelocateSound = true;
             state.moveToSavedVector = true;
             state.stopped = true;
+            state.isSaving = false;
           }
 
           if (state.isTracking && !state.stopped) {

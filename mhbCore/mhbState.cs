@@ -24,6 +24,8 @@ namespace myHelperBot
 
     public bool stopped = false;
 
+    public bool isSaving = false;
+
     public Point3D userPosition = new Point3D();
 
     public bool isInStopGesture = false;

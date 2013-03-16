@@ -13,7 +13,8 @@ NavigationController::NavigationController(DualMotorController &dualMotorControl
                                            MappingEncoder &mappingEncoder)
   : mDualMotorController(dualMotorController),
     mMappingEncoder(mappingEncoder),
-    mMoveToSavedVector(false)
+    mMoveToSavedVector(false),
+    mSavingVector(false)
 {
 
 }
@@ -53,14 +54,21 @@ NavigationController::handleMotors()
     if (abs(x) <= POSITION_TOL && abs(y) <= POSITION_TOL) {
       mDualMotorController.setSpeed(MOTOR_POWER_NONE, MOTOR_POWER_NONE, true);
       mMoveToSavedVector = false;
+      ClearSerialBuffer();
       return false;
     }
   }
 
   if (fabs(heading - mOptimalReturnAngle) > HEADING_TOL) {
     int sign = !((heading - mOptimalReturnAngle < M_PI) ^ (heading > mOptimalReturnAngle)) ? 1 : -1;
-    mDualMotorController.setSpeed(sign * MOTOR_POWER_TURN, -1 * sign * MOTOR_POWER_TURN, true);
+    if (mTurnStartTime == 0) mTurnStartTime = time;
+    if (time - mTurnStartTime < TURN_START_TIME) {
+      mDualMotorController.setSpeed(sign * MOTOR_POWER_TURN_START, -1 * sign * MOTOR_POWER_TURN_START, true);
+    } else {
+      mDualMotorController.setSpeed(sign * MOTOR_POWER_TURN_STEADY, -1 * sign * MOTOR_POWER_TURN_STEADY, true);
+    }
   } else /** if (abs(x) > POSITION_TOL || abs(y) > POSITION_TOL) */ {
+    mTurnStartTime = 0;
     mDualMotorController.setSpeed(MOTOR_POWER_FORWARD, MOTOR_POWER_FORWARD, true);
   }
 
@@ -70,19 +78,35 @@ NavigationController::handleMotors()
 void
 NavigationController::startSavingVector()
 {
+  //if (mMoveToSavedVector) {
+  //  return;
+  //}
+
   mMappingEncoder.resetPositionAndHeading();
+  //mSavingVector = true;
 }
 
 void
 NavigationController::moveToSavedVector()
 {
+  //if (!mSavingVector) {
+  //  return;
+  //}
+
   int x = mMappingEncoder.getX();
   int y = mMappingEncoder.getY();
   double heading = mMappingEncoder.getHeading();
 
   mMoveToSavedVector = true;
+  //mSavingVector = false;
   
   Serial.println(x);
   Serial.println(y);
   Serial.println(heading);
+}
+
+void
+NavigationController::ClearSerialBuffer()
+{
+  while (Serial.available()) Serial.read();
 }

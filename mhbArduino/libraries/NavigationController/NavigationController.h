@@ -40,13 +40,20 @@ public:
 protected:
   double CalculateOptimalReturnAngle(int x, int y);
 
+  /** Clears the serial buffer to prevent control from making data stale. */
+  void ClearSerialBuffer();
+
   /** Tolerance on the heading before exiting the move-to-saved-vector state, in rads. */
   const static double HEADING_TOL = 0.1;
   /** Tolerance on the position before exiting the move-to-saved-vector state, in mm. */
   const static double POSITION_TOL = 200;
+  /** Amount of time to stay in turn start, in ms. */
+  const static unsigned int TURN_START_TIME = 350;
 
-  /** Power to set on motors when turning. */
-  const static int MOTOR_POWER_TURN = 2500;
+  /** Power to set on motors when starting a turn. */
+  const static int MOTOR_POWER_TURN_START = 1250;
+  /** Power to set on motors when turning steadily. */
+  const static int MOTOR_POWER_TURN_STEADY = 1;
   /** Power to set on motors when moving forward. */
   const static int MOTOR_POWER_FORWARD = 3000;
   /** Power to set on motors when not moving. */
@@ -55,7 +62,10 @@ protected:
   DualMotorController &mDualMotorController;
   MappingEncoder &mMappingEncoder;
 
+  unsigned int mTurnStartTime;
+
   bool mMoveToSavedVector;
+  bool mSavingVector;
 
   double mOptimalReturnAngle;
 };

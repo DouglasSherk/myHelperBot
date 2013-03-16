@@ -453,9 +453,9 @@ namespace myHelperBot
     private const double SAVE_HAND_END_DIST = 0.2;
     private const int SAVE_INTERVAL = 750;
 
-    private const double RELOCATE_HAND_MAX_DIST = 0.3;
-    private const double RELOCATE_SHOULDER_MIN_DIST = 0.2;
-    private const int RELOCATE_INTERVAL = 500;
+    private const double RELOCATE_HAND_MAX_DIST = 0.4;
+    private const double RELOCATE_SHOULDER_MIN_DIST = 0.00;
+    private const int RELOCATE_INTERVAL = 750;
     #endregion constants
 
     #region Private state

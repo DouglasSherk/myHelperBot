@@ -55,7 +55,7 @@ namespace myHelperBot
             mhbState.g.startSavingVector = false;
             mhbState.g.moveToSavedVector = false;
 
-            string sendingMessage = (int)saveState + ", " +
+            string sendingMessage = "@" + (int)saveState + ", " +
                                    mhbState.g.motors.leftSpeed.ToString() + ", " +
                                    mhbState.g.motors.rightSpeed.ToString() + "*";
 

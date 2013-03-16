@@ -45,6 +45,7 @@ void setup()
 
 	unsigned int time = millis();
 	gMotorTimer = time + 100;
+  gDataTimer = time + 100;
 }
 
 void loop()
@@ -69,38 +70,39 @@ void loop()
     return;
   }
 
-	while (Serial.available())
+  if (Serial.available())
 	{
+    gDataTimer = time;
+
 		i = 1;
 		data[0] = (char)Serial.read();
-		
-		while (data[i - 1] != '*') {
-			if (Serial.available()) {
-				data[i++] = (char)Serial.read();
-			}
-		}
-    data[i - 1] = '\0';
 
-    SaveState saveState;
-		int leftSpeed, rightSpeed;
-		sscanf(data, "%d, %d, %d", &saveState, &leftSpeed, &rightSpeed);
+    if (data[0] == '@') {
+		  do {
+			  if (Serial.available()) {
+				  data[i++] = (char)Serial.read();
+			  }
+      } while (data[i - 1] != '*');
+      data[i - 1] = '\0';
 
-		dmc.setSpeed(leftSpeed, rightSpeed, true);
+      SaveState saveState = SaveState_None;
+		  int leftSpeed = 0, rightSpeed = 0;
+		  sscanf(&data[1], "%d, %d, %d", &saveState, &leftSpeed, &rightSpeed);
 
-    switch (saveState) {
-    case SaveState_None:
-      break;
-    case SaveState_StartSavingVector:
-      nc.startSavingVector();
-      break;
-    case SaveState_MoveToSavedVector:
-      nc.moveToSavedVector();
-      break;
+		  dmc.setSpeed(leftSpeed, rightSpeed, true);
+
+      if (saveState == SaveState_StartSavingVector) {
+        nc.startSavingVector();
+        return;
+      } else if (saveState == SaveState_MoveToSavedVector) {
+        nc.moveToSavedVector();
+        return;
+      }
     }
 	}
 
-  //if (time - gDataTimer > DATA_INTERVAL) {
-  //  dmc.setSpeed(0, 0, true);
-  //}
+  if (time - gDataTimer > DATA_INTERVAL) {
+    dmc.setSpeed(0, 0, true);
+  }
 }
  

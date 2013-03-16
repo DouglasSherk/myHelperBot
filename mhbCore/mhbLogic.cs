@@ -45,6 +45,7 @@ namespace myHelperBot
 
           if (state.isInRelocateGesture) {
             state.moveToSavedVector = true;
+            state.stopped = true;
           }
 
           if (state.isTracking && !state.stopped) {
@@ -135,7 +136,7 @@ namespace myHelperBot
     private const double ROT_MAX = 10.0;
     private const double ROT_FORWARD = 12.0;
 
-    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 40.0;
+    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 30.0;
     private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 0.5;
 
     private double mPreviousRot;

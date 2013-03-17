@@ -21,7 +21,7 @@ namespace myHelperBot
     #region Initialization
     public mhbKinect()
     {
-      lastRequest = DateTime.Now;
+      
     }
 
     ~mhbKinect()
@@ -386,6 +386,8 @@ namespace myHelperBot
       if (!possibleSaveGesture &&
           leftHand.Position.Y < centerShoulder.Position.Y &&
           rightHand.Position.Y < centerShoulder.Position.Y &&
+          leftHand.Position.Y > spine.Position.Y &&
+          rightHand.Position.Y > spine.Position.Y &&
           handDist >= SAVE_HAND_START_DIST) {
         possibleSaveGesture = true;
         startSaveTime = DateTime.Now;
@@ -506,7 +508,17 @@ namespace myHelperBot
 
       bool isTracking = false;
       foreach (Skeleton data in skeletons) {
-        if (SkeletonTrackingState.Tracked == data.TrackingState) {
+        if (SkeletonTrackingState.Tracked == data.TrackingState &&
+            (lastFoundUserId == data.TrackingId || (DateTime.Now - lastFoundUserTime).TotalSeconds >= FIND_USER_INTERVAL)) {
+          if (lastFoundUserId != data.TrackingId) {
+            lock (mhbState.Lock) {
+              mhbState.g.playFoundSound = true;
+            }
+            lastFoundUserId = data.TrackingId;
+            lastFoundUserTime = DateTime.Now;
+            playedSoundSinceLastUserLost = false;
+          }
+
           isTracking = true;
 
           Joint trackingJoint = FindJoint(data.Joints, JointType.Spine);
@@ -525,10 +537,13 @@ namespace myHelperBot
         }
       }
 
-      // Careful here! If anyone else tries to modify this, we're liable to overwrite them.
-      // lock (mhbGlobal.lock) {
-      mhbState.g.isTracking = isTracking;
-      // }
+      lock (mhbState.Lock) {
+        mhbState.g.isTracking = isTracking;
+        if (!isTracking && !playedSoundSinceLastUserLost) {
+          playedSoundSinceLastUserLost = true;
+          mhbState.g.playLostSound = true;
+        }
+      }
     }
     #endregion Skeletal processing
 
@@ -539,6 +554,8 @@ namespace myHelperBot
       Y = 2,
       Z = 4,
     };
+
+    private const int FIND_USER_INTERVAL = 2;
 
     private const int STOP_SUCCESSIVE_GESTURES = 3;
 
@@ -554,18 +571,20 @@ namespace myHelperBot
     private const int GO_INTERVAL = 500;
 
     private const double SAVE_HAND_START_DIST = 0.5;
-    private const double SAVE_HAND_END_DIST = 0.2;
-    private const int SAVE_INTERVAL = 750;
+    private const double SAVE_HAND_END_DIST = 0.1;
+    private const int SAVE_INTERVAL = 500;
 
     private const double RELOCATE_HAND_MAX_DIST = 0.4;
-    private const double RELOCATE_SHOULDER_MIN_DIST = 0.00;
+    private const double RELOCATE_SHOULDER_MIN_DIST = 0.05;
     private const int RELOCATE_INTERVAL = 750;
     #endregion constants
 
     #region Private state
     private KinectSensor mKinect = null;
     private SpeechRecognitionEngine mSpeechRecognizer;
-    private DateTime lastRequest;
+    private DateTime lastFoundUserTime;
+    private bool playedSoundSinceLastUserLost = true;
+    private int lastFoundUserId;
     private WebClient webClient = new WebClient();
 
     private int numSuccessiveStopGestures = 0;

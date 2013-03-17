@@ -36,6 +36,8 @@ namespace myHelperBot
     public bool startSavingVector = false;
     public bool moveToSavedVector = false;
 
+    public bool playFoundSound = false;
+    public bool playLostSound = false;
     public bool playGoSound = false;
     public bool playStopSound = false;
     public bool playSaveSound = false;

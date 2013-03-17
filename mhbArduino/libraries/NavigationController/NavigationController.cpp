@@ -44,6 +44,12 @@ NavigationController::handleMotors()
   int x = mMappingEncoder.getX();
   int y = mMappingEncoder.getY();
   double heading = mMappingEncoder.getHeading();
+  if(heading>M_PI) {
+    heading -= 2*M_PI;
+  }
+  else if(heading<-M_PI) {
+    heading += 2*M_PI;
+  }
   mOptimalReturnAngle = CalculateOptimalReturnAngle(x, y);
 
   unsigned int time = millis();

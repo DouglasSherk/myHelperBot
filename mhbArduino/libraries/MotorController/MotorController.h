@@ -28,7 +28,7 @@ class MotorController
         //private:
         const static int MAX_SPEED = 5000;
 
-        const static int MIN_POWER = 170;
+        const static int MIN_POWER = 180;
         const static int MAX_POWER = 255;
         const static int MAX_CORRECTION = 25;
     

@@ -55,7 +55,7 @@ protected:
   /** Power to set on motors when turning steadily. */
   const static int MOTOR_POWER_TURN_STEADY = 1;
   /** Power to set on motors when moving forward. */
-  const static int MOTOR_POWER_FORWARD = 3000;
+  const static int MOTOR_POWER_FORWARD = 1500;
   /** Power to set on motors when not moving. */
   const static int MOTOR_POWER_NONE = 0;
 

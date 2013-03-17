@@ -36,6 +36,12 @@ namespace myHelperBot
       mKinect.InitKinect();
     }
 
+    // fuck da police
+    public void DestroyKinect()
+    {
+      mKinect.DestroyKinect();
+    }
+
     public bool HasKinect()
     {
       return true;

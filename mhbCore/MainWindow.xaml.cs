@@ -35,7 +35,7 @@ namespace myHelperBot
     }
 
     private void Window_Closed(object sender, EventArgs e) {
-
+      mCore.DestroyKinect();
     }
     #endregion ctor & Window events
 

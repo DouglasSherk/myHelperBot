@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Media.Media3D;
 using System.Net;
@@ -7,9 +8,14 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using Microsoft.Kinect;
+using Microsoft.Speech;
+using Microsoft.Speech.AudioFormat;
+using Microsoft.Speech.Recognition;
 
 namespace myHelperBot
 {
+  [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+    Justification = "In a full-fledged application, the SpeechRecognitionEngine object should be properly disposed. For the sake of simplicity, we're omitting that code in this sample.")]
   class mhbKinect
   {
     #region Initialization
@@ -23,6 +29,18 @@ namespace myHelperBot
       if (mKinect != null) {
         mKinect.Stop();
       }
+    }
+
+    private static RecognizerInfo GetKinectRecognizer() {
+      foreach (RecognizerInfo recognizer in SpeechRecognitionEngine.InstalledRecognizers()) {
+        string value;
+        recognizer.AdditionalInfo.TryGetValue("Kinect", out value);
+        if ("True".Equals(value, StringComparison.OrdinalIgnoreCase) && "en-US".Equals(recognizer.Culture.Name, StringComparison.OrdinalIgnoreCase)) {
+          return recognizer;
+        }
+      }
+
+      return null;
     }
 
     public void InitKinect()
@@ -48,8 +66,90 @@ namespace myHelperBot
           this.mKinect = null;
         }
       }
+
+      RecognizerInfo ri = GetKinectRecognizer();
+      if (ri != null) {
+        this.mSpeechRecognizer = new SpeechRecognitionEngine(ri.Id);
+
+        var directions = new Choices();
+        directions.Add(new SemanticResultValue("go", "GO"));
+        directions.Add(new SemanticResultValue("stop", "STOP"));
+        directions.Add(new SemanticResultValue("save", "SAVE"));
+        directions.Add(new SemanticResultValue("relocate", "RELOCATE"));
+
+        var gb = new GrammarBuilder { Culture = ri.Culture };
+        gb.Append(directions);
+
+        var g = new Grammar(gb);
+
+        this.mSpeechRecognizer.LoadGrammar(g);
+      }
+
+      mSpeechRecognizer.SpeechRecognized += SpeechRecognized;
+      mSpeechRecognizer.SpeechRecognitionRejected += SpeechRejected;
+
+      mSpeechRecognizer.SetInputToAudioStream(
+        mKinect.AudioSource.Start(), new SpeechAudioFormatInfo(EncodingFormat.Pcm, 16000, 16, 1, 32000, 2, null));
+      mSpeechRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+    }
+
+    public void DestroyKinect()
+    {
+      if (this.mKinect != null) {
+        this.mKinect.AudioSource.Stop();
+
+        this.mKinect.Stop();
+        this.mKinect = null;
+      }
+
+      if (this.mSpeechRecognizer != null) {
+        this.mSpeechRecognizer.SpeechRecognized -= SpeechRecognized;
+        this.mSpeechRecognizer.SpeechRecognitionRejected -= SpeechRejected;
+        this.mSpeechRecognizer.RecognizeAsyncStop();
+      }
     }
     #endregion Initialization
+
+    #region speech processing
+    private void SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+    {
+      // Speech utterance confidence below which we treat speech as if it hadn't been heard
+      const double ConfidenceThreshold = 0.3;
+
+      if (e.Result.Confidence >= ConfidenceThreshold) {
+        switch (e.Result.Semantics.Value.ToString()) {
+          case "GO":
+            lock (mhbState.Lock) {
+              mhbState.g.isInGoGesture = true;
+            }
+            break;
+
+          case "STOP":
+            lock (mhbState.Lock) {
+              mhbState.g.isInStopGesture = true;
+            }
+            break;
+
+          case "SAVE":
+            lock (mhbState.Lock) {
+              mhbState.g.isInSaveGesture = true;
+            }
+            break;
+
+          case "RELOCATE":
+            lock (mhbState.Lock) {
+              mhbState.g.isInRelocateGesture = true;
+            }
+            break;
+        }
+      }
+    }
+
+    private void SpeechRejected(object sender, SpeechRecognitionRejectedEventArgs e)
+    {
+
+    }
+    #endregion speech processing
 
     #region Utils
     private bool InRange(double val, double min, double max)
@@ -464,6 +564,7 @@ namespace myHelperBot
 
     #region Private state
     private KinectSensor mKinect = null;
+    private SpeechRecognitionEngine mSpeechRecognizer;
     private DateTime lastRequest;
     private WebClient webClient = new WebClient();
 

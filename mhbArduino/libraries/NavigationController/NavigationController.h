@@ -51,11 +51,11 @@ protected:
   const static unsigned int TURN_START_TIME = 350;
 
   /** Power to set on motors when starting a turn. */
-  const static int MOTOR_POWER_TURN_START = 1250;
+  const static int MOTOR_POWER_TURN_START = 2500;
   /** Power to set on motors when turning steadily. */
-  const static int MOTOR_POWER_TURN_STEADY = 1;
+  const static int MOTOR_POWER_TURN_STEADY = 500;
   /** Power to set on motors when moving forward. */
-  const static int MOTOR_POWER_FORWARD = 1500;
+  const static int MOTOR_POWER_FORWARD = 2000;
   /** Power to set on motors when not moving. */
   const static int MOTOR_POWER_NONE = 0;
 

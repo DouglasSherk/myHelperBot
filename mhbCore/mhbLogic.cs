@@ -137,11 +137,11 @@ namespace myHelperBot
     private const double DIST_MAX = 1.7;
     private const double DIST_MAX_TURN = 2.5;
 
-    private const double ROT_MAX = 10.0;
-    private const double ROT_FORWARD = 12.0;
+    private const double ROT_MAX = 8.0;
+    private const double ROT_FORWARD = 10.0;
 
-    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 30.0;
-    private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 0.75;
+    private double ROT_FACTOR = /** SPEED_MAX */ 1.0 / 22.5;
+    private double DIST_FACTOR = /** SPEED_MAX */ 1.0 / 0.45;
 
     private double mPreviousRot;
     private double mPreviousDist;

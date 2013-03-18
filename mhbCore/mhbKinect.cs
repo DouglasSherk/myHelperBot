@@ -420,9 +420,7 @@ namespace myHelperBot
 
       Joint leftHand = new Joint(),
             rightHand = new Joint(),
-            leftShoulder = new Joint(),
-            rightShoulder = new Joint(),
-            spine = new Joint();
+            head = new Joint();
 
       foreach (Joint joint in data.Joints) {
         bool lowQuality = joint.TrackingState == JointTrackingState.NotTracked;
@@ -434,14 +432,8 @@ namespace myHelperBot
           case JointType.HandRight:
             rightHand = joint;
             break;
-          case JointType.ShoulderLeft:
-            leftShoulder = joint;
-            break;
-          case JointType.ShoulderRight:
-            rightShoulder = joint;
-            break;
-          case JointType.Spine:
-            spine = joint;
+          case JointType.Head:
+            head = joint;
             break;
           default:
             lowQuality = false;
@@ -453,41 +445,27 @@ namespace myHelperBot
         }
       }
 
-      double handDist = DistanceJoints(leftHand, rightHand);
-      double leftShoulderDist = DistanceJoints(leftHand, leftShoulder);
-      double rightShoulderDist = DistanceJoints(rightHand, rightShoulder);
+      double leftHandDist = DistanceJoints(leftHand, head);
+      double rightHandDist = DistanceJoints(rightHand, head);
 
-      if (handDist <= RELOCATE_HAND_MAX_DIST &&
-          leftHand.Position.Y > spine.Position.Y && rightHand.Position.Y > spine.Position.Y &&
-          leftHand.Position.Y < leftShoulder.Position.Y && rightHand.Position.Y < rightShoulder.Position.Y &&
-          leftShoulderDist >= RELOCATE_SHOULDER_MIN_DIST && rightShoulderDist >= RELOCATE_SHOULDER_MIN_DIST &&
-          !possibleRelocateGestureLeftward && !possibleRelocateGestureRightward) {
-        if (!possibleRelocateGestureLeftward && leftHand.Position.X < leftShoulder.Position.X) {
-          possibleRelocateGestureLeftward = true;
-          startRelocateTime = DateTime.Now;
-        } else if (!possibleRelocateGestureRightward && rightHand.Position.X > rightShoulder.Position.X) {
-          possibleRelocateGestureRightward = true;
-          startRelocateTime = DateTime.Now;
-        }
+      bool isPossiblyRelocateGesture = false;
+      if (leftHandDist <= RELOCATE_HAND_MAX_DIST && rightHandDist <= RELOCATE_HAND_MAX_DIST) {
+        return isPossiblyRelocateGesture = true;
       }
 
-      bool definitelyInRelocateGesture = false;
+      if (isPossiblyRelocateGesture) {
+        numSuccessiveRelocateGestures++;
+      }
+      else {
+        numSuccessiveRelocateGestures = 0;
+      }
 
-      if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
-          handDist <= RELOCATE_HAND_MAX_DIST &&
-          leftHand.Position.Y > spine.Position.Y && rightHand.Position.Y > spine.Position.Y &&
-          leftHand.Position.Y < leftShoulder.Position.Y && rightHand.Position.Y < rightShoulder.Position.Y &&
-          leftShoulderDist >= RELOCATE_SHOULDER_MIN_DIST && rightShoulderDist >= RELOCATE_SHOULDER_MIN_DIST &&
-          (possibleRelocateGestureLeftward && rightHand.Position.X > rightShoulder.Position.X) ||
-          (possibleRelocateGestureRightward && leftHand.Position.X < leftShoulder.Position.X)) {
-        definitelyInRelocateGesture = true;
-        possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
+      bool definitelyInRelocateGesture = numSuccessiveStopGestures >= RELOCATE_SUCCESSIVE_GESTURES;
+
+      if (definitelyInRelocateGesture) {
+        possibleGoGesture = false;
+        numSuccessiveStopGestures = 0;
         mhbCore.DebugGesture("Relocate");
-      }
-
-      if ((possibleRelocateGestureLeftward || possibleRelocateGestureRightward) &&
-          (DateTime.Now - startRelocateTime).TotalMilliseconds >= RELOCATE_INTERVAL) {
-        possibleRelocateGestureLeftward = possibleRelocateGestureRightward = false;
       }
 
       return definitelyInRelocateGesture;
@@ -558,6 +536,7 @@ namespace myHelperBot
     private const int FIND_USER_INTERVAL = 2;
 
     private const int STOP_SUCCESSIVE_GESTURES = 3;
+    private const int RELOCATE_SUCCESSIVE_GESTURES = 3;
 
     private const double STOP_ELBOW_ANGLE_TOL = 10.0;
     private const double STOP_HAND_MIN_DIST = 0.5;
@@ -571,12 +550,10 @@ namespace myHelperBot
     private const int GO_INTERVAL = 500;
 
     private const double SAVE_HAND_START_DIST = 0.5;
-    private const double SAVE_HAND_END_DIST = 0.1;
+    private const double SAVE_HAND_END_DIST = 0.2;
     private const int SAVE_INTERVAL = 500;
 
-    private const double RELOCATE_HAND_MAX_DIST = 0.4;
-    private const double RELOCATE_SHOULDER_MIN_DIST = 0.05;
-    private const int RELOCATE_INTERVAL = 750;
+    private const double RELOCATE_HAND_MAX_DIST = 0.15;
     #endregion constants
 
     #region Private state
@@ -595,9 +572,7 @@ namespace myHelperBot
     private bool possibleSaveGesture = false;
     private DateTime startSaveTime;
 
-    private bool possibleRelocateGestureLeftward = false;
-    private bool possibleRelocateGestureRightward = false;
-    private DateTime startRelocateTime;
+    private int numSuccessiveRelocateGestures = 0;
     #endregion Private state
   }
 }

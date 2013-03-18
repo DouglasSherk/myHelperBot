@@ -1,8 +1,6 @@
-﻿Build started 3/16/2013 7:34:01 PM.
+﻿Build started 3/18/2013 12:31:40 PM.
      1>Project "C:\Common\myHelperBot\mhbArduino\mhbArduino.vcxproj" on node 2 (build target(s)).
-     1>PrepareForBuild:
-         Creating directory "C:\Common\myHelperBot\Debug\".
-       InitializeBuildStatus:
+     1>InitializeBuildStatus:
          Creating "Debug\mhbArduino.unsuccessfulbuild" because "AlwaysCreate" was specified.
        FinalizeBuildStatus:
          Deleting file "Debug\mhbArduino.unsuccessfulbuild".

@@ -484,40 +484,51 @@ namespace myHelperBot
         }
       }
 
-      bool isTracking = false;
+      Skeleton skel = null;
       foreach (Skeleton data in skeletons) {
-        if (SkeletonTrackingState.Tracked == data.TrackingState &&
-            (lastFoundUserId == data.TrackingId || (DateTime.Now - lastFoundUserTime).TotalSeconds >= FIND_USER_INTERVAL)) {
-          if (lastFoundUserId != data.TrackingId) {
-            lock (mhbState.Lock) {
-              mhbState.g.playFoundSound = true;
-            }
-            lastFoundUserId = data.TrackingId;
-            lastFoundUserTime = DateTime.Now;
-            playedSoundSinceLastUserLost = false;
+        if (SkeletonTrackingState.Tracked == data.TrackingState && lastFoundUserId == data.TrackingId) {
+          skel = data;
+          lastFoundUserTime = DateTime.Now;
+        }
+      }
+
+      // We couldn't find what we were trying to track.
+      double closestDist = 999999.0;
+      if (skel == null && (DateTime.Now - lastFoundUserTime).Seconds >= FIND_USER_INTERVAL) {
+        foreach (Skeleton data in skeletons) {
+          if (data.TrackingState == SkeletonTrackingState.Tracked &&
+              data.Position.Z < closestDist) {
+            skel = data;
+            closestDist = data.Position.Z;
           }
+        }
+      }
 
-          isTracking = true;
-
-          Joint trackingJoint = FindJoint(data.Joints, JointType.Spine);
-          Point3D trackingPoint =
-            new Point3D(trackingJoint.Position.X, trackingJoint.Position.Y, trackingJoint.Position.Z);
-
+      if (skel != null) {
+        if (lastFoundUserId != skel.TrackingId) {
           lock (mhbState.Lock) {
-            mhbState.g.userPosition = trackingPoint;
-            mhbState.g.isInStopGesture |= IsInStopGesture(data);
-            mhbState.g.isInGoGesture |= IsInGoGesture(data);
-            mhbState.g.isInSaveGesture |= IsInSaveGesture(data);
-            mhbState.g.isInRelocateGesture |= IsInRelocateGesture(data);
+            mhbState.g.playFoundSound = true;
           }
+          lastFoundUserId = skel.TrackingId;
+          lastFoundUserTime = DateTime.Now;
+          playedSoundSinceLastUserLost = false;
+        }
 
-          break;
+        Point3D trackingPoint =
+          new Point3D(skel.Position.X, skel.Position.Y, skel.Position.Z);
+
+        lock (mhbState.Lock) {
+          mhbState.g.userPosition = trackingPoint;
+          mhbState.g.isInStopGesture |= IsInStopGesture(skel);
+          mhbState.g.isInGoGesture |= IsInGoGesture(skel);
+          mhbState.g.isInSaveGesture |= IsInSaveGesture(skel);
+          mhbState.g.isInRelocateGesture |= IsInRelocateGesture(skel);
         }
       }
 
       lock (mhbState.Lock) {
-        mhbState.g.isTracking = isTracking;
-        if (!isTracking && !playedSoundSinceLastUserLost) {
+        mhbState.g.isTracking = skel != null;
+        if (skel == null && !playedSoundSinceLastUserLost) {
           playedSoundSinceLastUserLost = true;
           mhbState.g.playLostSound = true;
         }
@@ -561,7 +572,7 @@ namespace myHelperBot
     private SpeechRecognitionEngine mSpeechRecognizer;
     private DateTime lastFoundUserTime;
     private bool playedSoundSinceLastUserLost = true;
-    private int lastFoundUserId;
+    private int lastFoundUserId = -1;
     private WebClient webClient = new WebClient();
 
     private int numSuccessiveStopGestures = 0;
